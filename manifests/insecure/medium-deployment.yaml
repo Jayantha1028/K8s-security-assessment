@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medium-app
+  namespace: security-demo
+  labels:
+    app: medium-app
+    tier: medium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medium-app
+  template:
+    metadata:
+      labels:
+        app: medium-app
+    spec:
+      serviceAccountName: demo-app
+      automountServiceAccountToken: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: web
+        image: nginx:1.28-alpine
+        securityContext:
+          allowPrivilegeEscalation: true
+          readOnlyRootFilesystem: false
+          capabilities:
+            add:
+            - NET_ADMIN
+        resources:
+          limits:
+            cpu: "250m"
+            memory: "128Mi"
+        ports:
+        - containerPort: 80
+          hostPort: 8080

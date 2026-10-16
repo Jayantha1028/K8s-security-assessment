@@ -1,0 +1,12 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: secured-app-default-deny
+  namespace: security-demo
+spec:
+  podSelector:
+    matchLabels:
+      app: secured-app
+  policyTypes:
+  - Ingress
+  - Egress

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vulnerable-app
+  namespace: security-demo
+  labels:
+    app: vulnerable-app
+    tier: weak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vulnerable-app
+  template:
+    metadata:
+      labels:
+        app: vulnerable-app
+    spec:
+      serviceAccountName: demo-app
+      hostNetwork: true
+      hostPID: true
+      containers:
+      - name: web
+        image: nginx:1.14.2
+        securityContext:
+          privileged: true
+          runAsUser: 0
+          allowPrivilegeEscalation: true
+        ports:
+        - containerPort: 80

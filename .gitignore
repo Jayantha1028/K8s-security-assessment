@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Raw / regenerable inputs: generated manifests, scanner output, cluster
+# collections (including in-progress .tmp folders). Processed datasets,
+# the trained model and the report are kept under version control.
+data/raw/
+
+# Local Kubernetes state / editor / OS files
+.kube/
+.DS_Store
+logs/
+*.log
