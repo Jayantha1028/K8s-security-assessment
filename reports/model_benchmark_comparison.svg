@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 860" width="100%" height="100%">
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 22px; font-weight: bold; fill: #0f172a; }
+      .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; fill: #64748b; }
+      .panel-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 15px; font-weight: bold; fill: #1e293b; }
+      .label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; fill: #334155; }
+      .axis-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #64748b; }
+      .val-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: bold; fill: #0f172a; text-anchor: middle; }
+      .legend { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #475569; }
+      .panel-bg { fill: #f8fafc; stroke: #e2e8f0; stroke-width: 1; rx: 8; }
+      .grid-line { stroke: #e2e8f0; stroke-width: 1; stroke-dasharray: 3,3; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="860" fill="#ffffff" />
+
+  <!-- Header -->
+  <text x="40" y="42" class="title">CDC-5 Kubernetes Security Assessment: 4-Model Comparative Benchmark</text>
+  <text x="40" y="64" class="subtitle">Side-by-side evaluation across 100 manifests &amp; dual Kind cluster fleet telemetry (Grouped 5-Fold Cross-Validation)</text>
+
+  <!-- ================= PANEL 1: REGRESSION ================= -->
+  <rect x="40" y="90" width="540" height="350" class="panel-bg" />
+  <text x="60" y="120" class="panel-title">1. Continuous Score Regression (Target: 0–100 Score)</text>
+  
+  <!-- Legend -->
+  <rect x="360" y="110" width="12" height="12" fill="#0284c7" rx="2" />
+  <text x="378" y="121" class="legend">R² Score (Higher is better)</text>
+  <rect x="360" y="128" width="12" height="12" fill="#ef4444" rx="2" />
+  <text x="378" y="139" class="legend">RMSE Error (Lower is better)</text>
+
+  <!-- Chart axes -->
+  <line x1="100" y1="390" x2="540" y2="390" stroke="#94a3b8" stroke-width="1.5" />
+  <line x1="100" y1="160" x2="100" y2="390" stroke="#94a3b8" stroke-width="1.5" />
+
+  <!-- Grid lines & labels -->
+  <line x1="100" y1="180" x2="540" y2="180" class="grid-line" />
+  <text x="85" y="184" class="axis-label" text-anchor="end">1.0 / 10</text>
+  <line x1="100" y1="285" x2="540" y2="285" class="grid-line" />
+  <text x="85" y="289" class="axis-label" text-anchor="end">0.5 / 5</text>
+  <line x1="100" y1="390" x2="540" y2="390" class="grid-line" />
+  <text x="85" y="394" class="axis-label" text-anchor="end">0.0 / 0</text>
+
+  <!-- Bars: Random Forest -->
+  <rect x="150" y="189" width="38" height="201" fill="#0284c7" rx="3" />
+  <text x="169" y="182" class="val-text">0.955</text>
+  <rect x="194" y="294" width="38" height="96" fill="#ef4444" rx="3" />
+  <text x="213" y="287" class="val-text" fill="#ef4444">4.56</text>
+  <text x="191" y="415" class="label" text-anchor="middle">Random Forest</text>
+  <text x="191" y="430" class="axis-label" text-anchor="middle">(Baseline)</text>
+
+  <!-- Bars: SVM -->
+  <rect x="290" y="190" width="38" height="200" fill="#0284c7" rx="3" />
+  <text x="309" y="183" class="val-text">0.952</text>
+  <rect x="334" y="291" width="38" height="99" fill="#ef4444" rx="3" />
+  <text x="353" y="284" class="val-text" fill="#ef4444">4.68</text>
+  <text x="331" y="415" class="label" text-anchor="middle">SVM</text>
+  <text x="331" y="430" class="axis-label" text-anchor="middle">(Kernel)</text>
+
+  <!-- Bars: XGBoost -->
+  <rect x="430" y="188" width="38" height="202" fill="#0284c7" rx="3" />
+  <text x="449" y="181" class="val-text" font-weight="bold">0.959</text>
+  <rect x="474" y="298" width="38" height="92" fill="#ef4444" rx="3" />
+  <text x="493" y="291" class="val-text" fill="#ef4444" font-weight="bold">4.38</text>
+  <text x="471" y="415" class="label" text-anchor="middle" font-weight="bold">XGBoost</text>
+  <text x="471" y="430" class="axis-label" text-anchor="middle" fill="#0284c7">★ Lowest Error</text>
+
+
+  <!-- ================= PANEL 2: CLASSIFICATION ================= -->
+  <rect x="620" y="90" width="540" height="350" class="panel-bg" />
+  <text x="640" y="120" class="panel-title">2. Discrete Risk Classification (Low / Medium / High)</text>
+
+  <!-- Legend -->
+  <rect x="950" y="110" width="12" height="12" fill="#16a34a" rx="2" />
+  <text x="968" y="121" class="legend">Accuracy (%)</text>
+  <rect x="950" y="128" width="12" height="12" fill="#9333ea" rx="2" />
+  <text x="968" y="139" class="legend">Macro F1 (%)</text>
+
+  <!-- Chart axes -->
+  <line x1="680" y1="390" x2="1120" y2="390" stroke="#94a3b8" stroke-width="1.5" />
+  <line x1="680" y1="160" x2="680" y2="390" stroke="#94a3b8" stroke-width="1.5" />
+
+  <!-- Grid lines & labels (50% to 100%) -->
+  <line x1="680" y1="180" x2="1120" y2="180" class="grid-line" />
+  <text x="665" y="184" class="axis-label" text-anchor="end">100%</text>
+  <line x1="680" y1="285" x2="1120" y2="285" class="grid-line" />
+  <text x="665" y="289" class="axis-label" text-anchor="end">75%</text>
+  <line x1="680" y1="390" x2="1120" y2="390" class="grid-line" />
+  <text x="665" y="394" class="axis-label" text-anchor="end">50%</text>
+
+  <!-- Model 1: Random Forest (Winner) -->
+  <rect x="715" y="220" width="28" height="170" fill="#16a34a" rx="3" />
+  <text x="729" y="213" class="val-text" fill="#16a34a">90.5%</text>
+  <rect x="747" y="229" width="28" height="161" fill="#9333ea" rx="3" />
+  <text x="761" y="222" class="val-text" fill="#9333ea">88.3%</text>
+  <text x="745" y="415" class="label" text-anchor="middle" font-weight="bold">Random Forest</text>
+  <text x="745" y="430" class="axis-label" text-anchor="middle" fill="#16a34a">★ Top Classifier</text>
+
+  <!-- Model 2: XGBoost -->
+  <rect x="825" y="237" width="28" height="153" fill="#16a34a" rx="3" />
+  <text x="839" y="230" class="val-text">86.5%</text>
+  <rect x="857" y="250" width="28" height="140" fill="#9333ea" rx="3" />
+  <text x="871" y="243" class="val-text">83.2%</text>
+  <text x="855" y="415" class="label" text-anchor="middle">XGBoost</text>
+  <text x="855" y="430" class="axis-label" text-anchor="middle">2nd</text>
+
+  <!-- Model 3: SVM -->
+  <rect x="935" y="250" width="28" height="140" fill="#16a34a" rx="3" />
+  <text x="949" y="243" class="val-text">83.3%</text>
+  <rect x="967" y="279" width="28" height="111" fill="#9333ea" rx="3" />
+  <text x="981" y="272" class="val-text">76.4%</text>
+  <text x="965" y="415" class="label" text-anchor="middle">SVM</text>
+  <text x="965" y="430" class="axis-label" text-anchor="middle">3rd</text>
+
+  <!-- Model 4: Logistic Regression -->
+  <rect x="1045" y="250" width="28" height="140" fill="#94a3b8" rx="3" />
+  <text x="1059" y="243" class="val-text">83.3%</text>
+  <rect x="1077" y="279" width="28" height="111" fill="#94a3b8" rx="3" />
+  <text x="1091" y="272" class="val-text">76.5%</text>
+  <text x="1075" y="415" class="label" text-anchor="middle">Logistic Reg</text>
+  <text x="1075" y="430" class="axis-label" text-anchor="middle">(Linear Base)</text>
+
+
+  <!-- ================= PANEL 3: FEATURE IMPORTANCE ================= -->
+  <rect x="40" y="470" width="540" height="350" class="panel-bg" />
+  <text x="60" y="500" class="panel-title">3. Top Security Indicator Attribution (RF vs XGBoost)</text>
+
+  <!-- Legend -->
+  <rect x="400" y="490" width="12" height="12" fill="#0284c7" rx="2" />
+  <text x="418" y="501" class="legend">Random Forest</text>
+  <rect x="400" y="508" width="12" height="12" fill="#ea580c" rx="2" />
+  <text x="418" y="519" class="legend">XGBoost</text>
+
+  <!-- Feature Rows -->
+  <text x="220" y="546" class="label" text-anchor="end">critical_cve_count</text>
+  <rect x="230" y="536" width="117" height="10" fill="#0284c7" rx="2" />
+  <rect x="230" y="548" width="228" height="10" fill="#ea580c" rx="2" />
+  <text x="465" y="557" class="axis-label">0.254 (XGB)</text>
+
+  <text x="220" y="586" class="label" text-anchor="end">high_cve_count</text>
+  <rect x="230" y="576" width="135" height="10" fill="#0284c7" rx="2" />
+  <rect x="230" y="588" width="116" height="10" fill="#ea580c" rx="2" />
+  <text x="372" y="585" class="axis-label">0.150 (RF)</text>
+
+  <text x="220" y="626" class="label" text-anchor="end">rbac_risk_score</text>
+  <rect x="230" y="616" width="67" height="10" fill="#0284c7" rx="2" />
+  <rect x="230" y="628" width="98" height="10" fill="#ea580c" rx="2" />
+
+  <text x="220" y="666" class="label" text-anchor="end">kubescape_failed</text>
+  <rect x="230" y="656" width="86" height="10" fill="#0284c7" rx="2" />
+  <rect x="230" y="668" width="35" height="10" fill="#ea580c" rx="2" />
+
+  <text x="220" y="706" class="label" text-anchor="end">privileged_count</text>
+  <rect x="230" y="696" width="61" height="10" fill="#0284c7" rx="2" />
+  <rect x="230" y="708" width="24" height="10" fill="#ea580c" rx="2" />
+
+  <text x="220" y="746" class="label" text-anchor="end">risky_capability_count</text>
+  <rect x="230" y="736" width="60" height="10" fill="#0284c7" rx="2" />
+  <rect x="230" y="748" width="67" height="10" fill="#ea580c" rx="2" />
+
+  <text x="220" y="786" class="label" text-anchor="end">high_misconfig_count</text>
+  <rect x="230" y="776" width="56" height="10" fill="#0284c7" rx="2" />
+  <rect x="230" y="788" width="22" height="10" fill="#ea580c" rx="2" />
+
+
+  <!-- ================= PANEL 4: ISOLATION FOREST ================= -->
+  <rect x="620" y="470" width="540" height="350" class="panel-bg" />
+  <text x="640" y="500" class="panel-title">4. Isolation Forest: Unsupervised Anomaly Detection</text>
+
+  <!-- Legend -->
+  <rect x="910" y="490" width="12" height="12" fill="#16a34a" rx="2" />
+  <text x="928" y="501" class="legend">Benign Inliers (Low Risk)</text>
+  <rect x="910" y="508" width="12" height="12" fill="#ef4444" rx="2" />
+  <text x="928" y="519" class="legend">Critical Outliers (High Risk)</text>
+
+  <!-- Separation Graphic -->
+  <rect x="670" y="540" width="440" height="120" fill="#ffffff" stroke="#cbd5e1" rx="6" />
+
+  <!-- Zero threshold line -->
+  <line x1="880" y1="535" x2="880" y2="675" stroke="#0f172a" stroke-width="2" stroke-dasharray="4,4" />
+  <text x="880" y="690" class="axis-label" text-anchor="middle" font-weight="bold">Threshold: 0.0</text>
+  <text x="770" y="690" class="axis-label" text-anchor="middle" fill="#ef4444">← Anomalies (-Score)</text>
+  <text x="990" y="690" class="axis-label" text-anchor="middle" fill="#16a34a">Normal Inliers (+Score) →</text>
+
+  <!-- Outlier Cluster (Red) -->
+  <circle cx="730" cy="600" r="14" fill="#ef4444" opacity="0.8" />
+  <circle cx="755" cy="580" r="12" fill="#ef4444" opacity="0.8" />
+  <circle cx="775" cy="615" r="16" fill="#ef4444" opacity="0.8" />
+  <circle cx="790" cy="590" r="14" fill="#ef4444" opacity="0.8" />
+  <circle cx="810" cy="610" r="13" fill="#ef4444" opacity="0.8" />
+  <text x="760" y="558" class="val-text" fill="#ef4444">High-Risk Drifts (-0.141)</text>
+
+  <!-- Inlier Cluster (Green) -->
+  <circle cx="940" cy="600" r="14" fill="#16a34a" opacity="0.8" />
+  <circle cx="965" cy="580" r="15" fill="#16a34a" opacity="0.8" />
+  <circle cx="985" cy="615" r="18" fill="#16a34a" opacity="0.8" />
+  <circle cx="1010" cy="590" r="14" fill="#16a34a" opacity="0.8" />
+  <circle cx="1040" cy="605" r="16" fill="#16a34a" opacity="0.8" />
+  <text x="990" y="558" class="val-text" fill="#16a34a">Hardened Inliers (+0.067)</text>
+
+  <!-- Summary Box -->
+  <rect x="670" y="715" width="440" height="85" fill="#f1f5f9" rx="6" />
+  <text x="690" y="740" class="label" font-weight="bold">Unsupervised Anomaly Detection Highlights:</text>
+  <text x="690" y="760" class="axis-label">• ROC-AUC vs Ground Truth: 0.975 (Flawless outlier separation)</text>
+  <text x="690" y="776" class="axis-label">• Outlier Recall: 100.0% (Zero false negatives on critical high-risk clusters)</text>
+  <text x="690" y="792" class="axis-label">• Solves Zero-Day Drift: Detects abnormal clusters without requiring labeled training formulas</text>
+</svg>

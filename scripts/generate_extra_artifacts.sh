@@ -26,5 +26,5 @@ echo "Remediated manifest saved to: data/processed/remediated-weak-deployment.ya
 echo
 echo "✓ All side-output artifacts generated successfully:"
 echo "  - HTML Dashboard   : reports/dashboard.html"
-echo "  - Benchmark Plot   : reports/model_benchmark_comparison.png"
+echo "  - Benchmark Plot   : reports/model_benchmark_comparison.svg"
 echo "  - Remediated Patch : data/processed/remediated-weak-deployment.yaml"
