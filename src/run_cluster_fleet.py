@@ -17,23 +17,10 @@ import pandas as pd
 import yaml
 
 import paths
-from build_cluster_dataset import score_row
+from build_cluster_dataset import COUNT_COLUMNS, score_row
 from data_cleaning import clean_dataset
 from k8s_features import extract_features, load_workloads
 from scan_parser import parse_kubescape_data
-
-COUNT_COLUMNS = [
-    "kubescape_failed", "kubescape_passed", "kubescape_skipped",
-    "kubescape_critical", "kubescape_high", "kubescape_medium",
-    "kubescape_low", "critical_cve_count", "high_cve_count",
-    "critical_misconfig_count", "high_misconfig_count", "secret_count",
-    "rbac_risk_score", "service_account_permission_score",
-    "wildcard_rbac_rules", "cluster_admin_bindings", "rbac_binding_count",
-    "privileged_count", "root_execution_count", "host_path_count",
-    "risky_capability_count", "host_port_count",
-    "missing_network_policies", "workload_count",
-    "falco_alert_count", "falco_critical_count", "falco_warning_count",
-]
 
 
 def check_cluster_connectivity(context):
@@ -367,8 +354,8 @@ def main():
     df.to_csv(output_csv, index=False)
     print(f"Saved: {paths.rel(output_csv)} ({len(df)} cluster rows)")
 
-    # Step 6: Multi-pillar labeling & model training (Random Forest + SVM)
-    print("\n[6/7] Multi-pillar labeling & retraining ML models (Random Forest + SVM)...")
+    # Step 6: Multi-pillar labeling & model training (Random Forest, SVM, XGBoost, Isolation Forest)
+    print("\n[6/7] Multi-pillar labeling & retraining ML models (RF, SVM, XGBoost, Isolation Forest)...")
     subprocess.run([sys.executable, "src/train_security_models.py"], check=True)
 
     # Step 7: Applying models on live test clusters to compare & generate report
