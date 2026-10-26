@@ -269,7 +269,6 @@ if len(DATA) > 1:
         header += f" {'Iso Status':<13}"
     header += "Posture"
     add(header)
-    divider_len = len(header) + 12
     add("-" * 106)
     for pos in range(len(DATA)):
         r = DATA.iloc[pos]

@@ -10,7 +10,7 @@ help:
 	@echo "  make fleet                         Alias for 'make pipeline'"
 	@echo "  make test-cluster [CONTEXT=<ctx>]  Scan a live cluster context and generate ML report"
 	@echo "  make report                        Display the latest generated security report"
-	@echo "  make train                         Train the Random Forest & SVM security models"
+	@echo "  make train                         Train RF, SVM, XGBoost & Isolation Forest models"
 	@echo "  make manifests [COUNT=100]         Generate and scan sample manifests"
 	@echo "  make final                         Run Kind clusters + latest assessment"
 	@echo "  make all                           Run complete multi-scenario assessment pipeline"

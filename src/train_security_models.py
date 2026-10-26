@@ -54,14 +54,6 @@ if not DATASET.is_file():
 
 df = pd.read_csv(DATASET)
 
-# If manifest scans exist and are not yet in df, fold them in for training
-if paths.MANIFEST_DATASET.is_file() and not (df["environment"] == "manifest").any():
-    from build_cluster_dataset import load_manifest_assessments
-    m_rows = load_manifest_assessments()
-    if m_rows:
-        print(f"Folding in {len(m_rows)} scanned workload manifests into training...")
-        df = pd.concat([df, pd.DataFrame(m_rows)], ignore_index=True)
-
 print("Rows:", len(df))
 print("Assessment snapshots:", df["snapshot"].nunique())
 
@@ -200,7 +192,7 @@ oof_xgb_score = pd.Series(np.nan, index=X.index, dtype=float)
 oof_xgb_risk = pd.Series(index=X.index, dtype=object)
 oof_logistic = pd.Series(index=X.index, dtype=object)
 oof_iso_score = pd.Series(np.nan, index=X.index, dtype=float)
-oof_iso_pred = pd.Series(np.nan, index=X.index, dtype=float)
+oof_iso_pred = pd.Series(0, index=X.index, dtype=int)
 fold_accuracy = []
 fold_svm_accuracy = []
 fold_xgb_accuracy = []
