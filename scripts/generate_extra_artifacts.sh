@@ -9,22 +9,28 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 echo "=== GENERATING OPTIONAL SIDE-OUTPUT ARTIFACTS ==="
 
-# 1. Interactive HTML Dashboard
-echo "1. Generating Interactive HTML Dashboard..."
+# 1. Standard Text Security Report
+echo "1. Generating Standard Assessment Report..."
+python3 src/generate_report.py > /dev/null
+echo "Assessment report saved to: reports/security_report.txt"
+
+# 2. Interactive HTML Dashboard
+echo "2. Generating Interactive HTML Dashboard..."
 python3 src/generate_dashboard.py
 
-# 2. Comparative Benchmark Plots
-echo "2. Generating Comparative Benchmark Plot..."
+# 3. Comparative Benchmark Plots
+echo "3. Generating Comparative Benchmark Plot..."
 python3 src/plot_benchmark.py
 
-# 3. Auto-Remediation Example
-echo "3. Generating Remediation Patch Example..."
+# 4. Auto-Remediation Example
+echo "4. Generating Remediation Patch Example..."
 python3 src/auto_remediate.py manifests/insecure/weak-deployment.yaml \
   --output data/processed/remediated-weak-deployment.yaml > /dev/null
 echo "Remediated manifest saved to: data/processed/remediated-weak-deployment.yaml"
 
 echo
-echo "✓ All side-output artifacts generated successfully:"
+echo "✓ All artifacts generated successfully at once:"
+echo "  - Text Report      : reports/security_report.txt"
 echo "  - HTML Dashboard   : reports/dashboard.html"
 echo "  - Benchmark Plot   : reports/model_benchmark_comparison.svg"
 echo "  - Remediated Patch : data/processed/remediated-weak-deployment.yaml"
