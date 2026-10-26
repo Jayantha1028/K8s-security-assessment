@@ -180,13 +180,13 @@ class ManifestPipelineTests(PipelineCase):
         result = self.run_cmd("./run.sh", "--manifests", "--fresh", check=True)
         import pandas as pd
         df = pd.read_csv(self.work / "data/processed/kubernetes_security_dataset.csv")
-        self.assertEqual(len(df), 40)
+        self.assertEqual(len(df), 100)
         self.assertFalse(df.isna().any().any())
 
         # Incremental run adds rows instead of replacing them.
         self.run_cmd("./run.sh", "--manifests", check=True)
         df2 = pd.read_csv(self.work / "data/processed/kubernetes_security_dataset.csv")
-        self.assertEqual(len(df2), 80)
+        self.assertEqual(len(df2), 200)
 
     def test_run_writes_a_log_with_exit_status(self):
         self.run_cmd("./run.sh", "--manifests", "--fresh", check=True)

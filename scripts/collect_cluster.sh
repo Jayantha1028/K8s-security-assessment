@@ -28,6 +28,7 @@ pids=()
 echo "Kubescape -> $CONTEXT"
 kubescape scan framework nsa \
   --kube-context "$CONTEXT" \
+  --host-scan=false \
   --include-namespaces security-demo \
   --format json \
   --format-version v2 \
