@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vulnerable-app
+  namespace: security-demo
+  labels:
+    app: vulnerable-app
+    tier: weak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vulnerable-app
+  template:
+    metadata:
+      labels:
+        app: vulnerable-app
+    spec:
+      serviceAccountName: demo-app
+      containers:
+      - name: web
+        image: nginx:1.14.2
+        securityContext:
+          privileged: false
+          runAsUser: 0
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: tmp-storage
+          mountPath: /tmp
+        - name: var-run
+          mountPath: /var/run
+        resources:
+          limits:
+            cpu: 250m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - name: tmp-storage
+        emptyDir: {}
+      - name: var-run
+        emptyDir: {}
