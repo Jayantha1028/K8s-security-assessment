@@ -39,6 +39,9 @@ cleanup() {
 cmd_manifests() {
   local fresh=0
   [[ "${1:-}" == "--fresh" ]] && fresh=1
+  local count="${MANIFEST_COUNT:-${COUNT:-}}"
+  local count_args=()
+  [ -n "$count" ] && count_args=(--count "$count")
 
   # Fail before generating anything if the scanner is missing.
   require_tools python3 kubescape
@@ -49,11 +52,11 @@ cmd_manifests() {
     echo "Fresh run: clearing samples, scans and the existing dataset."
     rm -rf "$RAW_DIR/samples" "$RAW_DIR/manifest_scans"
     rm -f "$PROCESSED_DIR/kubernetes_security_dataset.csv"
-    python3 src/generate_samples.py --fresh
+    python3 src/generate_samples.py --fresh ${count_args[@]+"${count_args[@]}"}
   else
     echo "Incremental run: adding new samples on top of what's already on disk."
     echo "(use './run.sh --manifests --fresh' to start over instead)"
-    python3 src/generate_samples.py
+    python3 src/generate_samples.py ${count_args[@]+"${count_args[@]}"}
   fi
 
   python3 src/scan_manifests.py
@@ -126,6 +129,15 @@ cmd_final() {
   python3 src/train_security_models.py
   python3 src/generate_report.py "$REPORT_INPUT"
   echo
+  echo "╔════════════════════════════════════════════════════════════════════════════╗"
+  echo "║                   LIVE CLUSTER SECURITY ASSESSMENT COMPLETE                ║"
+  echo "╠════════════════════════════════════════════════════════════════════════════╣"
+  echo "║  Trained Model : models/security_models.joblib                             ║"
+  echo "║  Cluster Data  : $CLUSTER_DATASET                                          ║"
+  echo "║  Audit Report  : $REPORT_FILE                                              ║"
+  echo "║                                                                            ║"
+  echo "║  View Report   : cat $REPORT_FILE                                          ║"
+  echo "╚════════════════════════════════════════════════════════════════════════════╝"
   echo "Final pipeline completed."
 }
 
@@ -172,12 +184,29 @@ cmd_all() {
   take_series auto_base
 
   echo
-  echo "=== Step 3/5: medium-risk scenario snapshots ==="
+  echo "=== Step 3/5: security scenario snapshots ==="
+  local scenarios_to_run="${SCENARIOS:-medium}"
   MEDIUM_APPLIED=1
-  scripts/apply_medium_scenario.sh
-  kubectl --context "$INSECURE_CTX" rollout status deployment/medium-app \
-    -n security-demo --timeout=180s
-  take_series auto_medium
+  if [ "$scenarios_to_run" = "all" ]; then
+    echo "Applying all 3 essential scenarios: medium, host_secrets, runtime_attack..."
+    scripts/apply_medium_scenario.sh medium
+    kubectl --context "$INSECURE_CTX" rollout status deployment/medium-app \
+      -n security-demo --timeout=180s
+    take_series auto_medium
+
+    scripts/apply_medium_scenario.sh host_secrets
+    kubectl --context "$INSECURE_CTX" rollout status deployment/medium-app \
+      -n security-demo --timeout=180s
+    take_series auto_secrets
+
+    scripts/apply_medium_scenario.sh runtime_attack
+    take_series auto_attack
+  else
+    scripts/apply_medium_scenario.sh "$scenarios_to_run"
+    kubectl --context "$INSECURE_CTX" rollout status deployment/medium-app \
+      -n security-demo --timeout=180s
+    take_series "auto_${scenarios_to_run}"
+  fi
 
   echo
   echo "=== Step 4/5: restoring weak workload ==="
@@ -200,21 +229,44 @@ cmd_all() {
   python3 src/generate_report.py "$REPORT_INPUT"
 
   echo
+  echo "╔════════════════════════════════════════════════════════════════════════════╗"
+  echo "║                   LIVE CLUSTER SECURITY ASSESSMENT COMPLETE                ║"
+  echo "╠════════════════════════════════════════════════════════════════════════════╣"
+  echo "║  Evaluated     : Kind Clusters (Secure & Insecure Postures)                ║"
+  echo "║  Telemetry     : Kubescape, Trivy, RBAC Graph & Falco eBPF                 ║"
+  echo "║  Trained Model : models/security_models.joblib                             ║"
+  echo "║  Dataset       : $CLUSTER_DATASET                                          ║"
+  echo "║  Audit Report  : $REPORT_FILE                                              ║"
+  echo "║                                                                            ║"
+  echo "║  View Report   : cat $REPORT_FILE                                          ║"
+  echo "╚════════════════════════════════════════════════════════════════════════════╝"
   echo "All done. Outputs: $CLUSTER_DATASET, models/security_models.joblib, $REPORT_FILE"
+}
+
+cmd_test_cluster() {
+  local ctx="${1:-${CONTEXT:-kind-ml-k8s-insecure}}"
+  echo "=== Live Cluster Assessment: $ctx ==="
+  require_tools python3 kubectl kubescape trivy
+  local out_dir="$RAW_DIR/latest/$ctx"
+  mkdir -p "$out_dir"
+  scripts/collect_cluster.sh "$ctx" "$out_dir"
+  python3 src/build_cluster_dataset.py --report-input "$REPORT_INPUT"
+  python3 src/generate_report.py "$REPORT_INPUT" "$REPORT_FILE"
 }
 
 main() {
   trap cleanup EXIT
   case "$MODE" in
-    --manifests|--midsem) shift || true; cmd_manifests "$@" ;;
-    --final)              cmd_final ;;
-    --all)                cmd_all ;;
+    --manifests|--midsem)          shift || true; cmd_manifests "$@" ;;
+    --final)                       cmd_final ;;
+    --all)                         cmd_all ;;
+    --test-cluster|--test_cluster) shift || true; cmd_test_cluster "$@" ;;
   esac
 }
 
 MODE="${1:---manifests}"
 case "$MODE" in
-  --manifests|--midsem|--final|--all) ;;
+  --manifests|--midsem|--final|--all|--test-cluster|--test_cluster) ;;
   -h|--help) usage; exit 0 ;;
   *)
     echo "Unknown option: $MODE" >&2

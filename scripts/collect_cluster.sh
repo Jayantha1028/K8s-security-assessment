@@ -36,6 +36,8 @@ pids+=($!)
 
 echo "Trivy -> $CONTEXT"
 trivy k8s \
+  --timeout 15m \
+  --skip-version-check \
   --scanners vuln,misconfig,secret \
   --disable-node-collector \
   --include-namespaces security-demo \

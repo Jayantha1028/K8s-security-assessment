@@ -2,43 +2,50 @@
       KUBERNETES SECURITY ASSESSMENT
 ========================================
 Assessment         : latest / secure
-Evidence Score     : 53.1/100
-ML Predicted Score : 53.1/100
-ML Risk Level      : Medium
+Evidence Score     : 83.0/100
+Posture Bar        : [█████████████████░░░] 83.0/100
+ML Predicted Score : 83.0/100
+ML Risk Level      : Low
+Model Delta (|Δ|)  : 0.00 points (High ML Alignment)
 
-Security Indicators
-kubescape_failed                    2
-kubescape_critical                  0
-kubescape_high                      0
-critical_cve_count                  0
-high_cve_count                      4
-critical_misconfig_count            0
-high_misconfig_count                0
-secret_count                        0
-rbac_risk_score                     6
-service_account_permission_score    15
-risky_capability_count              0
-host_path_count                     0
-missing_network_policies            1
-root_execution_count                1
-falco_alert_count                   21
-privileged_count                    0
-host_port_count                     0
+Security Indicators (Telemetry Breakdown)
+  [Vulnerabilities & Supply Chain]
+    critical_cve_count                0     [PASS]   Clean
+    high_cve_count                    8     [WARN]   High risk (8)
+    critical_misconfig_count          0     [PASS]   Clean
+    high_misconfig_count              0     [PASS]   Clean
+    secret_count                      0     [PASS]   Clean
 
-Detected Risk Indicators
-- kubescape_failed
-- high_cve_count
-  Remediation: Update or replace images with high-severity CVEs.
-- rbac_risk_score
-  Remediation: Apply least-privilege Roles and RoleBindings.
-- service_account_permission_score
-  Remediation: Reduce unnecessary service-account permissions.
-- missing_network_policies
-  Remediation: Add restrictive NetworkPolicies.
-- root_execution_count
-  Remediation: Run containers as non-root users.
-- falco_alert_count
-  Remediation: Investigate recent runtime security alerts.
+  [Configuration & Pod Hardening]
+    privileged_count                  0     [PASS]   Clean
+    root_execution_count              1     [WARN]   High risk (1)
+    risky_capability_count            0     [PASS]   Clean
+    host_path_count                   0     [PASS]   Clean
+    host_port_count                   0     [PASS]   Clean
+    missing_network_policies          1     [NOTE]   Active finding (1)
+
+  [Access & Identity (RBAC)]
+    rbac_risk_score                   6     [WARN]   High risk (6)
+    service_account_permission_score  15    [NOTE]   Active finding (15)
+
+  [Compliance & Runtime Detection]
+    kubescape_failed                  2     [NOTE]   Active finding (2)
+    kubescape_critical                0     [PASS]   Clean
+    kubescape_high                    0     [PASS]   Clean
+    falco_alert_count                 0     [PASS]   Clean
+
+Detected Risk Indicators & Remediation Action Plan
+- [HIGH] high_cve_count (observed: 8)
+  Action: Update or replace images with high-severity CVEs.
+- [HIGH] rbac_risk_score (observed: 6)
+  Action: Apply least-privilege Roles and RoleBindings.
+- [HIGH] root_execution_count (observed: 1)
+  Action: Run containers as non-root users.
+- [MEDIUM] kubescape_failed (observed: 2)
+- [MEDIUM] missing_network_policies (observed: 1)
+  Action: Add restrictive NetworkPolicies.
+- [MEDIUM] service_account_permission_score (observed: 15)
+  Action: Reduce unnecessary service-account permissions.
 
 Assessment
 The evidence score is the transparent baseline computed from collected security indicators.
@@ -48,49 +55,67 @@ The ML prediction estimates the security condition from the same underlying indi
       KUBERNETES SECURITY ASSESSMENT
 ========================================
 Assessment         : latest / insecure
-Evidence Score     : 0.0/100
-ML Predicted Score : 0.0/100
+Evidence Score     : 25.2/100
+Posture Bar        : [█████░░░░░░░░░░░░░░░] 25.5/100
+ML Predicted Score : 25.5/100
 ML Risk Level      : High
+Model Delta (|Δ|)  : 0.27 points (High ML Alignment)
 
-Security Indicators
-kubescape_failed                    14
-kubescape_critical                  0
-kubescape_high                      5
-critical_cve_count                  31
-high_cve_count                      82
-critical_misconfig_count            0
-high_misconfig_count                5
-secret_count                        0
-rbac_risk_score                     43
-service_account_permission_score    45
-risky_capability_count              0
-host_path_count                     0
-missing_network_policies            2
-root_execution_count                2
-falco_alert_count                   0
-privileged_count                    1
-host_port_count                     0
+Security Indicators (Telemetry Breakdown)
+  [Vulnerabilities & Supply Chain]
+    critical_cve_count                31    [FAIL]   Critical alert (31)
+    high_cve_count                    82    [WARN]   High risk (82)
+    critical_misconfig_count          0     [PASS]   Clean
+    high_misconfig_count              5     [WARN]   High risk (5)
+    secret_count                      0     [PASS]   Clean
 
-Detected Risk Indicators
-- kubescape_failed
-- kubescape_high
-- critical_cve_count
-  Remediation: Update or replace images with critical CVEs.
-- high_cve_count
-  Remediation: Update or replace images with high-severity CVEs.
-- high_misconfig_count
-  Remediation: Remediate high-severity Kubernetes misconfigurations.
-- rbac_risk_score
-  Remediation: Apply least-privilege Roles and RoleBindings.
-- service_account_permission_score
-  Remediation: Reduce unnecessary service-account permissions.
-- missing_network_policies
-  Remediation: Add restrictive NetworkPolicies.
-- root_execution_count
-  Remediation: Run containers as non-root users.
-- privileged_count
-  Remediation: Remove privileged containers.
+  [Configuration & Pod Hardening]
+    privileged_count                  1     [FAIL]   Critical alert (1)
+    root_execution_count              2     [WARN]   High risk (2)
+    risky_capability_count            0     [PASS]   Clean
+    host_path_count                   0     [PASS]   Clean
+    host_port_count                   0     [PASS]   Clean
+    missing_network_policies          2     [NOTE]   Active finding (2)
+
+  [Access & Identity (RBAC)]
+    rbac_risk_score                   43    [WARN]   High risk (43)
+    service_account_permission_score  45    [NOTE]   Active finding (45)
+
+  [Compliance & Runtime Detection]
+    kubescape_failed                  14    [NOTE]   Active finding (14)
+    kubescape_critical                0     [PASS]   Clean
+    kubescape_high                    5     [NOTE]   Active finding (5)
+    falco_alert_count                 0     [PASS]   Clean
+
+Detected Risk Indicators & Remediation Action Plan
+- [CRITICAL] critical_cve_count (observed: 31)
+  Action: Update or replace images with critical CVEs.
+- [CRITICAL] privileged_count (observed: 1)
+  Action: Remove privileged containers.
+- [HIGH] high_cve_count (observed: 82)
+  Action: Update or replace images with high-severity CVEs.
+- [HIGH] high_misconfig_count (observed: 5)
+  Action: Remediate high-severity Kubernetes misconfigurations.
+- [HIGH] rbac_risk_score (observed: 43)
+  Action: Apply least-privilege Roles and RoleBindings.
+- [HIGH] root_execution_count (observed: 2)
+  Action: Run containers as non-root users.
+- [MEDIUM] kubescape_failed (observed: 14)
+- [MEDIUM] kubescape_high (observed: 5)
+- [MEDIUM] missing_network_policies (observed: 2)
+  Action: Add restrictive NetworkPolicies.
+- [MEDIUM] service_account_permission_score (observed: 45)
+  Action: Reduce unnecessary service-account permissions.
 
 Assessment
 The evidence score is the transparent baseline computed from collected security indicators.
 The ML prediction estimates the security condition from the same underlying indicators without using the final score itself as an input feature.
+
+================================================================================
+                    EXECUTIVE MULTI-CLUSTER COMPARISON                          
+================================================================================
+Environment                  Evidence Score   ML Predicted     Risk Tier    Posture
+--------------------------------------------------------------------------------
+latest / secure              83.0/100         83.0/100         Low          [████████░░]
+latest / insecure            25.2/100         25.5/100         High         [███░░░░░░░]
+================================================================================

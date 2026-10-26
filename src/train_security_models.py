@@ -48,6 +48,14 @@ if not DATASET.is_file():
 
 df = pd.read_csv(DATASET)
 
+# If manifest scans exist and are not yet in df, fold them in for training
+if paths.MANIFEST_DATASET.is_file() and not (df["environment"] == "manifest").any():
+    from build_cluster_dataset import load_manifest_assessments
+    m_rows = load_manifest_assessments()
+    if m_rows:
+        print(f"Folding in {len(m_rows)} scanned workload manifests into training...")
+        df = pd.concat([df, pd.DataFrame(m_rows)], ignore_index=True)
+
 print("Rows:", len(df))
 print("Assessment snapshots:", df["snapshot"].nunique())
 
@@ -126,12 +134,12 @@ except ValueError as error:
 
 
 def make_score_model():
-    return RandomForestRegressor(n_estimators=200, random_state=42)
+    return RandomForestRegressor(n_estimators=200, max_depth=10, min_samples_leaf=2, random_state=42)
 
 
 def make_risk_model():
     return RandomForestClassifier(
-        n_estimators=200, class_weight="balanced", random_state=42,
+        n_estimators=200, max_depth=10, min_samples_leaf=2, class_weight="balanced", random_state=42,
     )
 
 
@@ -235,8 +243,11 @@ importance = sorted(
     reverse=True,
 )
 
+max_imp = max((v for _, v in importance), default=1.0)
 for name, value in importance:
-    print(f"{name}: {value:.3f}")
+    bar_len = int(round((value / max_imp) * 20)) if max_imp > 0 else 0
+    bar = "█" * bar_len + "░" * (20 - bar_len)
+    print(f"{name:35} [{bar}] {value:.3f}")
 
 
 MODEL_FILE.parent.mkdir(parents=True, exist_ok=True)
