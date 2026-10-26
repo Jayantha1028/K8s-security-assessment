@@ -30,6 +30,10 @@ MANIFEST_DATASET = PROCESSED / "kubernetes_security_dataset.csv"
 CLUSTER_DATASET = PROCESSED / "final_security_dataset.csv"
 REPORT_INPUT = PROCESSED / "report_input.csv"
 MODEL_FILE = ROOT / "models" / "security_models.joblib"
+RF_MODEL_FILE = ROOT / "models" / "random_forest_model.joblib"
+SVM_MODEL_FILE = ROOT / "models" / "svm_model.joblib"
+XGB_MODEL_FILE = ROOT / "models" / "xgboost_model.joblib"
+ISO_MODEL_FILE = ROOT / "models" / "isolation_forest_model.joblib"
 REPORT_FILE = ROOT / "reports" / "security_report.txt"
 
 

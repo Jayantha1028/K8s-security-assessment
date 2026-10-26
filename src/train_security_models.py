@@ -447,6 +447,55 @@ for name, value in xgb_importance:
 
 
 MODEL_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+# 1. Save Random Forest Model
+joblib.dump(
+    {
+        "score_model": score_model,
+        "risk_model": risk_model,
+        "features": FEATURES,
+        "model_type": "Random Forest",
+        "trained_rows": int(len(df)),
+    },
+    paths.RF_MODEL_FILE,
+)
+
+# 2. Save Support Vector Machine (SVM) Model
+joblib.dump(
+    {
+        "score_model": svm_score_model,
+        "risk_model": svm_risk_model,
+        "features": FEATURES,
+        "model_type": "Support Vector Machine",
+        "trained_rows": int(len(df)),
+    },
+    paths.SVM_MODEL_FILE,
+)
+
+# 3. Save XGBoost Model
+joblib.dump(
+    {
+        "score_model": xgb_score_model,
+        "risk_model": xgb_risk_model,
+        "features": FEATURES,
+        "model_type": "XGBoost",
+        "trained_rows": int(len(df)),
+    },
+    paths.XGB_MODEL_FILE,
+)
+
+# 4. Save Isolation Forest Model
+joblib.dump(
+    {
+        "model": iso_model,
+        "features": FEATURES,
+        "model_type": "Isolation Forest",
+        "trained_rows": int(len(df)),
+    },
+    paths.ISO_MODEL_FILE,
+)
+
+# Also save bundle for consolidated pipeline/report loading
 joblib.dump(
     {
         "score_model": score_model,
@@ -462,4 +511,9 @@ joblib.dump(
     MODEL_FILE,
 )
 
-print("\nSaved:", paths.rel(MODEL_FILE))
+print("\nSaved 4 separate trained models to models/:")
+print(f"  1. Random Forest    : {paths.rel(paths.RF_MODEL_FILE)}")
+print(f"  2. SVM              : {paths.rel(paths.SVM_MODEL_FILE)}")
+print(f"  3. XGBoost          : {paths.rel(paths.XGB_MODEL_FILE)}")
+print(f"  4. Isolation Forest : {paths.rel(paths.ISO_MODEL_FILE)}")
+print(f"  Bundle              : {paths.rel(MODEL_FILE)}")
