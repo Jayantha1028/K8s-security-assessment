@@ -43,6 +43,8 @@ if bad_rows.any():
 
 predicted_scores = MODEL["score_model"].predict(X)
 predicted_risks = MODEL["risk_model"].predict(X)
+svm_scores = MODEL["svm_score_model"].predict(X) if "svm_score_model" in MODEL else None
+svm_risks = MODEL["svm_risk_model"].predict(X) if "svm_risk_model" in MODEL else None
 
 remediations = {
     "privileged_count":
@@ -155,15 +157,11 @@ def describe(position):
 
     add(f"Evidence Score     : {evidence}")
     add(f"Posture Bar        : {pred_meter}")
-    add(
-        f"ML Predicted Score : "
-        f"{predicted_score:.1f}/100"
-    )
-
-    add(
-        f"ML Risk Level      : "
-        f"{predicted_risk}"
-    )
+    add(f"RF Predicted Score : {predicted_score:.1f}/100 (Risk: {predicted_risk})")
+    if svm_scores is not None:
+        add(f"SVM Predicted Score: {svm_scores[position]:.1f}/100 (Risk: {svm_risks[position]})")
+    else:
+        add(f"ML Risk Level      : {predicted_risk}")
 
     if evidence_val is not None:
         delta = abs(predicted_score - evidence_val)
@@ -253,7 +251,7 @@ if len(DATA) > 1:
     add("================================================================================")
     add("                    EXECUTIVE MULTI-CLUSTER COMPARISON                          ")
     add("================================================================================")
-    add(f"{'Environment':<28} {'Evidence Score':<16} {'ML Predicted':<16} {'Risk Tier':<12} {'Posture'}")
+    add(f"{'Environment':<22} {'Evidence':<12} {'RF Score':<12} {'SVM Score':<12} {'Risk Tier':<10} {'Posture'}")
     add("-" * 80)
     for pos in range(len(DATA)):
         r = DATA.iloc[pos]
@@ -263,9 +261,10 @@ if len(DATA) > 1:
         except (KeyError, TypeError, ValueError):
             ev = "N/A"
         pred = f"{float(predicted_scores[pos]):.1f}/100"
+        svm_p = f"{float(svm_scores[pos]):.1f}/100" if svm_scores is not None else "N/A"
         tier = str(predicted_risks[pos])
         meter = f"[{make_meter(float(predicted_scores[pos]), 10)}]"
-        add(f"{lbl:<28} {ev:<16} {pred:<16} {tier:<12} {meter}")
+        add(f"{lbl:<22} {ev:<12} {pred:<12} {svm_p:<12} {tier:<10} {meter}")
     add("================================================================================")
 
 report_file = Path(sys.argv[2]) if len(sys.argv) > 2 else paths.REPORT_FILE

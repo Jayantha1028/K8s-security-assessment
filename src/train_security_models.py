@@ -12,7 +12,9 @@ from sklearn.metrics import (
     r2_score,
 )
 from sklearn.model_selection import StratifiedGroupKFold
+from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC, SVR
 
 import paths
 
@@ -143,12 +145,28 @@ def make_risk_model():
     )
 
 
+def make_svm_score_model():
+    return make_pipeline(
+        StandardScaler(),
+        SVR(kernel="rbf", C=50.0, epsilon=1.0)
+    )
+
+
+def make_svm_risk_model():
+    return make_pipeline(
+        StandardScaler(),
+        SVC(kernel="rbf", C=10.0, class_weight="balanced", random_state=42)
+    )
+
+
 # Evaluate on ALL five grouped folds and pool the out-of-fold predictions.
-# A single fold on a small dataset gives a very noisy estimate.
 oof_score = pd.Series(np.nan, index=X.index, dtype=float)
 oof_risk = pd.Series(index=X.index, dtype=object)
+oof_svm_score = pd.Series(np.nan, index=X.index, dtype=float)
+oof_svm_risk = pd.Series(index=X.index, dtype=object)
 oof_logistic = pd.Series(index=X.index, dtype=object)
 fold_accuracy = []
+fold_svm_accuracy = []
 skipped_folds = 0
 
 for fold_number, (train_idx, test_idx) in enumerate(folds, start=1):
@@ -159,6 +177,7 @@ for fold_number, (train_idx, test_idx) in enumerate(folds, start=1):
 
     X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
 
+    # Random Forest
     fold_score_model = make_score_model().fit(X_train, y_score.iloc[train_idx])
     fold_risk_model = make_risk_model().fit(X_train, y_risk.iloc[train_idx])
 
@@ -168,6 +187,17 @@ for fold_number, (train_idx, test_idx) in enumerate(folds, start=1):
         accuracy_score(y_risk.iloc[test_idx], oof_risk.iloc[test_idx])
     )
 
+    # Support Vector Machine (SVM)
+    fold_svm_score_model = make_svm_score_model().fit(X_train, y_score.iloc[train_idx])
+    fold_svm_risk_model = make_svm_risk_model().fit(X_train, y_risk.iloc[train_idx])
+
+    oof_svm_score.iloc[test_idx] = fold_svm_score_model.predict(X_test)
+    oof_svm_risk.iloc[test_idx] = fold_svm_risk_model.predict(X_test)
+    fold_svm_accuracy.append(
+        accuracy_score(y_risk.iloc[test_idx], oof_svm_risk.iloc[test_idx])
+    )
+
+    # Baseline Logistic Regression
     fold_scaler = StandardScaler().fit(X_train)
     fold_logistic = LogisticRegression(max_iter=2000).fit(
         fold_scaler.transform(X_train), y_risk.iloc[train_idx]
@@ -199,6 +229,17 @@ print(
     round(mean_absolute_error(y_score[evaluated], oof_score[evaluated]), 3)
 )
 
+print("\n=== Support Vector Machine (SVM): Security Score (grouped 5-fold) ===")
+print("R2 :", round(r2_score(y_score[evaluated], oof_svm_score[evaluated]), 3))
+print(
+    "RMSE:",
+    round(np.sqrt(mean_squared_error(y_score[evaluated], oof_svm_score[evaluated])), 3)
+)
+print(
+    "MAE :",
+    round(mean_absolute_error(y_score[evaluated], oof_svm_score[evaluated]), 3)
+)
+
 print("\n=== Random Forest: Risk Level (grouped 5-fold) ===")
 print(
     "Accuracy:",
@@ -213,29 +254,41 @@ print(
     )
 )
 
+print("\n=== Support Vector Machine (SVM): Risk Level (grouped 5-fold) ===")
+print(
+    "Accuracy:",
+    round(accuracy_score(y_risk[evaluated], oof_svm_risk[evaluated]), 3),
+    f"(per-fold mean {np.mean(fold_svm_accuracy):.3f} +/- {np.std(fold_svm_accuracy):.3f})",
+)
+print(
+    classification_report(
+        y_risk[evaluated],
+        oof_svm_risk[evaluated],
+        zero_division=0,
+    )
+)
+
 baseline_accuracy = y_risk[evaluated].value_counts(normalize=True).max()
 
-print(
-    "Most-frequent-class baseline:",
-    round(baseline_accuracy, 3)
-)
+print("=== Classification Model Comparison Summary ===")
+print(f"Random Forest Accuracy        : {accuracy_score(y_risk[evaluated], oof_risk[evaluated]):.3f}")
+print(f"SVM (RBF Kernel) Accuracy     : {accuracy_score(y_risk[evaluated], oof_svm_risk[evaluated]):.3f}")
+print(f"Logistic Regression Accuracy  : {accuracy_score(y_risk[evaluated], oof_logistic[evaluated]):.3f}")
+print(f"Most-frequent-class baseline  : {baseline_accuracy:.3f}")
 
-print(
-    "Logistic Regression accuracy:",
-    round(accuracy_score(y_risk[evaluated], oof_logistic[evaluated]), 3),
-)
 print(
     "\nNote: security_score and risk_level are computed from the same "
     "indicators used as features, so high scores here show the models "
     "reproduce the heuristic, not that they predict real-world breaches."
 )
 
-# Final deliverable: refit on ALL usable rows (the evaluation above used
-# held-out folds, so no data is wasted on the shipped model).
+# Final deliverable: refit on ALL usable rows
 score_model = make_score_model().fit(X, y_score)
 risk_model = make_risk_model().fit(X, y_risk)
+svm_score_model = make_svm_score_model().fit(X, y_score)
+svm_risk_model = make_svm_risk_model().fit(X, y_risk)
 
-print("\n=== Important Security Indicators ===")
+print("\n=== Important Security Indicators (Random Forest) ===")
 
 importance = sorted(
     zip(FEATURES, risk_model.feature_importances_),
@@ -255,6 +308,8 @@ joblib.dump(
     {
         "score_model": score_model,
         "risk_model": risk_model,
+        "svm_score_model": svm_score_model,
+        "svm_risk_model": svm_risk_model,
         "features": FEATURES,
         "trained_rows": int(len(df)),
     },
