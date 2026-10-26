@@ -231,6 +231,13 @@ def create_workload(number):
         ),
     }
 
+    # When hostNetwork is enabled, Kubernetes API requires hostPort to match containerPort
+    if pod_spec["hostNetwork"]:
+        for c in containers:
+            for p in c.get("ports", []):
+                if "hostPort" in p:
+                    p["hostPort"] = p["containerPort"]
+
     if host_path_needed:
         pod_spec["volumes"] = [
             {

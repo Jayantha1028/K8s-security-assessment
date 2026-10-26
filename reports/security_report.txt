@@ -3,10 +3,10 @@
 ========================================
 Assessment         : latest / secure
 Evidence Score     : 83.0/100
-Posture Bar        : [█████████████████░░░] 83.0/100
-ML Predicted Score : 83.0/100
+Posture Bar        : [███████████████░░░░░] 77.5/100
+ML Predicted Score : 77.5/100
 ML Risk Level      : Low
-Model Delta (|Δ|)  : 0.00 points (High ML Alignment)
+Model Delta (|Δ|)  : 5.51 points (Moderate Alignment)
 
 Security Indicators (Telemetry Breakdown)
   [Vulnerabilities & Supply Chain]
@@ -56,10 +56,10 @@ The ML prediction estimates the security condition from the same underlying indi
 ========================================
 Assessment         : latest / insecure
 Evidence Score     : 25.2/100
-Posture Bar        : [█████░░░░░░░░░░░░░░░] 25.5/100
-ML Predicted Score : 25.5/100
-ML Risk Level      : High
-Model Delta (|Δ|)  : 0.27 points (High ML Alignment)
+Posture Bar        : [█████████░░░░░░░░░░░] 46.3/100
+ML Predicted Score : 46.3/100
+ML Risk Level      : Medium
+Model Delta (|Δ|)  : 21.04 points (Review Needed)
 
 Security Indicators (Telemetry Breakdown)
   [Vulnerabilities & Supply Chain]
@@ -116,6 +116,6 @@ The ML prediction estimates the security condition from the same underlying indi
 ================================================================================
 Environment                  Evidence Score   ML Predicted     Risk Tier    Posture
 --------------------------------------------------------------------------------
-latest / secure              83.0/100         83.0/100         Low          [████████░░]
-latest / insecure            25.2/100         25.5/100         High         [███░░░░░░░]
+latest / secure              83.0/100         77.5/100         Low          [████████░░]
+latest / insecure            25.2/100         46.3/100         Medium       [█████░░░░░]
 ================================================================================
