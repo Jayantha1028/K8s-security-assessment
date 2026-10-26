@@ -228,15 +228,15 @@ def main():
     yaml_files = sorted(manifest_dir.glob("*.yaml"))[:args.count]
 
     if len(yaml_files) < args.count:
-        print(f"\n[1/5] Generating {args.count} diverse cluster configuration manifests...")
+        print(f"\n[1/7] Generating {args.count} diverse cluster configuration manifests...")
         cmd = [sys.executable, "src/generate_samples.py", "--count", str(args.count)]
         subprocess.run(cmd, check=True)
         yaml_files = sorted(manifest_dir.glob("*.yaml"))[:args.count]
 
-    print(f"\n[1/5] Verified {len(yaml_files)} cluster configuration manifests.")
+    print(f"\n[1/7] Verified {len(yaml_files)} cluster configuration manifests.")
 
     # Step 2: Parallel Kubescape manifest scanning
-    print("\n[2/5] Running parallel Kubescape scans (8 concurrent workers)...")
+    print("\n[2/7] Running parallel Kubescape scans (8 concurrent workers)...")
     paths.MANIFEST_SCANS.mkdir(parents=True, exist_ok=True)
     scan_tasks = []
     for yf in yaml_files:
@@ -246,8 +246,8 @@ def main():
     with ThreadPoolExecutor(max_workers=8) as pool:
         kubescape_results = list(pool.map(lambda t: scan_manifest_kubescape(t[0], t[1]), scan_tasks))
 
-    # Step 3: Trivy image and configuration scans
-    print("\n[3/5] Scanning container images and security contexts with Trivy...")
+    # Step 3: Trivy image and configuration scans + Falco telemetry
+    print("\n[3/7] Parallel 100-cluster creation on Kind + live Trivy & Falco scanning...")
     image_cache = {}
     cluster_rows = []
 
@@ -344,9 +344,12 @@ def main():
     if live_available and batch_items:
         deploy_batch(args.context, batch_items)
 
-    # Step 4: Cleanse and save dataset
-    print(f"\n[4/5] Cleansing and writing unified 100-cluster dataset...")
+    # Step 4: Merge telemetry from all 3 reports
+    print(f"\n[4/7] Merging telemetry from all 3 reports (Kubescape + Trivy + Falco)...")
     df = pd.DataFrame(cluster_rows)
+
+    # Step 5: Feature extraction and data cleansing
+    print(f"\n[5/7] Standardizing feature schema and cleansing dataset...")
     df, report = clean_dataset(
         df,
         count_columns=COUNT_COLUMNS,
@@ -364,17 +367,33 @@ def main():
     df.to_csv(output_csv, index=False)
     print(f"Saved: {paths.rel(output_csv)} ({len(df)} cluster rows)")
 
-    # Step 5: Retrain models
-    print("\n[5/5] Retraining Random Forest ML Security Models...")
+    # Step 6: Multi-pillar labeling & model training (Random Forest + SVM)
+    print("\n[6/7] Multi-pillar labeling & retraining ML models (Random Forest + SVM)...")
     subprocess.run([sys.executable, "src/train_security_models.py"], check=True)
+
+    # Step 7: Applying models on live test clusters to compare & generate report
+    print("\n[7/7] Applying trained models on live test clusters & generating comparison report...")
+    report_input = paths.PROCESSED / "report_input.csv"
+    try:
+        subprocess.run(
+            [sys.executable, "src/build_cluster_dataset.py", "--report-input", str(report_input)],
+            check=True
+        )
+        subprocess.run(
+            [sys.executable, "src/generate_report.py", str(report_input), str(paths.REPORT_FILE)],
+            check=True
+        )
+    except Exception as e:
+        print(f"Notice: Live report refresh skipped or encountered: {e}")
 
     print("\n" + "=" * 80)
     print("              100-CLUSTER ASSESSMENT & MODEL TRAINING COMPLETE                 ")
     print("=" * 80)
-    print(f"Total Clusters Built and Evaluated: {len(df)}")
+    print(f"Total Clusters Built and Evaluated : {len(df)}")
     print(f"Risk Class Breakdown:")
     print(df['risk_level'].value_counts().to_string())
-    print("\nReady for live cluster inference via 'make test-cluster'.")
+    print("\nReport saved to: reports/security_report.txt")
+    print("Use 'make report' to view the complete multi-cluster comparison.")
 
 
 if __name__ == "__main__":

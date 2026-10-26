@@ -1,4 +1,4 @@
-.PHONY: help test-cluster test_cluster report manifests fleet train all test clean
+.PHONY: help test-cluster test_cluster report manifests fleet pipeline train all test clean
 
 CONTEXT ?= kind-ml-k8s-insecure
 REPORT_INPUT ?= data/processed/report_input.csv
@@ -6,10 +6,11 @@ REPORT_FILE ?= reports/security_report.txt
 
 help:
 	@echo "Kubernetes ML Security Assessment - Makefile targets:"
-	@echo "  make fleet                         Run 100-cluster parallel assessment & ML training"
+	@echo "  make pipeline                      Run complete 7-phase 100-cluster assessment & ML training"
+	@echo "  make fleet                         Alias for 'make pipeline'"
 	@echo "  make test-cluster [CONTEXT=<ctx>]  Scan a live cluster context and generate ML report"
 	@echo "  make report                        Display the latest generated security report"
-	@echo "  make train                         Train the Random Forest security models"
+	@echo "  make train                         Train the Random Forest & SVM security models"
 	@echo "  make manifests [COUNT=100]         Generate and scan sample manifests"
 	@echo "  make final                         Run Kind clusters + latest assessment"
 	@echo "  make all                           Run complete multi-scenario assessment pipeline"
@@ -34,6 +35,8 @@ train:
 
 manifests:
 	@MANIFEST_COUNT=$(COUNT) ./run.sh --manifests
+
+pipeline: fleet
 
 fleet:
 	@python3 src/run_cluster_fleet.py

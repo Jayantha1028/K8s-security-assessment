@@ -243,6 +243,12 @@ cmd_all() {
   echo "All done. Outputs: $CLUSTER_DATASET, models/security_models.joblib, $REPORT_FILE"
 }
 
+cmd_fleet() {
+  echo "=== 100-CLUSTER PARALLEL FLEET PIPELINE ==="
+  require_tools python3 kubectl kubescape trivy
+  python3 src/run_cluster_fleet.py "$@"
+}
+
 cmd_test_cluster() {
   local ctx="${1:-${CONTEXT:-kind-ml-k8s-insecure}}"
   echo "=== Live Cluster Assessment: $ctx ==="
@@ -258,6 +264,7 @@ main() {
   trap cleanup EXIT
   case "$MODE" in
     --manifests|--midsem)          shift || true; cmd_manifests "$@" ;;
+    --fleet|--pipeline)            shift || true; cmd_fleet "$@" ;;
     --final)                       cmd_final ;;
     --all)                         cmd_all ;;
     --test-cluster|--test_cluster) shift || true; cmd_test_cluster "$@" ;;
@@ -266,7 +273,7 @@ main() {
 
 MODE="${1:---manifests}"
 case "$MODE" in
-  --manifests|--midsem|--final|--all|--test-cluster|--test_cluster) ;;
+  --manifests|--midsem|--fleet|--pipeline|--final|--all|--test-cluster|--test_cluster) ;;
   -h|--help) usage; exit 0 ;;
   *)
     echo "Unknown option: $MODE" >&2
