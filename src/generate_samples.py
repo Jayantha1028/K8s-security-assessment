@@ -29,7 +29,7 @@ import yaml
 import paths
 
 
-DEFAULT_COUNT = 40
+DEFAULT_COUNT = 100
 DEFAULT_OUTPUT_DIR = str(paths.SAMPLES / "synthetic")
 
 SAMPLE_NAME_RE = re.compile(r"sample-(\d+)\.yaml$")

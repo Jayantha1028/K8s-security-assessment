@@ -5,10 +5,10 @@ Assessment         : latest / secure
 Evidence Score     : 83.0/100
 Posture Bar        : [█████████████████░░░] 83.0/100
 RF Predicted Score : 83.0/100 (Risk: Low)
-SVM Predicted Score: 84.0/100 (Risk: Low)
-XGB Predicted Score: 82.9/100 (Risk: Low)
-Isolation Forest   : [Normal Inlier] (Decision Score: +0.068)
-Model Delta (|Δ|)  : 0.00 points (High ML Alignment)
+SVM Predicted Score: 83.6/100 (Risk: Low)
+XGB Predicted Score: 83.0/100 (Risk: Low)
+Isolation Forest   : [Normal Inlier] (Decision Score: +0.067)
+Model Delta (|Δ|)  : 0.02 points (High ML Alignment)
 
 Security Indicators (Telemetry Breakdown)
   [Vulnerabilities & Supply Chain]
@@ -58,12 +58,12 @@ The ML prediction estimates the security condition from the same underlying indi
 ========================================
 Assessment         : latest / insecure
 Evidence Score     : 25.2/100
-Posture Bar        : [█████░░░░░░░░░░░░░░░] 25.5/100
-RF Predicted Score : 25.5/100 (Risk: High)
+Posture Bar        : [█████░░░░░░░░░░░░░░░] 25.6/100
+RF Predicted Score : 25.6/100 (Risk: High)
 SVM Predicted Score: 26.2/100 (Risk: High)
-XGB Predicted Score: 25.9/100 (Risk: High)
-Isolation Forest   : [ANOMALY (Outlier)] (Decision Score: -0.137)
-Model Delta (|Δ|)  : 0.27 points (High ML Alignment)
+XGB Predicted Score: 25.8/100 (Risk: High)
+Isolation Forest   : [ANOMALY (Outlier)] (Decision Score: -0.141)
+Model Delta (|Δ|)  : 0.34 points (High ML Alignment)
 
 Security Indicators (Telemetry Breakdown)
   [Vulnerabilities & Supply Chain]
@@ -120,6 +120,6 @@ The ML prediction estimates the security condition from the same underlying indi
 ==========================================================================================================
 Environment            Evidence    RF Score    SVM Score   XGB Score   Risk Tier   Iso Status   Posture
 ----------------------------------------------------------------------------------------------------------
-latest / secure        83.0/100    83.0/100    84.0/100    82.9/100    Low         Inlier        [████████░░]
-latest / insecure      25.2/100    25.5/100    26.2/100    25.9/100    High        ANOMALY!      [███░░░░░░░]
+latest / secure        83.0/100    83.0/100    83.6/100    83.0/100    Low         Inlier        [████████░░]
+latest / insecure      25.2/100    25.6/100    26.2/100    25.8/100    High        ANOMALY!      [███░░░░░░░]
 ==========================================================================================================
