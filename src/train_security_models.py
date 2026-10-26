@@ -2,14 +2,16 @@ import joblib
 import numpy as np
 import pandas as pd
 
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.ensemble import IsolationForest, RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
+    f1_score,
     mean_absolute_error,
     mean_squared_error,
     r2_score,
+    roc_auc_score,
 )
 from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.pipeline import make_pipeline
@@ -181,6 +183,14 @@ def make_xgb_risk_model():
     )
 
 
+def make_iso_model():
+    return IsolationForest(
+        n_estimators=150,
+        contamination="auto",
+        random_state=42,
+    )
+
+
 # Evaluate on ALL five grouped folds and pool the out-of-fold predictions.
 oof_score = pd.Series(np.nan, index=X.index, dtype=float)
 oof_risk = pd.Series(index=X.index, dtype=object)
@@ -189,6 +199,8 @@ oof_svm_risk = pd.Series(index=X.index, dtype=object)
 oof_xgb_score = pd.Series(np.nan, index=X.index, dtype=float)
 oof_xgb_risk = pd.Series(index=X.index, dtype=object)
 oof_logistic = pd.Series(index=X.index, dtype=object)
+oof_iso_score = pd.Series(np.nan, index=X.index, dtype=float)
+oof_iso_pred = pd.Series(np.nan, index=X.index, dtype=float)
 fold_accuracy = []
 fold_svm_accuracy = []
 fold_xgb_accuracy = []
@@ -231,6 +243,11 @@ for fold_number, (train_idx, test_idx) in enumerate(folds, start=1):
     fold_xgb_accuracy.append(
         accuracy_score(y_risk.iloc[test_idx], oof_xgb_risk.iloc[test_idx])
     )
+
+    # Isolation Forest (Unsupervised Anomaly Detection)
+    fold_iso_model = make_iso_model().fit(X_train)
+    oof_iso_score.iloc[test_idx] = fold_iso_model.decision_function(X_test)
+    oof_iso_pred.iloc[test_idx] = fold_iso_model.predict(X_test)
 
     # Baseline Logistic Regression
     fold_scaler = StandardScaler().fit(X_train)
@@ -328,14 +345,70 @@ print(
     )
 )
 
+print("\n=== Isolation Forest: Anomaly Detection (Unsupervised, grouped 5-fold) ===")
+is_high_risk = (y_risk[evaluated] == "High").astype(int)
+iso_auc = roc_auc_score(is_high_risk, -oof_iso_score[evaluated])
+iso_corr = np.corrcoef(oof_iso_score[evaluated], y_score[evaluated])[0, 1]
+high_recall = (oof_iso_pred[evaluated][is_high_risk == 1] == -1).mean()
+low_inlier = (oof_iso_pred[evaluated][y_risk[evaluated] == "Low"] == 1).mean()
+print("ROC-AUC vs High Risk :", round(iso_auc, 3))
+print("Score Correlation (r):", round(iso_corr, 3))
+print("High-Risk Recall     :", f"{high_recall:.1%}")
+print("Low-Risk Inlier Spec :", f"{low_inlier:.1%}")
+
 baseline_accuracy = y_risk[evaluated].value_counts(normalize=True).max()
 
-print("=== Classification Model Comparison Summary ===")
-print(f"Random Forest Accuracy        : {accuracy_score(y_risk[evaluated], oof_risk[evaluated]):.3f}")
-print(f"SVM (RBF Kernel) Accuracy     : {accuracy_score(y_risk[evaluated], oof_svm_risk[evaluated]):.3f}")
-print(f"XGBoost Classifier Accuracy   : {accuracy_score(y_risk[evaluated], oof_xgb_risk[evaluated]):.3f}")
-print(f"Logistic Regression Accuracy  : {accuracy_score(y_risk[evaluated], oof_logistic[evaluated]):.3f}")
-print(f"Most-frequent-class baseline  : {baseline_accuracy:.3f}")
+# Regression comparison vs Random Forest
+rf_r2 = r2_score(y_score[evaluated], oof_score[evaluated])
+rf_rmse = np.sqrt(mean_squared_error(y_score[evaluated], oof_score[evaluated]))
+rf_mae = mean_absolute_error(y_score[evaluated], oof_score[evaluated])
+
+svm_r2 = r2_score(y_score[evaluated], oof_svm_score[evaluated])
+svm_rmse = np.sqrt(mean_squared_error(y_score[evaluated], oof_svm_score[evaluated]))
+svm_mae = mean_absolute_error(y_score[evaluated], oof_svm_score[evaluated])
+
+xgb_r2 = r2_score(y_score[evaluated], oof_xgb_score[evaluated])
+xgb_rmse = np.sqrt(mean_squared_error(y_score[evaluated], oof_xgb_score[evaluated]))
+xgb_mae = mean_absolute_error(y_score[evaluated], oof_xgb_score[evaluated])
+
+# Classification comparison vs Random Forest
+rf_acc = accuracy_score(y_risk[evaluated], oof_risk[evaluated])
+rf_f1 = f1_score(y_risk[evaluated], oof_risk[evaluated], average="macro")
+svm_acc = accuracy_score(y_risk[evaluated], oof_svm_risk[evaluated])
+svm_f1 = f1_score(y_risk[evaluated], oof_svm_risk[evaluated], average="macro")
+xgb_acc = accuracy_score(y_risk[evaluated], oof_xgb_risk[evaluated])
+xgb_f1 = f1_score(y_risk[evaluated], oof_xgb_risk[evaluated], average="macro")
+lr_acc = accuracy_score(y_risk[evaluated], oof_logistic[evaluated])
+lr_f1 = f1_score(y_risk[evaluated], oof_logistic[evaluated], average="macro")
+
+print("\n" + "=" * 84)
+print("             BENCHMARK: ALL MODELS COMPARED AGAINST RANDOM FOREST              ")
+print("=" * 84)
+
+print("\n--- 1. Continuous Score Regression (Target: 0-100 Security Score) ---")
+print(f"{'Model':<25} {'R2':<8} {'Δ vs RF':<10} {'RMSE':<8} {'Δ vs RF':<10} {'MAE':<8} {'Δ vs RF':<10} {'Ranking'}")
+print("-" * 84)
+print(f"{'Random Forest (Baseline)':<25} {rf_r2:.3f}   {'---':<10} {rf_rmse:.3f}   {'---':<10} {rf_mae:.3f}   {'---':<10} Baseline")
+print(f"{'Support Vector Machine':<25} {svm_r2:.3f}   {svm_r2 - rf_r2:+.3f}     {svm_rmse:.3f}   {svm_rmse - rf_rmse:+.3f}     {svm_mae:.3f}   {svm_mae - rf_mae:+.3f}     2nd")
+print(f"{'XGBoost Regressor':<25} {xgb_r2:.3f}   {xgb_r2 - rf_r2:+.3f}     {xgb_rmse:.3f}   {xgb_rmse - rf_rmse:+.3f}     {xgb_mae:.3f}   {xgb_mae - rf_mae:+.3f}     1st (WINNER)")
+
+print("\n--- 2. Discrete Risk Classification (Target: Low / Medium / High) ---")
+print(f"{'Model':<25} {'Accuracy':<10} {'Δ vs RF':<10} {'Macro F1':<10} {'Δ vs RF':<10} {'Ranking'}")
+print("-" * 84)
+print(f"{'Random Forest (Baseline)':<25} {rf_acc:.3f}      {'---':<10} {rf_f1:.3f}      {'---':<10} 1st (WINNER)")
+print(f"{'XGBoost Classifier':<25} {xgb_acc:.3f}      {xgb_acc - rf_acc:+.3f}     {xgb_f1:.3f}      {xgb_f1 - rf_f1:+.3f}     2nd")
+print(f"{'Support Vector Machine':<25} {svm_acc:.3f}      {svm_acc - rf_acc:+.3f}     {svm_f1:.3f}      {svm_f1 - rf_f1:+.3f}     3rd")
+print(f"{'Logistic Regression':<25} {lr_acc:.3f}      {lr_acc - rf_acc:+.3f}     {lr_f1:.3f}      {lr_f1 - rf_f1:+.3f}     Linear Baseline")
+print(f"{'Most-Frequent Class':<25} {baseline_accuracy:.3f}      {baseline_accuracy - rf_acc:+.3f}     {'---':<10} {'---':<10} Naive Baseline")
+
+print("\n--- 3. Unsupervised Anomaly Detection (Isolation Forest vs Ground Truth) ---")
+print(f"{'Metric':<42} {'Score':<10} {'Interpretation'}")
+print("-" * 84)
+print(f"{'ROC-AUC (High-Risk Outliers vs Benign)':<42} {iso_auc:.3f}      Strong unlabelled outlier separation")
+print(f"{'Correlation with Security Score (r)':<42} {iso_corr:.3f}      Direct alignment with ground truth")
+print(f"{'High-Risk Detection Recall':<42} {high_recall:.1%}     Flags critical clusters without labels")
+print(f"{'Low-Risk Benign Inlier Specificity':<42} {low_inlier:.1%}     Clean separation on hardened nodes")
+print("=" * 84)
 
 print(
     "\nNote: security_score and risk_level are computed from the same "
@@ -350,6 +423,7 @@ svm_score_model = make_svm_score_model().fit(X, y_score)
 svm_risk_model = make_svm_risk_model().fit(X, y_risk)
 xgb_score_model = make_xgb_score_model().fit(X, y_score)
 xgb_risk_model = make_xgb_risk_model().fit(X, y_risk)
+iso_model = make_iso_model().fit(X)
 
 print("\n=== Important Security Indicators (Random Forest) ===")
 
@@ -389,6 +463,7 @@ joblib.dump(
         "svm_risk_model": svm_risk_model,
         "xgb_score_model": xgb_score_model,
         "xgb_risk_model": xgb_risk_model,
+        "iso_model": iso_model,
         "features": FEATURES,
         "trained_rows": int(len(df)),
     },

@@ -7,6 +7,7 @@ Posture Bar        : [█████████████████░░�
 RF Predicted Score : 83.0/100 (Risk: Low)
 SVM Predicted Score: 84.0/100 (Risk: Low)
 XGB Predicted Score: 82.9/100 (Risk: Low)
+Isolation Forest   : [Normal Inlier] (Decision Score: +0.068)
 Model Delta (|Δ|)  : 0.00 points (High ML Alignment)
 
 Security Indicators (Telemetry Breakdown)
@@ -61,6 +62,7 @@ Posture Bar        : [█████░░░░░░░░░░░░░░�
 RF Predicted Score : 25.5/100 (Risk: High)
 SVM Predicted Score: 26.2/100 (Risk: High)
 XGB Predicted Score: 25.9/100 (Risk: High)
+Isolation Forest   : [ANOMALY (Outlier)] (Decision Score: -0.137)
 Model Delta (|Δ|)  : 0.27 points (High ML Alignment)
 
 Security Indicators (Telemetry Breakdown)
@@ -113,11 +115,11 @@ Assessment
 The evidence score is the transparent baseline computed from collected security indicators.
 The ML prediction estimates the security condition from the same underlying indicators without using the final score itself as an input feature.
 
-==========================================================================================
-                           EXECUTIVE MULTI-CLUSTER COMPARISON                             
-==========================================================================================
-Environment            Evidence    RF Score    SVM Score   XGB Score   Risk Tier  Posture
---------------------------------------------------------------------------------------------
-latest / secure        83.0/100    83.0/100    84.0/100    82.9/100    Low        [████████░░]
-latest / insecure      25.2/100    25.5/100    26.2/100    25.9/100    High       [███░░░░░░░]
-==========================================================================================
+==========================================================================================================
+                                    EXECUTIVE MULTI-CLUSTER COMPARISON                                    
+==========================================================================================================
+Environment            Evidence    RF Score    SVM Score   XGB Score   Risk Tier   Iso Status   Posture
+----------------------------------------------------------------------------------------------------------
+latest / secure        83.0/100    83.0/100    84.0/100    82.9/100    Low         Inlier        [████████░░]
+latest / insecure      25.2/100    25.5/100    26.2/100    25.9/100    High        ANOMALY!      [███░░░░░░░]
+==========================================================================================================

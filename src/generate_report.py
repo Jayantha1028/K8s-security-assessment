@@ -47,6 +47,9 @@ svm_scores = MODEL["svm_score_model"].predict(X) if "svm_score_model" in MODEL e
 svm_risks = MODEL["svm_risk_model"].predict(X) if "svm_risk_model" in MODEL else None
 xgb_scores = MODEL["xgb_score_model"].predict(X) if "xgb_score_model" in MODEL else None
 xgb_risks = MODEL["xgb_risk_model"].predict(X) if "xgb_risk_model" in MODEL else None
+iso_model = MODEL.get("iso_model")
+iso_scores = iso_model.decision_function(X) if iso_model is not None else None
+iso_preds = iso_model.predict(X) if iso_model is not None else None
 
 remediations = {
     "privileged_count":
@@ -164,6 +167,9 @@ def describe(position):
         add(f"SVM Predicted Score: {svm_scores[position]:.1f}/100 (Risk: {svm_risks[position]})")
     if xgb_scores is not None:
         add(f"XGB Predicted Score: {xgb_scores[position]:.1f}/100 (Risk: {xgb_risks[position]})")
+    if iso_scores is not None and iso_preds is not None:
+        status_tag = "Normal Inlier" if iso_preds[position] == 1 else "ANOMALY (Outlier)"
+        add(f"Isolation Forest   : [{status_tag}] (Decision Score: {iso_scores[position]:+.3f})")
     if svm_scores is None and xgb_scores is None:
         add(f"ML Risk Level      : {predicted_risk}")
 
@@ -252,15 +258,19 @@ for position in range(len(DATA)):
 # If multiple environments were evaluated, append a Comparative Executive Dashboard
 if len(DATA) > 1:
     add()
-    add("==========================================================================================")
-    add("                           EXECUTIVE MULTI-CLUSTER COMPARISON                             ")
-    add("==========================================================================================")
+    add("==========================================================================================================")
+    add("                                    EXECUTIVE MULTI-CLUSTER COMPARISON                                    ")
+    add("==========================================================================================================")
     header = f"{'Environment':<22} {'Evidence':<11} {'RF Score':<11} {'SVM Score':<11}"
     if xgb_scores is not None:
         header += f" {'XGB Score':<11}"
-    header += f" {'Risk Tier':<10} {'Posture'}"
+    header += f" {'Risk Tier':<11}"
+    if iso_preds is not None:
+        header += f" {'Iso Status':<13}"
+    header += "Posture"
     add(header)
-    add("-" * (92 if xgb_scores is not None else 80))
+    divider_len = len(header) + 12
+    add("-" * 106)
     for pos in range(len(DATA)):
         r = DATA.iloc[pos]
         lbl = " / ".join(str(r[c]) for c in ("snapshot", "environment") if c in DATA.columns) or f"Target #{pos+1}"
@@ -275,10 +285,14 @@ if len(DATA) > 1:
             xgb_p = f"{float(xgb_scores[pos]):.1f}/100"
             row_str += f" {xgb_p:<11}"
         tier = str(predicted_risks[pos])
+        row_str += f" {tier:<11}"
+        if iso_preds is not None:
+            iso_label = "Inlier" if iso_preds[pos] == 1 else "ANOMALY!"
+            row_str += f" {iso_label:<13}"
         meter = f"[{make_meter(float(predicted_scores[pos]), 10)}]"
-        row_str += f" {tier:<10} {meter}"
+        row_str += f" {meter}"
         add(row_str)
-    add("==========================================================================================")
+    add("==========================================================================================================")
 
 report_file = Path(sys.argv[2]) if len(sys.argv) > 2 else paths.REPORT_FILE
 report_file.parent.mkdir(parents=True, exist_ok=True)
