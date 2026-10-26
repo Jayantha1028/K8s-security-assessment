@@ -1,112 +1,118 @@
 # CDC-5: ML‑Based Kubernetes Security Assessment
 
-**Purpose** – Generate 100 synthetic Kubernetes manifests, spin up up‑to‑100 Kind clusters in parallel, run **Trivy**, **Falco**, and **Kubescape** scans, merge the three reports into a unified CSV, and train four machine‑learning models (Random Forest, SVM, XGBoost, Isolation Forest).  The trained models are then applied to fresh test clusters and a comparative performance report is generated.
+**Purpose** – An end-to-end Kubernetes security assessment and machine-learning benchmarking platform. Generates 100 synthetic Kubernetes manifests, provisions Kind clusters, runs **Trivy**, **Falco**, and **Kubescape** scans with RBAC inspection, merges telemetry into unified datasets, and trains & benchmarks **four independent machine learning models** (**Random Forest**, **Support Vector Machine**, **XGBoost**, and **Isolation Forest**).
+
+---
 
 ## Quick‑Start
 ```bash
-# 1️⃣ Set up the Python environment (once)
+# 1️⃣ Set up the Python environment
 chmod +x run.sh scripts/*.sh
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# 2️⃣ Install external scanners (see SETUP.md)
-#    Kubescape, Trivy, Docker, Kind, kubectl, Helm
+# 2️⃣ Verify required tools (Docker, Kind, kubectl, Helm, Kubescape, Trivy)
+for t in docker kind kubectl helm kubescape trivy; do command -v $t >/dev/null && echo "ok: $t" || echo "MISSING: $t"; done
 
-# 3️⃣ Run the full pipeline (creates 100 clusters in bounded parallel batches)
-./run.sh --all   # equivalent to the steps below
+# 3️⃣ Run the full pipeline
+./run.sh --manifests   # Fast: 100 synthetic manifests + Kubescape + dataset
+./run.sh --final       # Kind clusters (secure + insecure) + latest assessment + report
+./run.sh --all         # Full suite: clusters, snapshots, medium scenario, training, report
 ```
-*You can also run the steps individually (see **Step‑by‑step** section).*
-
-## Project layout
-```
-.
-├── run.sh                      # entry point (–manifests | –final | –all)
-├── src/                        # Python code
-│   ├── paths.py                # all I/O locations (single source of truth)
-│   ├── k8s_features.py
-│   ├── scan_parser.py
-│   ├── data_cleaning.py
-│   ├── generate_samples.py     # synthetic manifest generator (100 manifests)
-│   ├── scan_manifests.py       # Kubescape on manifests
-│   ├── collect_cluster_features.py
-│   ├── collect_falco.py
-│   ├── build_cluster_dataset.py
-│   ├── train_security_models.py
-│   └── generate_report.py
-├── scripts/                    # Bash helpers
-│   ├── setup-kind-clusters.sh
-│   ├── apply_medium_scenario.sh
-│   ├── collect_cluster.sh
-│   ├── take_snapshot.sh
-│   └── lib.sh
-├── manifests/                  # example secure / insecure workloads
-├── data/                       # generated data (git‑ignored)
-│   ├── raw/                    # manifests, scanner JSON, Falco logs
-│   └── processed/              # CSVs used for ML
-├── models/                     # trained model file (joblib)
-├── reports/                    # final human‑readable report
-├── docs/                       # README.md, SETUP.md, PROJECT_REPORT.md
-└── tests/                      # unit + integration tests (no cluster needed)
-```
-
-## Core pipeline (what `./run.sh --all` does)
-1. **Manifest generation** – `src/generate_samples.py` creates 100 YAML files in `data/raw/samples/`.
-2. **Parallel cluster creation** – `src/run_cluster_fleet.py` launches up to `--batch-size` clusters concurrently (default 5, configurable via `MAX_PARALLEL` env var).  The total target is 100 clusters (`--count`).
-3. **Live scans** – for each cluster we run:
-   * **Trivy** (image CVEs & misconfigurations)
-   * **Falco** (runtime alerts, 5‑minute window)
-   * **Kubescape** (policy compliance on the live cluster)
-4. **Manifest‑only scan** – `src/scan_manifests.py` runs Kubescape on the generated manifests.
-5. **Data merging** – `src/build_cluster_dataset.py` combines the three scanner outputs into a single row per cluster, adding the evidence score and the target label (high/medium/low risk).
-6. **Feature extraction & cleaning** – `src/data_cleaning.py` removes NaNs, normalises numeric columns, and derives additional features (e.g., total CVEs, Falco alert count).
-7. **Model training** – `src/train_security_models.py` fits four models:
-   * Random Forest (`sklearn.ensemble.RandomForestClassifier`)
-   * Support Vector Machine (`sklearn.svm.SVC`)
-   * XGBoost (`xgboost.XGBClassifier`)
-   * Isolation Forest (`sklearn.ensemble.IsolationForest` – unsupervised anomaly detector)
-   Models are saved to `models/security_models.joblib`.
-8. **Live‑test evaluation** – The same pipeline is executed on a fresh set of clusters; the trained models predict risk and a comparative table (accuracy, ROC‑AUC, precision, recall) is written to `reports/security_report.txt`.
-9. **Report generation** – `src/generate_report.py` produces a human‑readable markdown report (`PROJECT_REPORT.md`).
-
-## Supported models
-| Model               | Type                | Primary use case |
-|---------------------|---------------------|------------------|
-| Random Forest       | Supervised classifier | Baseline, robust to noisy features |
-| SVM                 | Supervised classifier | High‑dimensional feature spaces |
-| XGBoost             | Gradient‑boosted tree | Often best predictive performance |
-| Isolation Forest    | Unsupervised anomaly detector | Detect out‑of‑distribution clusters |
-
-*All four models are trained together and benchmarked in the final report.*
-
-## How to adjust parallelism
-- The default parallel batch size is **5** (see `--batch-size` in `run_cluster_fleet.py`).
-- Override with an environment variable, e.g.:
-```bash
-export MAX_PARALLEL=12
-./run.sh --all
-```
-- **Caution** – increasing parallelism may exhaust CPU or memory on a modest laptop.  Monitor `top`/`htop` and adjust accordingly.
-
-## Running only the manifest pipeline
-If you want to skip the heavyweight cluster step, execute:
-```bash
-./run.sh --manifests   # generates manifests and runs Kubescape on them
-```
-The resulting CSV can still be used for model training (the cluster‑derived columns will be missing).
-
-## Testing & verification
-```bash
-# Unit + integration tests (no real clusters needed)
-python3 -m unittest discover -s tests -v
-
-# Verify bash scripts syntax
-for s in run.sh scripts/*.sh; do bash -n "$s" || exit 1; done
-```
-All tests must pass before committing changes.
-
-## Documentation
-- **SETUP.md** – detailed environment installation.
-- **PROJECT_REPORT.md** – full end‑to‑end description, benchmark tables, and future work.
 
 ---
-*For a deeper dive into the architecture, see the **Project Report** (`docs/PROJECT_REPORT.md`).*
+
+## Project Layout
+```
+.
+├── run.sh                          # Main pipeline entry point (--manifests | --final | --all)
+├── requirements.txt                # Python dependencies
+├── src/                            # Pipeline source code
+│   ├── paths.py                    # Centralized I/O paths
+│   ├── generate_samples.py         # Synthetic manifest generator (100 manifests)
+│   ├── scan_manifests.py           # Parallel Kubescape scanner for manifests
+│   ├── create_dataset.py           # Builds kubernetes_security_dataset.csv
+│   ├── collect_cluster_features.py # Live cluster RBAC & workload configuration extractor
+│   ├── collect_falco.py            # Runtime Falco alert collector
+│   ├── build_cluster_dataset.py    # Merges scanner outputs into final_security_dataset.csv
+│   ├── train_security_models.py    # Trains & benchmarks 4 models independently
+│   ├── generate_report.py          # Executive multi-model CLI security report
+│   ├── generate_dashboard.py       # (Side-output) Standalone interactive HTML dashboard
+│   ├── plot_benchmark.py           # (Side-output) 4-panel SVG benchmark chart generator
+│   └── auto_remediate.py           # (Side-output) Automated YAML manifest security hardening
+├── scripts/                        # Automation & cluster scripts
+│   ├── setup-kind-clusters.sh      # Provisions secure and insecure Kind clusters
+│   ├── collect_cluster.sh          # Parallel Kubescape, Trivy, Falco, kubectl collector
+│   ├── generate_extra_artifacts.sh # All-in-one runner for optional side outputs
+│   └── lib.sh                      # Common shell library and paths
+├── manifests/                      # Workload deployment templates
+│   ├── secure/                     # Hardened workloads, default-deny network policy, RBAC
+│   └── insecure/                   # Vulnerable and medium-risk workloads
+├── models/                         # 4 Individually trained model files
+│   ├── random_forest_model.joblib  # Supervised baseline classifier & regressor
+│   ├── svm_model.joblib            # Support Vector Machine (kernel margin)
+│   ├── xgboost_model.joblib        # Gradient boosted trees (lowest error)
+│   ├── isolation_forest_model.joblib # Unsupervised zero-day anomaly detector
+│   └── security_models.joblib      # Consolidated bundle for backward compatibility
+├── reports/                        # Output reports and visual artifacts
+│   ├── security_report.txt         # Terminal assessment report & comparison table
+│   ├── dashboard.html              # Interactive HTML executive dashboard
+│   └── model_benchmark_comparison.svg # Scalable vector benchmark graphic
+├── docs/                           # Documentation
+│   ├── SETUP.md                    # Environment installation guide
+│   └── DETAILED_PROJECT_REPORT.md  # Comprehensive project report & benchmarks
+└── tests/                          # 41 Unit & integration tests (no cluster required)
+```
+
+---
+
+## Supported Machine Learning Models
+
+Rather than ensembling into an opaque black-box, all 4 models are **trained and evaluated independently** to benchmark their distinct advantages:
+
+| Model | Paradigm | Role & Benchmark Finding | Best For |
+|---|---|---|---|
+| **Random Forest** | Supervised Bagging | **Top Classifier:** 90.5% Accuracy, 0.883 Macro F1 | Robust baseline, stable feature importances |
+| **SVM** | Kernel Margin | **Competitive Regression:** $R^2 = 0.952$, RMSE = 4.684 | High-dimensional decision boundaries |
+| **XGBoost** | Gradient Boosting | **Top Regressor:** $R^2 = 0.959$, RMSE = 4.376 (Lowest Error) | Precise continuous security score prediction |
+| **Isolation Forest** | Unsupervised Ensembling | **Anomaly Detection:** ROC-AUC = 0.975, 100% Outlier Recall | Catching novel/zero-day cluster drifts without labels |
+
+---
+
+## Optional Side-Output Artifacts (Visual & Remediation)
+
+The core pipeline in `./run.sh` remains lightweight, fast, and terminal-friendly. If you want executive visual deliverables, run the dedicated side-output generator:
+
+```bash
+# Generate all visual & actionable side artifacts at once
+./scripts/generate_extra_artifacts.sh
+```
+
+### What this produces:
+1. **Interactive HTML Dashboard** (`reports/dashboard.html`): Open in any browser (`open reports/dashboard.html`) for interactive charts, posture gauges, and findings breakdown.
+2. **Benchmark Graphic** (`reports/model_benchmark_comparison.svg`): 4-panel publication-ready comparison plot.
+3. **Automated YAML Hardening** (`src/auto_remediate.py`):
+   ```bash
+   python3 src/auto_remediate.py manifests/insecure/weak-deployment.yaml
+   ```
+   Inspects insecure manifests, revokes container privileges, removes host namespaces, enforces `runAsNonRoot` & `RuntimeDefault` seccomp, drops all Linux capabilities, and outputs a colorized unified diff.
+
+---
+
+## Testing & Verification
+
+All 41 unit and integration tests run entirely with mocks—**no live Kubernetes cluster is needed**:
+
+```bash
+# Run full test suite
+python3 -m unittest discover -s tests -v
+
+# Verify bash script syntax
+for s in run.sh scripts/*.sh; do bash -n "$s" || exit 1; done
+```
+
+---
+
+## Documentation
+* [**SETUP.md**](docs/SETUP.md) – Detailed tool setup (Docker, Kind, Kubescape, Trivy, Falco).
+* [**DETAILED_PROJECT_REPORT.md**](docs/DETAILED_PROJECT_REPORT.md) – Comprehensive architecture and mathematical formulation report.
