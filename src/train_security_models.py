@@ -15,8 +15,10 @@ from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC, SVR
+import xgboost as xgb
 
 import paths
+from xgb_wrapper import XGBoostSecurityClassifier
 
 DATASET = paths.CLUSTER_DATASET
 MODEL_FILE = paths.MODEL_FILE
@@ -159,14 +161,37 @@ def make_svm_risk_model():
     )
 
 
+def make_xgb_score_model():
+    return xgb.XGBRegressor(
+        n_estimators=100,
+        max_depth=4,
+        learning_rate=0.05,
+        min_child_weight=0,
+        random_state=42,
+    )
+
+
+def make_xgb_risk_model():
+    return XGBoostSecurityClassifier(
+        n_estimators=100,
+        max_depth=4,
+        learning_rate=0.05,
+        min_child_weight=0,
+        random_state=42,
+    )
+
+
 # Evaluate on ALL five grouped folds and pool the out-of-fold predictions.
 oof_score = pd.Series(np.nan, index=X.index, dtype=float)
 oof_risk = pd.Series(index=X.index, dtype=object)
 oof_svm_score = pd.Series(np.nan, index=X.index, dtype=float)
 oof_svm_risk = pd.Series(index=X.index, dtype=object)
+oof_xgb_score = pd.Series(np.nan, index=X.index, dtype=float)
+oof_xgb_risk = pd.Series(index=X.index, dtype=object)
 oof_logistic = pd.Series(index=X.index, dtype=object)
 fold_accuracy = []
 fold_svm_accuracy = []
+fold_xgb_accuracy = []
 skipped_folds = 0
 
 for fold_number, (train_idx, test_idx) in enumerate(folds, start=1):
@@ -195,6 +220,16 @@ for fold_number, (train_idx, test_idx) in enumerate(folds, start=1):
     oof_svm_risk.iloc[test_idx] = fold_svm_risk_model.predict(X_test)
     fold_svm_accuracy.append(
         accuracy_score(y_risk.iloc[test_idx], oof_svm_risk.iloc[test_idx])
+    )
+
+    # XGBoost
+    fold_xgb_score_model = make_xgb_score_model().fit(X_train, y_score.iloc[train_idx])
+    fold_xgb_risk_model = make_xgb_risk_model().fit(X_train, y_risk.iloc[train_idx])
+
+    oof_xgb_score.iloc[test_idx] = fold_xgb_score_model.predict(X_test)
+    oof_xgb_risk.iloc[test_idx] = fold_xgb_risk_model.predict(X_test)
+    fold_xgb_accuracy.append(
+        accuracy_score(y_risk.iloc[test_idx], oof_xgb_risk.iloc[test_idx])
     )
 
     # Baseline Logistic Regression
@@ -268,11 +303,37 @@ print(
     )
 )
 
+print("\n=== XGBoost: Security Score (grouped 5-fold) ===")
+print("R2 :", round(r2_score(y_score[evaluated], oof_xgb_score[evaluated]), 3))
+print(
+    "RMSE:",
+    round(np.sqrt(mean_squared_error(y_score[evaluated], oof_xgb_score[evaluated])), 3)
+)
+print(
+    "MAE :",
+    round(mean_absolute_error(y_score[evaluated], oof_xgb_score[evaluated]), 3)
+)
+
+print("\n=== XGBoost: Risk Level (grouped 5-fold) ===")
+print(
+    "Accuracy:",
+    round(accuracy_score(y_risk[evaluated], oof_xgb_risk[evaluated]), 3),
+    f"(per-fold mean {np.mean(fold_xgb_accuracy):.3f} +/- {np.std(fold_xgb_accuracy):.3f})",
+)
+print(
+    classification_report(
+        y_risk[evaluated],
+        oof_xgb_risk[evaluated],
+        zero_division=0,
+    )
+)
+
 baseline_accuracy = y_risk[evaluated].value_counts(normalize=True).max()
 
 print("=== Classification Model Comparison Summary ===")
 print(f"Random Forest Accuracy        : {accuracy_score(y_risk[evaluated], oof_risk[evaluated]):.3f}")
 print(f"SVM (RBF Kernel) Accuracy     : {accuracy_score(y_risk[evaluated], oof_svm_risk[evaluated]):.3f}")
+print(f"XGBoost Classifier Accuracy   : {accuracy_score(y_risk[evaluated], oof_xgb_risk[evaluated]):.3f}")
 print(f"Logistic Regression Accuracy  : {accuracy_score(y_risk[evaluated], oof_logistic[evaluated]):.3f}")
 print(f"Most-frequent-class baseline  : {baseline_accuracy:.3f}")
 
@@ -287,6 +348,8 @@ score_model = make_score_model().fit(X, y_score)
 risk_model = make_risk_model().fit(X, y_risk)
 svm_score_model = make_svm_score_model().fit(X, y_score)
 svm_risk_model = make_svm_risk_model().fit(X, y_risk)
+xgb_score_model = make_xgb_score_model().fit(X, y_score)
+xgb_risk_model = make_xgb_risk_model().fit(X, y_risk)
 
 print("\n=== Important Security Indicators (Random Forest) ===")
 
@@ -302,6 +365,20 @@ for name, value in importance:
     bar = "█" * bar_len + "░" * (20 - bar_len)
     print(f"{name:35} [{bar}] {value:.3f}")
 
+print("\n=== Important Security Indicators (XGBoost) ===")
+
+xgb_importance = sorted(
+    zip(FEATURES, xgb_risk_model.feature_importances_),
+    key=lambda item: item[1],
+    reverse=True,
+)
+
+max_xgb_imp = max((v for _, v in xgb_importance), default=1.0)
+for name, value in xgb_importance:
+    bar_len = int(round((value / max_xgb_imp) * 20)) if max_xgb_imp > 0 else 0
+    bar = "█" * bar_len + "░" * (20 - bar_len)
+    print(f"{name:35} [{bar}] {value:.3f}")
+
 
 MODEL_FILE.parent.mkdir(parents=True, exist_ok=True)
 joblib.dump(
@@ -310,6 +387,8 @@ joblib.dump(
         "risk_model": risk_model,
         "svm_score_model": svm_score_model,
         "svm_risk_model": svm_risk_model,
+        "xgb_score_model": xgb_score_model,
+        "xgb_risk_model": xgb_risk_model,
         "features": FEATURES,
         "trained_rows": int(len(df)),
     },

@@ -45,6 +45,8 @@ predicted_scores = MODEL["score_model"].predict(X)
 predicted_risks = MODEL["risk_model"].predict(X)
 svm_scores = MODEL["svm_score_model"].predict(X) if "svm_score_model" in MODEL else None
 svm_risks = MODEL["svm_risk_model"].predict(X) if "svm_risk_model" in MODEL else None
+xgb_scores = MODEL["xgb_score_model"].predict(X) if "xgb_score_model" in MODEL else None
+xgb_risks = MODEL["xgb_risk_model"].predict(X) if "xgb_risk_model" in MODEL else None
 
 remediations = {
     "privileged_count":
@@ -160,7 +162,9 @@ def describe(position):
     add(f"RF Predicted Score : {predicted_score:.1f}/100 (Risk: {predicted_risk})")
     if svm_scores is not None:
         add(f"SVM Predicted Score: {svm_scores[position]:.1f}/100 (Risk: {svm_risks[position]})")
-    else:
+    if xgb_scores is not None:
+        add(f"XGB Predicted Score: {xgb_scores[position]:.1f}/100 (Risk: {xgb_risks[position]})")
+    if svm_scores is None and xgb_scores is None:
         add(f"ML Risk Level      : {predicted_risk}")
 
     if evidence_val is not None:
@@ -248,11 +252,15 @@ for position in range(len(DATA)):
 # If multiple environments were evaluated, append a Comparative Executive Dashboard
 if len(DATA) > 1:
     add()
-    add("================================================================================")
-    add("                    EXECUTIVE MULTI-CLUSTER COMPARISON                          ")
-    add("================================================================================")
-    add(f"{'Environment':<22} {'Evidence':<12} {'RF Score':<12} {'SVM Score':<12} {'Risk Tier':<10} {'Posture'}")
-    add("-" * 80)
+    add("==========================================================================================")
+    add("                           EXECUTIVE MULTI-CLUSTER COMPARISON                             ")
+    add("==========================================================================================")
+    header = f"{'Environment':<22} {'Evidence':<11} {'RF Score':<11} {'SVM Score':<11}"
+    if xgb_scores is not None:
+        header += f" {'XGB Score':<11}"
+    header += f" {'Risk Tier':<10} {'Posture'}"
+    add(header)
+    add("-" * (92 if xgb_scores is not None else 80))
     for pos in range(len(DATA)):
         r = DATA.iloc[pos]
         lbl = " / ".join(str(r[c]) for c in ("snapshot", "environment") if c in DATA.columns) or f"Target #{pos+1}"
@@ -262,10 +270,15 @@ if len(DATA) > 1:
             ev = "N/A"
         pred = f"{float(predicted_scores[pos]):.1f}/100"
         svm_p = f"{float(svm_scores[pos]):.1f}/100" if svm_scores is not None else "N/A"
+        row_str = f"{lbl:<22} {ev:<11} {pred:<11} {svm_p:<11}"
+        if xgb_scores is not None:
+            xgb_p = f"{float(xgb_scores[pos]):.1f}/100"
+            row_str += f" {xgb_p:<11}"
         tier = str(predicted_risks[pos])
         meter = f"[{make_meter(float(predicted_scores[pos]), 10)}]"
-        add(f"{lbl:<22} {ev:<12} {pred:<12} {svm_p:<12} {tier:<10} {meter}")
-    add("================================================================================")
+        row_str += f" {tier:<10} {meter}"
+        add(row_str)
+    add("==========================================================================================")
 
 report_file = Path(sys.argv[2]) if len(sys.argv) > 2 else paths.REPORT_FILE
 report_file.parent.mkdir(parents=True, exist_ok=True)

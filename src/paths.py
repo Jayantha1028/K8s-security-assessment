@@ -6,8 +6,14 @@ scripts/lib.sh mirrors the data/ locations for the shell side.
 """
 
 from pathlib import Path
+import sys
 
-ROOT = Path(__file__).resolve().parent.parent
+# Ensure src/ directory is importable from anywhere
+SRC_DIR = Path(__file__).resolve().parent
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+ROOT = SRC_DIR.parent
 
 # Raw inputs: generated manifests, scanner output, cluster collections.
 # Regenerable, so data/raw/ is git-ignored.
