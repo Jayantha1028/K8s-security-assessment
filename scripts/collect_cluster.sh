@@ -8,12 +8,13 @@
 # fails if any of them fails; the caller then discards the whole directory.
 set -euo pipefail
 
-if [[ $# -ne 2 ]]; then
-  echo "Usage: $0 <kube-context> <output-directory>" >&2
+if [[ $# -lt 2 ]]; then
+  echo "Usage: $0 <kube-context> <output-directory> [namespace]" >&2
   exit 2
 fi
 CONTEXT="$1"
 OUTPUT="$2"
+NAMESPACE="${3:-security-demo}"
 case "$OUTPUT" in /*) ;; *) OUTPUT="$PWD/$OUTPUT" ;; esac  # before lib.sh changes directory
 
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
@@ -22,26 +23,33 @@ require_tools kubectl kubescape trivy python3
 mkdir -p "$OUTPUT"
 pids=()
 
+ns_arg_ks=()
+ns_arg_trivy=()
+if [ "$NAMESPACE" != "all" ] && [ -n "$NAMESPACE" ]; then
+  ns_arg_ks=(--include-namespaces "$NAMESPACE")
+  ns_arg_trivy=(--include-namespaces "$NAMESPACE")
+fi
+
 # The context is passed explicitly with --kube-context instead of mutating
 # the shared kubeconfig current-context via `kubectl config use-context`, so
 # several scans can safely run at the same time.
-echo "Kubescape -> $CONTEXT"
+echo "Kubescape -> $CONTEXT (${NAMESPACE:-all})"
 kubescape scan framework nsa \
   --kube-context "$CONTEXT" \
   --host-scan=false \
-  --include-namespaces security-demo \
+  ${ns_arg_ks[@]+"${ns_arg_ks[@]}"} \
   --format json \
   --format-version v2 \
   --output "$OUTPUT/kubescape.json" &
 pids+=($!)
 
-echo "Trivy -> $CONTEXT"
+echo "Trivy -> $CONTEXT (${NAMESPACE:-all})"
 trivy k8s \
   --timeout 15m \
   --skip-version-check \
   --scanners vuln,misconfig,secret \
   --disable-node-collector \
-  --include-namespaces security-demo \
+  ${ns_arg_trivy[@]+"${ns_arg_trivy[@]}"} \
   --report all \
   --format json \
   --output "$OUTPUT/trivy.json" \
