@@ -23,7 +23,7 @@ cluster-0021,cluster,60.0,8,12,0,0,1,6,1,0,0,0,5,0,25,20,0,0,1,0,1,0,1,1,1,1,0,0
 cluster-0022,cluster,45.0,11,9,0,0,5,5,1,36,84,1,10,0,0,0,0,0,1,1,1,1,3,1,1,2,3,1,1,29.6,High,Vulnerability,"Resource, Network, Vulnerability"
 cluster-0023,cluster,45.0,11,9,0,0,5,5,1,2,8,0,6,0,25,20,0,0,1,0,1,0,1,1,1,1,0,0,0,42.33,Medium,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0024,cluster,55.0,9,11,0,0,3,5,1,4,16,0,7,0,0,0,0,0,1,0,0,0,2,1,1,2,0,0,0,48.0,Medium,Vulnerability,"Resource, Network, Vulnerability"
-cluster-0025,cluster,65.0,7,13,0,0,2,4,1,0,0,0,4,0,25,20,0,0,1,0,0,0,0,1,1,1,0,0,0,75.9,Low,Vulnerability,"Access, Network, Vulnerability"
+cluster-0025,cluster,65.0,7,13,0,0,2,4,1,0,0,0,4,0,25,20,0,0,1,0,0,0,0,1,1,1,1,0,0,75.9,Low,Vulnerability,"Access, Network, Vulnerability"
 cluster-0026,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,94.0,Low,Network,Network
 cluster-0027,cluster,70.0,6,14,0,0,1,4,1,0,0,0,4,0,0,0,0,0,1,0,0,0,0,1,1,1,0,0,0,82.5,Low,Vulnerability,"Network, Vulnerability"
 cluster-0028,cluster,50.0,10,10,0,0,4,5,1,0,0,0,6,0,0,0,0,0,1,0,0,0,1,1,1,1,1,0,1,67.9,Medium,Vulnerability,"Resource, Network, Vulnerability"
@@ -33,17 +33,17 @@ cluster-0031,cluster,60.0,8,12,0,0,1,6,1,2,8,0,5,0,25,20,0,0,1,0,0,0,1,1,1,1,0,0
 cluster-0032,cluster,65.0,7,13,0,0,2,4,1,0,0,0,3,0,25,20,0,0,1,0,0,0,0,0,1,1,0,0,0,79.9,Low,Vulnerability,"Access, Network, Vulnerability"
 cluster-0033,cluster,70.0,6,14,0,0,2,3,1,2,8,0,3,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,67.93,Medium,Vulnerability,"Network, Vulnerability"
 cluster-0034,cluster,55.0,9,11,0,0,3,5,1,4,16,0,5,0,0,0,0,0,1,0,1,0,1,1,1,2,0,0,0,49.0,Medium,Vulnerability,"Resource, Network, Vulnerability"
-cluster-0035,cluster,60.0,8,12,0,0,2,5,1,0,0,0,3,0,25,20,0,0,1,0,1,0,0,0,1,1,0,0,0,76.4,Low,Vulnerability,"Resource, Access, Network, Vulnerability"
+cluster-0035,cluster,60.0,8,12,0,0,2,5,1,0,0,0,3,0,25,20,0,0,1,0,1,0,0,0,1,1,1,0,0,76.4,Low,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0036,cluster,80.0,4,16,0,0,0,3,1,0,0,0,3,0,0,0,0,0,1,0,0,0,0,1,1,1,0,0,0,87.0,Low,Network,"Network, Vulnerability"
 cluster-0037,cluster,40.0,12,8,0,0,5,6,1,4,12,1,7,0,25,20,0,0,1,1,1,0,0,1,1,1,2,1,0,35.1,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0038,cluster,65.0,7,13,0,0,3,3,1,2,8,0,3,0,0,0,0,0,1,0,0,0,1,1,1,1,0,0,0,59.93,Medium,Vulnerability,"Resource, Network, Vulnerability"
 cluster-0039,cluster,85.0,3,17,0,0,0,3,0,0,0,0,2,0,0,0,0,0,1,0,0,0,0,0,1,2,0,0,0,91.5,Low,Vulnerability,"Network, Vulnerability"
-cluster-0040,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,94.0,Low,Network,Network
+cluster-0040,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,1,0,0,94.0,Low,Network,Network
 cluster-0041,cluster,85.0,3,17,0,0,0,3,0,0,0,0,1,0,25,20,0,0,1,0,0,0,0,0,1,1,0,0,0,88.9,Low,Access,"Access, Network"
 cluster-0042,cluster,60.0,8,12,0,0,3,4,1,2,8,0,7,0,0,0,0,0,1,0,1,1,2,1,1,2,0,0,0,41.5,Medium,Vulnerability,"Resource, Network, Vulnerability"
 cluster-0043,cluster,85.0,3,17,0,0,0,3,0,0,0,0,1,0,25,20,0,0,1,0,0,0,0,0,1,1,0,0,0,88.9,Low,Access,"Access, Network"
 cluster-0044,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,94.0,Low,Network,Network
-cluster-0045,cluster,70.0,6,14,0,0,2,3,1,0,0,0,4,0,0,0,0,0,1,0,0,0,0,1,1,1,0,0,0,81.0,Low,Vulnerability,"Network, Vulnerability"
+cluster-0045,cluster,70.0,6,14,0,0,2,3,1,0,0,0,4,0,0,0,0,0,1,0,0,0,0,1,1,1,2,0,0,81.0,Low,Vulnerability,"Network, Vulnerability"
 cluster-0046,cluster,70.0,6,14,0,0,0,5,1,2,8,0,3,0,25,20,0,0,1,0,0,0,0,1,1,1,0,0,0,64.33,Medium,Vulnerability,"Access, Network, Vulnerability"
 cluster-0047,cluster,65.0,7,13,0,0,2,4,1,2,8,0,5,0,0,0,0,0,1,0,1,0,0,1,1,1,0,0,0,58.43,Medium,Vulnerability,"Resource, Network, Vulnerability"
 cluster-0048,cluster,85.0,3,17,0,0,0,3,0,0,0,0,1,0,25,20,0,0,1,0,0,0,0,0,1,1,0,0,0,88.9,Low,Access,"Access, Network"
@@ -53,7 +53,7 @@ cluster-0051,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0
 cluster-0052,cluster,40.0,12,8,0,0,5,6,1,4,12,0,7,0,25,20,0,0,1,0,1,1,2,1,1,1,1,0,1,33.3,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0053,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,94.0,Low,Network,Network
 cluster-0054,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,94.0,Low,Network,Network
-cluster-0055,cluster,85.0,3,17,0,0,0,3,0,0,0,0,2,0,0,0,0,0,1,0,0,0,0,1,1,1,0,0,0,89.5,Low,Network,"Network, Vulnerability"
+cluster-0055,cluster,85.0,3,17,0,0,0,3,0,0,0,0,2,0,0,0,0,0,1,0,0,0,0,1,1,1,1,0,0,89.5,Low,Network,"Network, Vulnerability"
 cluster-0056,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,0,1,1,0,0,0,91.0,Low,Network,"Resource, Network"
 cluster-0057,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,94.0,Low,Network,Network
 cluster-0058,cluster,40.0,12,8,0,0,6,5,1,18,42,0,8,0,0,0,0,0,1,0,1,1,2,1,1,1,1,0,1,37.9,High,Vulnerability,"Resource, Network, Vulnerability"
@@ -63,12 +63,12 @@ cluster-0061,cluster,80.0,4,16,0,0,1,3,0,0,0,0,1,0,25,20,0,0,1,0,0,0,0,0,1,1,0,0
 cluster-0062,cluster,35.0,13,7,0,0,6,6,1,8,24,1,13,0,25,20,0,0,1,1,1,1,3,2,1,2,2,1,0,25.1,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0063,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,94.0,Low,Network,Network
 cluster-0064,cluster,60.0,8,12,0,0,1,6,1,0,0,0,4,0,25,20,0,0,1,0,0,0,1,1,1,1,0,0,0,72.9,Low,Vulnerability,"Resource, Access, Network, Vulnerability"
-cluster-0065,cluster,55.0,9,11,0,0,3,5,1,0,0,0,7,0,25,20,0,0,1,0,1,0,1,1,1,2,0,0,0,60.4,Medium,Vulnerability,"Resource, Access, Network, Vulnerability"
+cluster-0065,cluster,55.0,9,11,0,0,3,5,1,0,0,0,7,0,25,20,0,0,1,0,1,0,1,1,1,2,1,0,0,60.4,Medium,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0066,cluster,50.0,10,10,0,0,4,5,1,4,12,0,6,0,25,20,0,0,1,0,1,0,2,1,1,1,1,0,1,38.3,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0067,cluster,40.0,12,8,0,0,6,5,1,4,12,0,7,0,25,20,0,0,1,0,1,1,2,1,1,1,1,0,1,33.3,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0068,cluster,45.0,11,9,0,0,5,5,1,36,84,1,11,0,0,0,0,0,1,1,1,1,2,1,1,2,3,1,1,29.6,High,Vulnerability,"Resource, Network, Vulnerability"
 cluster-0069,cluster,35.0,13,7,0,0,6,6,1,8,24,1,14,0,25,20,0,0,1,1,1,1,2,2,1,2,3,1,1,25.0,High,Vulnerability,"Resource, Access, Network, Vulnerability"
-cluster-0070,cluster,65.0,7,13,0,0,2,4,1,0,0,0,4,0,25,20,0,0,1,0,1,1,2,1,1,1,0,0,0,60.9,Medium,Resource,"Resource, Access, Network, Vulnerability"
+cluster-0070,cluster,65.0,7,13,0,0,2,4,1,0,0,0,4,0,25,20,0,0,1,0,1,1,2,1,1,1,2,0,0,60.9,Medium,Resource,"Resource, Access, Network, Vulnerability"
 cluster-0071,cluster,85.0,3,17,0,0,0,3,0,0,0,0,1,0,25,20,0,0,1,0,0,0,0,0,1,1,0,0,0,88.9,Low,Access,"Access, Network"
 cluster-0072,cluster,80.0,4,16,0,0,0,3,1,0,0,0,2,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,91.0,Low,Vulnerability,"Network, Vulnerability"
 cluster-0073,cluster,45.0,11,9,0,0,4,6,1,22,54,1,8,0,25,20,0,0,1,1,1,1,2,1,1,2,2,1,0,25.6,High,Vulnerability,"Resource, Access, Network, Vulnerability"
@@ -78,24 +78,24 @@ cluster-0076,cluster,45.0,11,9,0,0,5,5,1,36,84,1,8,0,25,20,0,0,1,1,0,0,4,0,1,2,3
 cluster-0077,cluster,65.0,7,13,0,0,2,4,1,0,0,0,5,0,0,0,0,0,1,0,1,0,2,1,1,1,0,0,0,67.5,Medium,Resource,"Resource, Network, Vulnerability"
 cluster-0078,cluster,70.0,6,14,0,0,1,4,1,2,8,0,4,0,0,0,0,0,1,0,0,0,0,1,1,1,0,0,0,65.43,Medium,Vulnerability,"Network, Vulnerability"
 cluster-0079,cluster,40.0,12,8,0,0,5,6,1,18,42,1,7,0,25,20,0,0,1,1,1,1,2,1,1,1,2,1,0,25.1,High,Vulnerability,"Resource, Access, Network, Vulnerability"
-cluster-0080,cluster,80.0,4,16,0,0,1,3,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,91.5,Low,Network,Network
+cluster-0080,cluster,80.0,4,16,0,0,1,3,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,4,0,0,91.5,Low,Network,Network
 cluster-0081,cluster,35.0,13,7,0,0,6,6,1,22,54,1,12,0,25,20,0,0,1,1,1,1,1,1,1,2,3,1,1,27.0,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0082,cluster,35.0,13,7,0,0,6,6,1,22,54,1,13,0,25,20,0,0,1,1,1,1,1,2,1,2,3,1,1,25.0,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0083,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,94.0,Low,Network,Network
 cluster-0084,cluster,75.0,5,15,0,0,2,3,0,2,8,0,2,0,25,20,0,0,1,0,0,0,1,0,1,1,0,0,0,61.83,Medium,Vulnerability,"Resource, Access, Network, Vulnerability"
-cluster-0085,cluster,40.0,12,8,0,0,5,6,1,18,42,1,8,0,25,20,0,0,1,1,0,1,2,1,1,1,2,1,0,26.1,High,Vulnerability,"Resource, Access, Network, Vulnerability"
+cluster-0085,cluster,40.0,12,8,0,0,5,6,1,18,42,1,8,0,25,20,0,0,1,1,0,1,2,1,1,1,4,1,0,26.1,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0086,cluster,35.0,13,7,0,0,6,6,1,36,84,1,13,0,25,20,0,0,1,1,1,1,3,2,1,2,2,1,0,25.1,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0087,cluster,60.0,8,12,0,0,2,5,1,4,12,0,4,0,25,20,0,0,1,0,0,0,0,1,1,1,0,0,0,53.4,Medium,Vulnerability,"Access, Network, Vulnerability"
 cluster-0088,cluster,40.0,12,8,0,0,6,5,1,22,54,1,13,0,0,0,0,0,1,1,1,1,2,2,1,2,2,1,0,29.7,High,Vulnerability,"Resource, Network, Vulnerability"
 cluster-0089,cluster,65.0,7,13,0,0,2,4,1,0,0,0,4,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,82.5,Low,Vulnerability,"Network, Vulnerability"
-cluster-0090,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,94.0,Low,Network,Network
+cluster-0090,cluster,90.0,2,18,0,0,0,2,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,4,0,0,94.0,Low,Network,Network
 cluster-0091,cluster,85.0,3,17,0,0,0,2,1,0,0,0,2,0,0,0,0,0,1,0,0,1,0,0,1,1,0,0,0,87.5,Low,Resource,"Resource, Network, Vulnerability"
 cluster-0092,cluster,85.0,3,17,0,0,1,2,0,0,0,0,1,0,0,0,0,0,1,0,1,0,1,0,1,1,0,0,0,85.0,Low,Resource,"Resource, Network"
 cluster-0093,cluster,55.0,9,11,0,0,3,5,1,4,16,0,6,0,25,20,0,0,1,0,1,1,2,1,1,2,0,0,0,36.4,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0094,cluster,60.0,8,12,0,0,3,4,1,0,0,0,3,0,25,20,0,0,1,0,1,0,1,0,1,1,0,0,0,70.9,Low,Resource,"Resource, Access, Network, Vulnerability"
-cluster-0095,cluster,45.0,11,9,0,0,4,6,1,8,24,1,10,0,25,20,0,0,1,1,1,1,1,2,1,2,2,1,0,25.6,High,Vulnerability,"Resource, Access, Network, Vulnerability"
+cluster-0095,cluster,45.0,11,9,0,0,4,6,1,8,24,1,10,0,25,20,0,0,1,1,2,1,1,2,1,2,7,1,0,25.6,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0096,cluster,70.0,6,14,0,0,2,3,1,0,0,0,5,0,0,0,0,0,1,0,1,0,2,1,1,1,0,0,0,68.0,Medium,Resource,"Resource, Network, Vulnerability"
 cluster-0097,cluster,40.0,12,8,0,0,5,6,1,22,54,1,13,0,25,20,0,0,1,1,1,1,2,2,1,2,3,1,1,25.0,High,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0098,cluster,60.0,8,12,0,0,3,4,1,4,12,0,5,0,25,20,0,0,1,0,1,0,1,1,1,1,0,0,0,44.9,Medium,Vulnerability,"Resource, Access, Network, Vulnerability"
 cluster-0099,cluster,50.0,10,10,0,0,4,5,1,4,12,1,5,0,0,0,0,0,1,1,1,1,1,1,1,1,2,1,0,32.7,High,Vulnerability,"Resource, Network, Vulnerability"
-cluster-0100,cluster,65.0,7,13,0,0,2,4,1,2,8,0,7,0,0,0,0,0,1,0,0,0,2,1,1,2,0,0,0,50.5,Medium,Vulnerability,"Resource, Network, Vulnerability"
+cluster-0100,cluster,65.0,7,13,0,0,2,4,1,2,8,0,7,0,0,0,0,0,1,0,0,0,2,1,1,2,4,0,0,50.5,Medium,Vulnerability,"Resource, Network, Vulnerability"

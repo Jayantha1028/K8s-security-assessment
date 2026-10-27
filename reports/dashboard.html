@@ -76,24 +76,24 @@
 
     <div class="card">
       <div class="card-title">
-        <span>Cluster: latest / secure</span>
+        <span>Cluster: cluster-0001 / cluster</span>
         <span class="status-badge status-low">Low Risk Tier</span>
       </div>
 
       <div class="score-circle">
-        <span class="score-num" style="color:var(--success);">83.0</span>
+        <span class="score-num" style="color:var(--success);">91.5</span>
         <span class="score-denom">/ 100 Evidence Score</span>
       </div>
 
       <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 1rem;">
-        Isolation Forest Anomaly Check: <span style="color:var(--success);font-weight:600;">✓ Inlier (Benign Posture)</span> (Score: 0.055)
+        Isolation Forest Anomaly Check: <span style="color:var(--success);font-weight:600;">✓ Inlier (Benign Posture)</span> (Score: 0.106)
       </div>
 
       <div style="margin-top: 1rem;">
         <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.5rem;">Independent ML Model Predictions</div>
-        <div class="model-row"><span class="model-name">Random Forest Score</span><span class="model-val">82.7/100</span></div>
-        <div class="model-row"><span class="model-name">Support Vector Machine Score</span><span class="model-val">84.0/100</span></div>
-        <div class="model-row"><span class="model-name">XGBoost Regressor Score</span><span class="model-val">83.0/100</span></div>
+        <div class="model-row"><span class="model-name">Random Forest Score</span><span class="model-val">90.0/100</span></div>
+        <div class="model-row"><span class="model-name">Support Vector Machine Score</span><span class="model-val">91.9/100</span></div>
+        <div class="model-row"><span class="model-name">XGBoost Regressor Score</span><span class="model-val">91.0/100</span></div>
         <div class="model-row"><span class="model-name">Isolation Forest Status</span><span class="model-val">Normal Inlier</span></div>
       </div>
 
@@ -108,8 +108,8 @@
           </tr>
           <tr>
             <td>High CVEs (Trivy)</td>
-            <td><strong>8</strong></td>
-            <td><span class="tag tag-warning">WARN</span></td>
+            <td><strong>0</strong></td>
+            <td><span class="tag tag-clean">PASS</span></td>
           </tr>
           <tr>
             <td>Privileged Workloads</td>
@@ -118,18 +118,18 @@
           </tr>
           <tr>
             <td>Root Execution Containers</td>
-            <td><strong>1</strong></td>
-            <td><span class="tag tag-warning">WARN</span></td>
+            <td><strong>0</strong></td>
+            <td><span class="tag tag-clean">PASS</span></td>
           </tr>
           <tr>
             <td>RBAC Risk Score</td>
-            <td><strong>6</strong></td>
+            <td><strong>0</strong></td>
             <td><span class="tag tag-clean">PASS</span></td>
           </tr>
           <tr>
             <td>NSA Compliance Score</td>
-            <td><strong>80.0%</strong></td>
-            <td><span class="tag tag-clean">2 Failed Controls</span></td>
+            <td><strong>85.0%</strong></td>
+            <td><span class="tag tag-clean">3 Failed Controls</span></td>
           </tr>
         </table>
       </div>
@@ -137,24 +137,24 @@
 
     <div class="card">
       <div class="card-title">
-        <span>Cluster: latest / insecure</span>
+        <span>Cluster: cluster-0005 / cluster</span>
         <span class="status-badge status-high">High Risk Tier</span>
       </div>
 
       <div class="score-circle">
-        <span class="score-num" style="color:var(--danger);">19.2</span>
+        <span class="score-num" style="color:var(--danger);">35.0</span>
         <span class="score-denom">/ 100 Evidence Score</span>
       </div>
 
       <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 1rem;">
-        Isolation Forest Anomaly Check: <span style="color:var(--danger);font-weight:700;">⚠️ OUTLIER (Anomaly Detected)</span> (Score: -0.146)
+        Isolation Forest Anomaly Check: <span style="color:var(--danger);font-weight:700;">⚠️ OUTLIER (Anomaly Detected)</span> (Score: -0.04)
       </div>
 
       <div style="margin-top: 1rem;">
         <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.5rem;">Independent ML Model Predictions</div>
-        <div class="model-row"><span class="model-name">Random Forest Score</span><span class="model-val">19.3/100</span></div>
-        <div class="model-row"><span class="model-name">Support Vector Machine Score</span><span class="model-val">20.2/100</span></div>
-        <div class="model-row"><span class="model-name">XGBoost Regressor Score</span><span class="model-val">19.9/100</span></div>
+        <div class="model-row"><span class="model-name">Random Forest Score</span><span class="model-val">31.7/100</span></div>
+        <div class="model-row"><span class="model-name">Support Vector Machine Score</span><span class="model-val">34.0/100</span></div>
+        <div class="model-row"><span class="model-name">XGBoost Regressor Score</span><span class="model-val">35.0/100</span></div>
         <div class="model-row"><span class="model-name">Isolation Forest Status</span><span class="model-val">ANOMALY</span></div>
       </div>
 
@@ -164,12 +164,12 @@
           <tr><th>Indicator</th><th>Observed</th><th>Severity Status</th></tr>
           <tr>
             <td>Critical CVEs (Trivy)</td>
-            <td><strong>33</strong></td>
+            <td><strong>18</strong></td>
             <td><span class="tag tag-danger">FAIL</span></td>
           </tr>
           <tr>
             <td>High CVEs (Trivy)</td>
-            <td><strong>146</strong></td>
+            <td><strong>42</strong></td>
             <td><span class="tag tag-warning">WARN</span></td>
           </tr>
           <tr>
@@ -179,18 +179,18 @@
           </tr>
           <tr>
             <td>Root Execution Containers</td>
-            <td><strong>2</strong></td>
+            <td><strong>1</strong></td>
             <td><span class="tag tag-warning">WARN</span></td>
           </tr>
           <tr>
             <td>RBAC Risk Score</td>
-            <td><strong>43</strong></td>
+            <td><strong>25</strong></td>
             <td><span class="tag tag-warning">ELEVATED</span></td>
           </tr>
           <tr>
             <td>NSA Compliance Score</td>
-            <td><strong>43.0%</strong></td>
-            <td><span class="tag tag-danger">16 Failed Controls</span></td>
+            <td><strong>45.0%</strong></td>
+            <td><span class="tag tag-danger">11 Failed Controls</span></td>
           </tr>
         </table>
       </div>
