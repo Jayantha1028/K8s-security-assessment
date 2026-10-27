@@ -8,6 +8,7 @@ venv/
 # collections (including in-progress .tmp folders). Processed datasets,
 # the trained model and the report are kept under version control.
 data/raw/
+!data/raw/samples/real_world/MANIFEST_CATALOG.md
 
 # Local Kubernetes state / editor / OS files
 .kube/
