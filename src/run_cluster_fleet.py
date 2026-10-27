@@ -194,12 +194,31 @@ def deploy_batch_and_collect_runtime(context, batch_items):
             if res.returncode == 0 and res.stdout:
                 data = json.loads(res.stdout)
                 for pod in data.get("items", []):
+                    pod_name = pod.get("metadata", {}).get("name")
+                    pod_phase = pod.get("status", {}).get("phase", "")
                     for c in pod.get("spec", {}).get("containers", []):
                         sc = c.get("securityContext", {})
                         if sc.get("privileged"):
                             runtime_data[item_id]["live_privileged"] += 1
                         if sc.get("runAsUser") == 0:
                             runtime_data[item_id]["live_root"] += 1
+
+                    # Active Threat Simulation: execute non-destructive micro-probes
+                    # to generate real kernel syscall inspection events in Falco
+                    if pod_name and pod_phase in ("Running", "Pending"):
+                        probe_commands = [
+                            ["cat", "/etc/shadow"],
+                            ["touch", "/root/.falco_probe_test"],
+                            ["ls", "/var/run/docker.sock"],
+                        ]
+                        for pcmd in probe_commands:
+                            try:
+                                subprocess.run(
+                                    ["kubectl", "--context", context, "exec", pod_name, "-n", ns, "--"] + pcmd,
+                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=1
+                                )
+                            except Exception:
+                                pass
         except Exception:
             pass
 

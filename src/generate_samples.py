@@ -64,6 +64,7 @@ PROFILE_PARAMS = {
         "images": [
             "nginx:1.27-alpine", "nginx:1.26-alpine",
             "caddy:2.8-alpine", "httpd:2.4.62-alpine",
+            "cgr.dev/chainguard/nginx:latest", "alpine:3.20",
         ],
         "cpu_limits": ["100m", "250m", "500m"],
         "mem_limits": ["128Mi", "256Mi", "512Mi"],
@@ -88,6 +89,7 @@ PROFILE_PARAMS = {
         "images": [
             "caddy:2.7-alpine", "node:18-slim",
             "python:3.11-slim", "redis:7-alpine",
+            "golang:1.21-alpine", "python:3.9-slim",
         ],
         "cpu_limits": ["250m", "500m", "1"],
         "mem_limits": ["256Mi", "512Mi", "1Gi"],
@@ -111,6 +113,7 @@ PROFILE_PARAMS = {
         "floating_image_prob": 0.5,
         "images": [
             "nginx:1.14.2", "python:2.7", "node:8", "httpd:2.2",
+            "redis:5.0.7", "httpd:2.4.49", "vulnerables/web-dvwa:latest",
         ],
         "cpu_limits": ["500m", "1", "2"],
         "mem_limits": ["512Mi", "1Gi", "2Gi"],
