@@ -319,7 +319,7 @@ def main():
     print(f"Kind Cluster Context          : {args.context}")
     print(f"Live Kind Snapshots Ingest    : {'Enabled (Optional Ingest)' if args.include_live else 'Disabled'}")
 
-    # Step 1: Ensure sample manifests exist (250 YAMLs)
+    # Step 1: Ensure sample manifests exist (100 YAMLs)
     manifest_dir = paths.SAMPLES / "synthetic"
     manifest_dir.mkdir(parents=True, exist_ok=True)
     yaml_files = sorted(manifest_dir.glob("*.yaml"))
