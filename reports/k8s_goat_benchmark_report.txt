@@ -4,6 +4,7 @@
 Benchmark Target   : Kubernetes Goat (Intentionally Vulnerable K8s Environment)
 Evaluation Mode    : Ground-Truth Scenario Profile (Madhu Akula)
 Evidence Baseline  : 8.7/100 (Critical Compound Security Risk)
+Primary Vuln Type  : Vulnerability (Active Vectors: Resource, Access, Network, Vulnerability)
 Posture Bar        : [████░░░░░░░░░░░░░░░░] 22.0/100
 
 --- 4-MODEL INDEPENDENT INFERENCE & COMPARISON ---

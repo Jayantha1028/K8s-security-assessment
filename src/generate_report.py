@@ -178,6 +178,11 @@ def describe(position):
         confidence = "High ML Alignment" if delta < 5 else "Moderate Alignment" if delta < 15 else "Review Needed"
         add(f"Model Delta (|Δ|)  : {delta:.2f} points ({confidence})")
 
+    vuln_type = str(row.get("vulnerability_type", ""))
+    vuln_bkdn = str(row.get("vulnerability_breakdown", ""))
+    if vuln_type and vuln_type != "nan":
+        add(f"Primary Vuln Type  : {vuln_type}" + (f" (Active Vectors: {vuln_bkdn})" if vuln_bkdn and vuln_bkdn != "nan" else ""))
+
     add()
     add("Security Indicators (Telemetry Breakdown)")
 

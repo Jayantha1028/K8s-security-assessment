@@ -247,6 +247,28 @@ def score_row(row):
         row["risk_level"] = "Medium"
     else:
         row["risk_level"] = "Low"
+
+    # Multi-pillar Vulnerability Type Classification
+    # Identifies whether the dominant vulnerability is Access-, Network-, or Resource-related
+    p_network = min(15.0, (
+        row.get("missing_network_policies", 0) * 3.5
+        + row.get("host_port_count", 0) * 4.0
+    ))
+    penalties = {
+        "Resource": p_workload,
+        "Access": p_rbac,
+        "Network": p_network,
+        "Vulnerability": p_cve,
+    }
+
+    if row["security_score"] >= 80 and max(penalties.values()) < 3.0:
+        row["vulnerability_type"] = "Hardened"
+    else:
+        row["vulnerability_type"] = max(penalties, key=penalties.get)
+
+    active_vulns = [k for k, v in penalties.items() if v >= 3.0]
+    row["vulnerability_breakdown"] = ", ".join(active_vulns) if active_vulns else "Clean"
+
     return row
 
 

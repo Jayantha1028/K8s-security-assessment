@@ -44,10 +44,28 @@ def collect_rows():
             # first. The scan is parsed once per file, not once per workload.
             scan = parse_kubescape(scan_file)
             for workload_name, workload_doc in workloads:
+                feats = extract_features(workload_doc)
+                scores = {
+                    "Resource": (
+                        feats.get("privileged", 0) * 25
+                        + feats.get("run_as_root", 0) * 10
+                        + feats.get("host_path_volumes", 0) * 15
+                        + feats.get("caps_added", 0) * 10
+                        + feats.get("allow_priv_esc", 0) * 10
+                    ),
+                    "Access": (feats.get("automount_sa_token", 0) * 20),
+                    "Network": (feats.get("host_network", 0) * 15 + feats.get("host_ports", 0) * 10),
+                    "Vulnerability": (feats.get("image_latest", 0) * 15),
+                }
+                primary_vuln = max(scores, key=scores.get) if max(scores.values()) > 0 else "Hardened"
+                active_vulns = [k for k, v in scores.items() if v > 0]
+
                 rows.append({
                     "workload": f"{yaml_file.stem}:{workload_name}",
-                    **extract_features(workload_doc),
+                    **feats,
                     **scan,
+                    "vulnerability_type": primary_vuln,
+                    "vulnerability_breakdown": ", ".join(active_vulns) if active_vulns else "Clean",
                 })
 
         except Exception as error:

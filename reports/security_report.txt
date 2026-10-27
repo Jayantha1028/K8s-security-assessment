@@ -9,6 +9,7 @@ SVM Predicted Score: 84.0/100 (Risk: Low)
 XGB Predicted Score: 83.0/100 (Risk: Low)
 Isolation Forest   : [Normal Inlier] (Decision Score: +0.068)
 Model Delta (|Δ|)  : 0.02 points (High ML Alignment)
+Primary Vuln Type  : Vulnerability (Active Vectors: Resource, Network, Vulnerability)
 
 Security Indicators (Telemetry Breakdown)
   [Vulnerabilities & Supply Chain]
@@ -64,6 +65,7 @@ SVM Predicted Score: 20.2/100 (Risk: High)
 XGB Predicted Score: 19.9/100 (Risk: High)
 Isolation Forest   : [ANOMALY (Outlier)] (Decision Score: -0.149)
 Model Delta (|Δ|)  : 0.37 points (High ML Alignment)
+Primary Vuln Type  : Vulnerability (Active Vectors: Resource, Access, Network, Vulnerability)
 
 Security Indicators (Telemetry Breakdown)
   [Vulnerabilities & Supply Chain]

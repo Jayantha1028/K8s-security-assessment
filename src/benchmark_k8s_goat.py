@@ -140,6 +140,7 @@ def evaluate_k8s_goat(raw_dir=DEFAULT_RAW_DIR, output_path=DEFAULT_OUTPUT_REPORT
         f"Benchmark Target   : Kubernetes Goat (Intentionally Vulnerable K8s Environment)",
         f"Evaluation Mode    : {mode_label}",
         f"Evidence Baseline  : {ev_score:.1f}/100 (Critical Compound Security Risk)",
+        f"Primary Vuln Type  : {row.get('vulnerability_type', 'Compound')} (Active Vectors: {row.get('vulnerability_breakdown', 'Access, Resource, Network, Vulnerability')})",
         f"Posture Bar        : [{bar}] {rf_score:.1f}/100",
         "",
         "--- 4-MODEL INDEPENDENT INFERENCE & COMPARISON ---",
