@@ -79,6 +79,8 @@ if missing_features:
 
 # CSVs edited by hand or produced by partial tool runs may contain text in
 # numeric columns. Coerce explicitly so bad rows are rejected predictably.
+# Replace infinite values (+/- inf) with NaN to prevent model crash.
+df = df.replace([np.inf, -np.inf], np.nan)
 for name in FEATURES + ["security_score"]:
     df[name] = pd.to_numeric(df[name], errors="coerce")
 

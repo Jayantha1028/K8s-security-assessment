@@ -112,6 +112,41 @@ class ParsingAndCleaningTests(unittest.TestCase):
         self.assertEqual(cleaned.loc[0, 'score'], 100)
         self.assertEqual(report.duplicate_rows_dropped, 1)
 
+    def test_clean_dataset_advanced_techniques(self):
+        import numpy as np
+        import pandas as pd
+        df = pd.DataFrame({
+            'snapshot': [' s1 ', 's2', '   ', 's4'],
+            'environment': [' SECURE ', 'Insecure', 'secure', 'secure'],
+            'risk_level': ['low', 'HIGH', 'medium', 'Low'],
+            'cve_count': [float('inf'), 5, -3, 1000000],
+            'score': [float('-inf'), 85.5, 50.0, 95.0],
+            'vuln_type': ['Access', None, 'Network', 'Resource'],
+        })
+        cleaned, report = clean_dataset(
+            df,
+            count_columns=['cve_count'],
+            bounded_columns={'score': (0, 100)},
+            key_columns=['snapshot'],
+            max_count_cap=10000,
+        )
+        # s1 stripped, '   ' empty key dropped -> 3 rows remaining
+        self.assertEqual(len(cleaned), 3)
+        self.assertEqual(cleaned.loc[0, 'snapshot'], 's1')
+        self.assertEqual(cleaned.loc[0, 'environment'], 'secure')
+        self.assertEqual(cleaned.loc[0, 'risk_level'], 'Low')
+        self.assertEqual(cleaned.loc[1, 'risk_level'], 'High')
+        # inf replaced and capped to max_count_cap or 0
+        self.assertEqual(cleaned.loc[0, 'cve_count'], 0)
+        self.assertEqual(cleaned.loc[2, 'cve_count'], 10000)
+        # -inf in bounded column filled with low (0)
+        self.assertEqual(cleaned.loc[0, 'score'], 0)
+        # None string filled with default
+        self.assertEqual(cleaned.loc[1, 'vuln_type'], 'Unknown')
+        self.assertEqual(report.dropped_missing_key, 1)
+        self.assertIn('cve_count', report.infinite_replaced)
+        self.assertIn('snapshot', report.whitespace_stripped)
+
 
 if __name__ == '__main__':
     unittest.main()
