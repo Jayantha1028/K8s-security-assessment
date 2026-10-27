@@ -168,3 +168,4 @@ for s in run.sh scripts/*.sh; do bash -n "$s" || exit 1; done
 ## Documentation
 * [**SETUP.md**](docs/SETUP.md) – Detailed tool setup (Docker, Kind, Kubescape, Trivy, Falco).
 * [**DETAILED_PROJECT_REPORT.md**](docs/DETAILED_PROJECT_REPORT.md) – Comprehensive architecture and mathematical formulation report.
+* [**PRESENTATION_MASTER_GUIDE.md**](docs/PRESENTATION_MASTER_GUIDE.md) – Complete presentation guide, codebase walkthrough, slide-by-slide script, and defense Q&A.
