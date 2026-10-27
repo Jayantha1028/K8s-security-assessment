@@ -12,5 +12,6 @@ data/raw/
 # Local Kubernetes state / editor / OS files
 .kube/
 .DS_Store
+**/.DS_Store
 logs/
 *.log

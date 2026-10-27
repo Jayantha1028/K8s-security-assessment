@@ -79,12 +79,10 @@ The CDC-5 project addresses this fragmentation through a unified methodology:
 K8S-security-assessment-main/
 ├── run.sh                          # Master entry point script (--manifests, --final, --all)
 ├── requirements.txt                # Pinned dependencies (scikit-learn, pandas, PyYAML, joblib, etc.)
-├── DETAILED_PROJECT_REPORT.md      # Project overview and run guides
-├── COMPREHENSIVE_K8S_SECURITY_ASSESSMENT_REPORT.md # Exhaustive technical reference
 ├── docs/                           # Documentation
 │   ├── README.md                   # Operational readme
 │   ├── SETUP.md                    # Environment setup and troubleshooting
-│   └── DETAILED_PROJECT_REPORT.md  # Copied architectural documentation
+│   └── DETAILED_PROJECT_REPORT.md  # Comprehensive project report & benchmarks
 ├── manifests/                      # Kubernetes manifests demonstrating security tiers
 │   ├── secure/                     # Hardened demo configuration
 │   │   ├── hardened-deployment.yaml# Least-privilege Pod security context, non-root, read-only FS
