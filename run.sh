@@ -2,6 +2,7 @@
 # Single entry point for the whole project.
 #
 #   ./run.sh --manifests [--fresh]   manifest pipeline (needs only Kubescape)
+#   ./run.sh --fleet [--count 250]   parallel fleet pipeline (250 YAMLs: Kubescape + Trivy + Kind/Falco)
 #   ./run.sh --final                 Kind clusters + latest assessment (+ training if enough data)
 #   ./run.sh --all                   everything: clusters, snapshots, medium scenario, training, report
 #
@@ -244,7 +245,7 @@ cmd_all() {
 }
 
 cmd_fleet() {
-  echo "=== 100-CLUSTER PARALLEL FLEET PIPELINE ==="
+  echo "=== 250-CLUSTER PARALLEL FLEET PIPELINE ==="
   require_tools python3 kubectl kubescape trivy
   python3 src/run_cluster_fleet.py "$@"
 }
