@@ -6,7 +6,7 @@ REPORT_FILE ?= reports/security_report.txt
 
 help:
 	@echo "Kubernetes ML Security Assessment - Makefile targets:"
-	@echo "  make pipeline [COUNT=250]          Run 250-cluster parallel assessment (Kubescape + Trivy + Kind/Falco)"
+	@echo "  make pipeline [COUNT=100]          Run 100-cluster parallel assessment (Kubescape + Trivy + Kind/Falco)"
 	@echo "  make fleet                         Alias for 'make pipeline'"
 	@echo "  make test-cluster [CONTEXT=<ctx>]  Scan a live cluster context and generate ML report"
 	@echo "  make report                        Display the latest generated security report"
@@ -39,7 +39,7 @@ manifests:
 pipeline: fleet
 
 fleet:
-	@python3 src/run_cluster_fleet.py --count $(or $(COUNT),250) $(if $(BATCH_SIZE),--batch-size $(BATCH_SIZE),)
+	@python3 src/run_cluster_fleet.py --count $(or $(COUNT),100) $(if $(BATCH_SIZE),--batch-size $(BATCH_SIZE),)
 
 final:
 	@./run.sh --final

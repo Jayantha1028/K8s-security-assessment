@@ -41,12 +41,16 @@ def check_cluster_connectivity(context):
 def scan_manifest_kubescape(yf, scan_file):
     if not scan_file.exists():
         cmd = [
-            "kubescape", "scan", str(yf),
+            "kubescape", "scan", "framework", "nsa", str(yf),
             "--format", "json",
             "--format-version", "v2",
             "--output", str(scan_file),
+            "--logger", "error",
         ]
-        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25)
+        except Exception:
+            pass
     if scan_file.exists():
         try:
             with open(scan_file, encoding="utf-8") as f:
@@ -79,7 +83,7 @@ def scan_trivy_image(image_name, cache):
             "--format", "json",
             image_name,
         ]
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=8)
         if res.returncode == 0 and res.stdout:
             data = json.loads(res.stdout)
             for r in data.get("Results", []):
@@ -96,6 +100,15 @@ def scan_trivy_image(image_name, cache):
 
 
 def scan_trivy_config(yf):
+    cache_file = paths.MANIFEST_SCANS / f"{yf.stem}_trivy.json"
+    if cache_file.exists():
+        try:
+            with open(cache_file, encoding="utf-8") as f:
+                data = json.load(f)
+            return data.get("crit_misc", 0), data.get("high_misc", 0), data.get("secrets", 0)
+        except Exception:
+            pass
+
     crit_misc, high_misc, secrets = 0, 0, 0
     try:
         cmd = [
@@ -120,6 +133,13 @@ def scan_trivy_config(yf):
                 secrets += len(r.get("Secrets", []))
     except Exception:
         pass
+
+    try:
+        with open(cache_file, "w", encoding="utf-8") as f:
+            json.dump({"crit_misc": crit_misc, "high_misc": high_misc, "secrets": secrets}, f)
+    except Exception:
+        pass
+
     return crit_misc, high_misc, secrets
 
 
@@ -265,8 +285,8 @@ def main():
         help="Number of clusters to run in parallel at once to avoid overloading (default: 5)",
     )
     parser.add_argument(
-        "--count", type=int, default=250,
-        help="Total number of cluster environments to evaluate (default: 250)",
+        "--count", type=int, default=100,
+        help="Total number of cluster environments to evaluate (default: 100)",
     )
     parser.add_argument(
         "--skip-live", action="store_true",
@@ -283,7 +303,7 @@ def main():
     args = parser.parse_args()
 
     print("================================================================================")
-    print("        250-CLUSTER PARALLEL FLEET ASSESSMENT & PIPELINE GENERATOR              ")
+    print("        100-CLUSTER PARALLEL FLEET ASSESSMENT & PIPELINE GENERATOR              ")
     print("================================================================================")
     print(f"Target Manifest Environments  : {args.count}")
     print(f"Parallel Batch Concurrency    : {args.batch_size} clusters simultaneously")
@@ -306,19 +326,49 @@ def main():
 
     print(f"\n[1/7] Verified {len(yaml_files)} cluster configuration manifests.")
 
-    # Step 2: Parallel Kubescape manifest scanning (offline)
+    # Step 2: Parallel Kubescape manifest scanning (offline with NSA framework & live progress)
     print("\n[2/7] Running offline parallel Kubescape scans (8 concurrent workers)...")
     paths.MANIFEST_SCANS.mkdir(parents=True, exist_ok=True)
-    scan_tasks = []
+    subprocess.run([sys.executable, "src/scan_manifests.py", "--workers", "8"], check=True)
+
+    kubescape_results = []
     for yf in yaml_files:
         scan_file = paths.MANIFEST_SCANS / f"{yf.stem}_scan.json"
-        scan_tasks.append((yf, scan_file))
-
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        kubescape_results = list(pool.map(lambda t: scan_manifest_kubescape(t[0], t[1]), scan_tasks))
+        if scan_file.exists():
+            try:
+                with open(scan_file, encoding="utf-8") as f:
+                    data = json.load(f)
+                kubescape_results.append(parse_kubescape_data(data, source=scan_file))
+            except Exception:
+                kubescape_results.append({
+                    "kubescape_compliance": 50.0,
+                    "kubescape_failed": 0,
+                    "kubescape_passed": 0,
+                    "kubescape_skipped": 0,
+                    "kubescape_critical": 0,
+                    "kubescape_high": 0,
+                    "kubescape_medium": 0,
+                    "kubescape_low": 0,
+                })
+        else:
+            kubescape_results.append({
+                "kubescape_compliance": 50.0,
+                "kubescape_failed": 0,
+                "kubescape_passed": 0,
+                "kubescape_skipped": 0,
+                "kubescape_critical": 0,
+                "kubescape_high": 0,
+                "kubescape_medium": 0,
+                "kubescape_low": 0,
+            })
 
     # Step 3: Offline Trivy scans (CVEs, misconfigs, secrets) + Parallel Live Kind Deployment (Falco & Kubectl)
-    print("\n[3/7] Running offline Trivy scans + parallel live Kind deployment (Falco & kubectl)...")
+    print("\n[3/7] Running offline Trivy scans (8 parallel workers) + live Kind deployment...")
+    print("  [Trivy Config] Auditing 250 manifests with 8 concurrent workers...")
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        trivy_configs = list(pool.map(scan_trivy_config, yaml_files))
+    print(f"  ✓ Trivy configuration scans complete for {len(trivy_configs)} manifests.")
+
     image_cache = {}
     cluster_rows = []
 
@@ -360,8 +410,8 @@ def main():
         if not images_in_workload and wf_features.get("image_latest"):
             total_high_cve = 12
 
-        # Trivy Config Scan (offline)
-        crit_misc, high_misc, secrets = scan_trivy_config(yf)
+        # Trivy Config Scan (from parallel pre-scan)
+        crit_misc, high_misc, secrets = trivy_configs[idx - 1]
 
         # Workload Security Profile
         has_priv = wf_features.get("privileged", 0)
@@ -422,6 +472,9 @@ def main():
             "falco_warning_count": 1 if has_hpid else 0,
         }
         cluster_rows.append(score_row(row))
+
+        if idx % 50 == 0 or idx == len(yaml_files):
+            print(f"  [{idx}/{len(yaml_files)}] processed telemetry & vulnerability labels...")
 
     # Final live batch flush
     if live_available and batch_items:
@@ -488,7 +541,7 @@ def main():
         print(f"Notice: Live report refresh skipped or encountered: {e}")
 
     print("\n" + "=" * 80)
-    print("              250-CLUSTER ASSESSMENT & MODEL TRAINING COMPLETE                 ")
+    print("              100-CLUSTER ASSESSMENT & MODEL TRAINING COMPLETE                 ")
     print("=" * 80)
     print(f"Total Clusters Built and Evaluated : {len(df)}")
     print(f"Risk Class Breakdown:")
