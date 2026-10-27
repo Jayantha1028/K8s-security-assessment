@@ -37,18 +37,19 @@ An exhaustive live system audit was executed directly on this environment:
 - Kind Binary: /opt/homebrew/bin/kind (v0.33.0)
 - kubectl Binary: /usr/local/bin/kubectl (Client v1.31.0+)
 - Helm Binary: /opt/homebrew/bin/helm (v3.16+)
-- Docker Binary: /usr/local/bin/docker (CLI installed; Daemon currently stopped)
-- Test Suite: 41 passed out of 41 tests in 66.01s
+- Docker Binary: /usr/local/bin/docker (CLI installed; Daemon running)
+- Test Suite: 42 passed out of 42 tests in 68.52s
 ```
 
 #### Feasibility Matrix
 
 | Pipeline Component | CLI Prerequisite | Status | Feasibility & Readiness Details |
 |---|---|---|---|
-| **Lightweight Manifest Pipeline** (`./run.sh --manifests`) | `python3`, `kubescape` | **Ready** | Fully functional right now. All Python libraries and the Kubescape binary are installed and verified. |
-| **Project Test Suite** (`unittest`) | `python3` | **Ready** | Fully passed (**41/41 tests OK**). Covers all mocked scanners, atomic operations, cleaning, and model fits. |
+| **Fleet Assessment Pipeline** (`./run.sh --fleet --count 100 --batch-size 5`) | `python3`, `docker`, `kind`, `kubectl`, `kubescape`, `trivy` | **Ready** | Fully functional. Bounded batches of 5 containers, active Falco micro-probes, 100 clusters. |
+| **Lightweight Manifest Pipeline** (`./run.sh --manifests`) | `python3`, `kubescape` | **Ready** | Fully functional. All Python libraries and Kubescape binary are installed and verified. |
+| **Project Test Suite** (`unittest`) | `python3` | **Ready** | Fully passed (**42/42 tests OK**). Covers all mocked scanners, atomic operations, cleaning, and model fits. |
 | **Model Retraining & Reporting** (`train_security_models.py`) | `python3`, `joblib`, `scikit-learn` | **Ready** | Fully functional. Operates directly on `data/processed/final_security_dataset.csv`. |
-| **Cluster-Backed Pipeline** (`./run.sh --final` / `--all`) | `docker`, `kind`, `kubectl`, `helm`, `kubescape`, `trivy` | **Action Required** | All six binaries exist on `$PATH`. **Single requirement:** Start Docker Desktop (`open -a Docker`) so Kind can spawn local cluster nodes. |
+| **Cluster-Backed Pipeline** (`./run.sh --final` / `--all`) | `docker`, `kind`, `kubectl`, `helm`, `kubescape`, `trivy` | **Ready** | All six binaries exist on `$PATH` and Docker daemon is active. |
 
 ---
 
@@ -134,15 +135,49 @@ K8S-security-assessment-main/
 
 ### 4.1 Master Pipeline Architecture
 
+#### High-Level Horizontal Architecture Flow
+```mermaid
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'background': '#FFFFFF',
+    'primaryColor': '#FFFFFF',
+    'primaryBorderColor': '#0F172A',
+    'primaryTextColor': '#0F172A',
+    'lineColor': '#2563EB',
+    'fontFamily': 'Inter, system-ui, sans-serif',
+    'fontSize': '14px'
+  }
+}}%%
+flowchart LR
+    A["100 Manifest Samples"] --> B["Static Scans<br/>(Kubescape & Trivy)"]
+    B --> C["Kind Deployment<br/>(Batches of 5)"]
+    C --> D["Runtime Telemetry<br/>(Falco & kubectl)"]
+    D --> E["Data Cleaning<br/>(32 Indicators)"]
+    E --> F["ML Models<br/>(RF, SVM, XGB, iForest)"]
+    F --> G["Validation<br/>(K8s Goat)"]
+    G --> H["Final Security Report"]
+
+    style A fill:#FFFFFF,stroke:#0F172A,stroke-width:2px,color:#0F172A
+    style B fill:#FFFFFF,stroke:#0F172A,stroke-width:2px,color:#0F172A
+    style C fill:#FFFFFF,stroke:#0F172A,stroke-width:2px,color:#0F172A
+    style D fill:#FFFFFF,stroke:#0F172A,stroke-width:2px,color:#0F172A
+    style E fill:#FFFFFF,stroke:#0F172A,stroke-width:2px,color:#0F172A
+    style F fill:#FFFFFF,stroke:#0F172A,stroke-width:2px,color:#0F172A
+    style G fill:#FFFFFF,stroke:#0F172A,stroke-width:2px,color:#0F172A
+    style H fill:#FFFFFF,stroke:#0F172A,stroke-width:2px,color:#0F172A
+```
+
+#### Detailed Component Flow
 ```mermaid
 flowchart TD
     subgraph Input_Sources["Primary Observation Sources"]
-        IS1["YAML Manifests (IaC)"]
+        IS1["100 YAML Manifests (IaC)"]
         IS2["Running Workloads (Kubernetes API)"]
         IS3["RBAC Bindings & Roles (API)"]
         IS4["Container Image Layer (Trivy)"]
         IS5["CIS/NSA Benchmarks (Kubescape)"]
-        IS6["Kernel eBPF Telemetry (Falco)"]
+        IS6["Kernel eBPF Telemetry (Falco Micro-probes)"]
     end
 
     subgraph Feature_Extraction["Feature Extraction & Parsing"]
@@ -158,7 +193,7 @@ flowchart TD
     IS6 --> FE4
 
     subgraph Normalization["Data Cleaning & Cleansing"]
-        DC["src/data_cleaning.py<br/>• Missing Values -> 0<br/>• Bounds Clipping: [0, 100]<br/>• Identity Deduplication"]
+        DC["src/data_cleaning.py<br/>• Bidirectional ±inf -> NaN<br/>• Outlier Cap (max 100,000)<br/>• String Strip & Casing Norm<br/>• Zero-Variance Diagnostics"]
     end
 
     FE1 & FE2 & FE3 & FE4 --> DC
@@ -168,18 +203,19 @@ flowchart TD
     end
 
     DC --> SE
-    SE --> CSV["data/processed/final_security_dataset.csv"]
+    SE --> CSV["data/processed/final_security_dataset.csv (34 Columns)"]
 
-    subgraph Machine_Learning["Supervised Machine Learning (Leakage-Free)"]
-        ML1["StratifiedGroupKFold (n_splits=5)<br/>Groups = snapshot ID"]
-        ML2["Random Forest Regressor (Continuous Score)"]
-        ML3["Random Forest Classifier (Risk Class)"]
-        ML4["Logistic Regression Baseline"]
+    subgraph Machine_Learning["Independent Model Benchmarking (Zero Leakage)"]
+        ML1["StratifiedGroupKFold / CV Splitting"]
+        ML2["Random Forest (Bagging Classifier & Regressor)"]
+        ML3["SVM (Kernel Margin Separation)"]
+        ML4["XGBoost (Gradient Boosted Trees - Lowest RMSE)"]
+        ML5["Isolation Forest (Unsupervised Anomaly Detection)"]
     end
 
     CSV --> ML1
-    ML1 --> ML2 & ML3 & ML4
-    ML2 & ML3 --> JOB["models/security_models.joblib"]
+    ML1 --> ML2 & ML3 & ML4 & ML5
+    ML2 & ML3 & ML4 & ML5 --> JOB["models/*.joblib"]
 
     subgraph Reporting["Audit & Remediation"]
         REP["src/generate_report.py"]
@@ -570,13 +606,13 @@ The target variable $S$ (`security_score`) is completely excluded from $X$. The 
 
 ## 9. Verification, Quality Assurance & Test Architecture
 
-The codebase enforces strict quality assurance with two test modules containing **41 tests**:
+The codebase enforces strict quality assurance with two test modules containing **42 tests**:
 
 ### 9.1 Unit Tests ([`tests/test_project.py`](file:///Users/jayanthanayak/Downloads/K8S-security-assessment-main/tests/test_project.py))
 - Validates that `hardened-deployment.yaml` extracts zero security violations across `privileged`, `run_as_root`, `allow_priv_esc`, `rw_root_fs`, and `automount_sa_token`.
 - Validates floating image detection for untagged images (`nginx`), explicit `:latest`, and digest pins (`@sha256:`).
 - Validates multi-document YAML loading and Kubernetes `List` parsing.
-- Tests `data_cleaning.py` bounds clipping, negative value correction, and deduplication logic.
+- Tests `data_cleaning.py` bounds clipping, negative value correction, ±inf replacement, categorical casing normalization, outlier capping, and zero-variance diagnostics.
 - Tests Kubescape parsing across flat and control-based schemas.
 
 ### 9.2 Mock Integration Tests ([`tests/test_pipeline.py`](file:///Users/jayanthanayak/Downloads/K8S-security-assessment-main/tests/test_pipeline.py))

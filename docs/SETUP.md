@@ -26,11 +26,21 @@ pip install -r requirements.txt
 ```bash
 python3 -m unittest discover -s tests -v
 ```
-Expected: `Ran 38 tests ... OK` (takes about a minute).
+Expected: `Ran 42 tests ... OK` (takes about a minute).
 
 ---------------------------------------------------------------------------
-## C1. Lightweight pipeline (needs only Kubescape)
+## C1. Fleet & Lightweight pipeline
 
+### Full 100-Cluster Fleet Assessment (Recommended)
+```bash
+# Live Kind deployment in bounded batches of 5 containers with Falco runtime micro-probes:
+./run.sh --fleet --count 100 --batch-size 5
+
+# Fast offline mode (100 manifests + Kubescape/Trivy cache + ML training):
+./run.sh --fleet --count 100 --skip-live
+```
+
+### Manifest-only pipeline (needs only Kubescape):
 Install Kubescape (any one):
 ```bash
 brew install kubescape-cli                                                  # macOS / Linuxbrew
