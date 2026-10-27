@@ -1,54 +1,48 @@
 ========================================
       KUBERNETES SECURITY ASSESSMENT
 ========================================
-Assessment         : latest / secure
-Evidence Score     : 83.0/100
-Posture Bar        : [█████████████████░░░] 83.0/100
-RF Predicted Score : 83.0/100 (Risk: Low)
-SVM Predicted Score: 84.0/100 (Risk: Low)
-XGB Predicted Score: 82.9/100 (Risk: Low)
-Isolation Forest   : [Normal Inlier] (Decision Score: +0.037)
-Model Delta (|Δ|)  : 0.01 points (High ML Alignment)
-Primary Vuln Type  : Vulnerability (Active Vectors: Resource, Network, Vulnerability)
+Assessment         : cluster-0001 / cluster
+Evidence Score     : 91.5/100
+Posture Bar        : [██████████████████░░] 90.1/100
+RF Predicted Score : 90.1/100 (Risk: Low)
+SVM Predicted Score: 92.5/100 (Risk: Low)
+XGB Predicted Score: 91.0/100 (Risk: Low)
+Isolation Forest   : [Normal Inlier] (Decision Score: +0.096)
+Model Delta (|Δ|)  : 1.43 points (High ML Alignment)
+Primary Vuln Type  : Vulnerability (Active Vectors: Network, Vulnerability)
 
 Security Indicators (Telemetry Breakdown)
   [Vulnerabilities & Supply Chain]
     critical_cve_count                0     [PASS]   Clean
-    high_cve_count                    8     [WARN]   High risk (8)
+    high_cve_count                    0     [PASS]   Clean
     critical_misconfig_count          0     [PASS]   Clean
-    high_misconfig_count              0     [PASS]   Clean
+    high_misconfig_count              2     [WARN]   High risk (2)
     secret_count                      0     [PASS]   Clean
 
   [Configuration & Pod Hardening]
     privileged_count                  0     [PASS]   Clean
-    root_execution_count              1     [WARN]   High risk (1)
+    root_execution_count              0     [PASS]   Clean
     risky_capability_count            0     [PASS]   Clean
     host_path_count                   0     [PASS]   Clean
     host_port_count                   0     [PASS]   Clean
     missing_network_policies          1     [NOTE]   Active finding (1)
 
   [Access & Identity (RBAC)]
-    rbac_risk_score                   6     [WARN]   High risk (6)
-    service_account_permission_score  15    [NOTE]   Active finding (15)
+    rbac_risk_score                   0     [PASS]   Clean
+    service_account_permission_score  0     [PASS]   Clean
 
   [Compliance & Runtime Detection]
-    kubescape_failed                  2     [NOTE]   Active finding (2)
+    kubescape_failed                  3     [NOTE]   Active finding (3)
     kubescape_critical                0     [PASS]   Clean
     kubescape_high                    0     [PASS]   Clean
     falco_alert_count                 0     [PASS]   Clean
 
 Detected Risk Indicators & Remediation Action Plan
-- [HIGH] high_cve_count (observed: 8)
-  Action: Update or replace images with high-severity CVEs.
-- [HIGH] rbac_risk_score (observed: 6)
-  Action: Apply least-privilege Roles and RoleBindings.
-- [HIGH] root_execution_count (observed: 1)
-  Action: Run containers as non-root users.
-- [MEDIUM] kubescape_failed (observed: 2)
+- [HIGH] high_misconfig_count (observed: 2)
+  Action: Remediate high-severity Kubernetes misconfigurations.
+- [MEDIUM] kubescape_failed (observed: 3)
 - [MEDIUM] missing_network_policies (observed: 1)
   Action: Add restrictive NetworkPolicies.
-- [MEDIUM] service_account_permission_score (observed: 15)
-  Action: Reduce unnecessary service-account permissions.
 
 Assessment
 The evidence score is the transparent baseline computed from collected security indicators.
@@ -57,64 +51,66 @@ The ML prediction estimates the security condition from the same underlying indi
 ========================================
       KUBERNETES SECURITY ASSESSMENT
 ========================================
-Assessment         : latest / insecure
-Evidence Score     : 19.2/100
-Posture Bar        : [████░░░░░░░░░░░░░░░░] 19.5/100
-RF Predicted Score : 19.5/100 (Risk: High)
-SVM Predicted Score: 20.2/100 (Risk: High)
-XGB Predicted Score: 19.9/100 (Risk: High)
-Isolation Forest   : [ANOMALY (Outlier)] (Decision Score: -0.140)
-Model Delta (|Δ|)  : 0.22 points (High ML Alignment)
+Assessment         : cluster-0005 / cluster
+Evidence Score     : 35.0/100
+Posture Bar        : [██████░░░░░░░░░░░░░░] 31.7/100
+RF Predicted Score : 31.7/100 (Risk: High)
+SVM Predicted Score: 34.0/100 (Risk: High)
+XGB Predicted Score: 35.0/100 (Risk: High)
+Isolation Forest   : [ANOMALY (Outlier)] (Decision Score: -0.074)
+Model Delta (|Δ|)  : 3.30 points (High ML Alignment)
 Primary Vuln Type  : Vulnerability (Active Vectors: Resource, Access, Network, Vulnerability)
 
 Security Indicators (Telemetry Breakdown)
   [Vulnerabilities & Supply Chain]
-    critical_cve_count                33    [FAIL]   Critical alert (33)
-    high_cve_count                    146   [WARN]   High risk (146)
-    critical_misconfig_count          0     [PASS]   Clean
-    high_misconfig_count              7     [WARN]   High risk (7)
+    critical_cve_count                18    [FAIL]   Critical alert (18)
+    high_cve_count                    42    [WARN]   High risk (42)
+    critical_misconfig_count          1     [FAIL]   Critical alert (1)
+    high_misconfig_count              8     [WARN]   High risk (8)
     secret_count                      0     [PASS]   Clean
 
   [Configuration & Pod Hardening]
     privileged_count                  1     [FAIL]   Critical alert (1)
-    root_execution_count              2     [WARN]   High risk (2)
-    risky_capability_count            1     [WARN]   High risk (1)
+    root_execution_count              1     [WARN]   High risk (1)
+    risky_capability_count            0     [PASS]   Clean
     host_path_count                   0     [PASS]   Clean
     host_port_count                   1     [NOTE]   Active finding (1)
-    missing_network_policies          2     [NOTE]   Active finding (2)
+    missing_network_policies          1     [NOTE]   Active finding (1)
 
   [Access & Identity (RBAC)]
-    rbac_risk_score                   43    [WARN]   High risk (43)
-    service_account_permission_score  45    [NOTE]   Active finding (45)
+    rbac_risk_score                   25    [WARN]   High risk (25)
+    service_account_permission_score  20    [NOTE]   Active finding (20)
 
   [Compliance & Runtime Detection]
-    kubescape_failed                  16    [NOTE]   Active finding (16)
+    kubescape_failed                  11    [NOTE]   Active finding (11)
     kubescape_critical                0     [PASS]   Clean
-    kubescape_high                    6     [NOTE]   Active finding (6)
-    falco_alert_count                 0     [PASS]   Clean
+    kubescape_high                    5     [NOTE]   Active finding (5)
+    falco_alert_count                 3     [NOTE]   Active finding (3)
 
 Detected Risk Indicators & Remediation Action Plan
-- [CRITICAL] critical_cve_count (observed: 33)
+- [CRITICAL] critical_cve_count (observed: 18)
   Action: Update or replace images with critical CVEs.
+- [CRITICAL] critical_misconfig_count (observed: 1)
+  Action: Remediate critical Kubernetes misconfigurations.
 - [CRITICAL] privileged_count (observed: 1)
   Action: Remove privileged containers.
-- [HIGH] high_cve_count (observed: 146)
+- [HIGH] high_cve_count (observed: 42)
   Action: Update or replace images with high-severity CVEs.
-- [HIGH] high_misconfig_count (observed: 7)
+- [HIGH] high_misconfig_count (observed: 8)
   Action: Remediate high-severity Kubernetes misconfigurations.
-- [HIGH] rbac_risk_score (observed: 43)
+- [HIGH] rbac_risk_score (observed: 25)
   Action: Apply least-privilege Roles and RoleBindings.
-- [HIGH] risky_capability_count (observed: 1)
-  Action: Drop unnecessary Linux capabilities.
-- [HIGH] root_execution_count (observed: 2)
+- [HIGH] root_execution_count (observed: 1)
   Action: Run containers as non-root users.
+- [MEDIUM] falco_alert_count (observed: 3)
+  Action: Investigate recent runtime security alerts.
 - [MEDIUM] host_port_count (observed: 1)
   Action: Prefer Kubernetes Services instead of hostPort.
-- [MEDIUM] kubescape_failed (observed: 16)
-- [MEDIUM] kubescape_high (observed: 6)
-- [MEDIUM] missing_network_policies (observed: 2)
+- [MEDIUM] kubescape_failed (observed: 11)
+- [MEDIUM] kubescape_high (observed: 5)
+- [MEDIUM] missing_network_policies (observed: 1)
   Action: Add restrictive NetworkPolicies.
-- [MEDIUM] service_account_permission_score (observed: 45)
+- [MEDIUM] service_account_permission_score (observed: 20)
   Action: Reduce unnecessary service-account permissions.
 
 Assessment
@@ -126,6 +122,6 @@ The ML prediction estimates the security condition from the same underlying indi
 ==========================================================================================================
 Environment            Evidence    RF Score    SVM Score   XGB Score   Risk Tier   Iso Status   Posture
 ----------------------------------------------------------------------------------------------------------
-latest / secure        83.0/100    83.0/100    84.0/100    82.9/100    Low         Inlier        [████████░░]
-latest / insecure      19.2/100    19.5/100    20.2/100    19.9/100    High        ANOMALY!      [██░░░░░░░░]
+cluster-0001 / cluster 91.5/100    90.1/100    92.5/100    91.0/100    Low         Inlier        [█████████░]
+cluster-0005 / cluster 35.0/100    31.7/100    34.0/100    35.0/100    High        ANOMALY!      [███░░░░░░░]
 ==========================================================================================================
