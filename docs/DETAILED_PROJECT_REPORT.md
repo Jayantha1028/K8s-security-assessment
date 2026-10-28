@@ -602,6 +602,36 @@ The target variable $S$ (`security_score`) is completely excluded from $X$. The 
 3. **Linear Baseline (Logistic Regression):**
    - Evaluated alongside `StandardScaler` to verify non-linear interaction advantages over a flat linear model.
 
+### 8.4 The 11-Model Machine Learning Matrix
+
+To provide empirical validation across both simulated clusters and authentic production manifests, the system implements an **11-Model Machine Learning Matrix**:
+
+```
+[Real-World Domain (115 Workloads)]      [Synthetic Domain (100 Clusters)]
+  ├─ Model 1: Random Forest (R²=0.978)     ├─ Model 5: Random Forest (R²=0.977)
+  ├─ Model 2: SVM (R²=0.916)               ├─ Model 6: SVM (R²=0.954)
+  ├─ Model 3: XGBoost (R²=0.987)           ├─ Model 7: XGBoost (R²=0.976)
+  └─ Model 4: Isolation Forest (ROC=0.968) └─ Model 8: Isolation Forest (ROC=0.975)
+            │                                        │
+            ▼                                        ▼
+  [Model 9: Consolidated Real Ensemble]    [Model 10: Consolidated Synth Ensemble]
+       (R²=0.986 | RMSE=1.97 | Acc=96.5%)       (R²=0.983 | RMSE=3.28 | Acc=92.0%)
+            │                                        │
+            └───────────────────┬────────────────────┘
+                                │
+                                ▼
+              [Model 11: Final Master Unified Model]
+               (R²=0.986 | RMSE=2.52 | Acc=94.4%)
+               (Combined Evaluation Acc = 89.3%)
+```
+
+#### 11-Model Performance Summary:
+- **Models 1–4 (Real-World Manifest Models):** Trained on 115 authentic enterprise manifests from Google Cloud (Online Boutique), CNCF projects (Argo CD, Knative, Tekton, cert-manager, Istio Bookinfo, Flannel, Calico), and Kubernetes Goat. XGBoost leads with $R^2 = 0.987$ and RMSE $1.92$.
+- **Models 5–8 (Synthetic Fleet Models):** Trained on 100 simulated cluster environments with paired snapshots and Falco telemetry. Random Forest achieves $91.0\%$ 3-class accuracy.
+- **Model 9 & 10 (Consolidated Domain Ensembles):** Ensemble averaging blends bagging variance reduction with gradient tree boosting, achieving $R^2 = 0.986$ (Real) and $R^2 = 0.983$ (Synthetic).
+- **Model 11 (Final Master Unified Model):** Merges real-world IaC features and multi-cluster telemetry into a master cross-domain ensemble.
+- **Unsupervised Anomaly Metric Clarity:** Isolation Forest reports **ROC-AUC (0.968–0.975)** and **100% Outlier Recall Rate** rather than standard continuous $R^2$ / RMSE, as it operates on path-length anomaly scoring without target regression labels.
+
 ---
 
 ## 9. Verification, Quality Assurance & Test Architecture

@@ -3,6 +3,7 @@
 #
 #   ./run.sh --manifests [--fresh]   manifest pipeline (needs only Kubescape)
 #   ./run.sh --fleet [--count 100]   parallel fleet pipeline (100 YAMLs: Kubescape + Trivy + Kind/Falco)
+#   ./run.sh --compare-11            train and benchmark all 11 models (Real, Synth, Consolidated, Master)
 #   ./run.sh --final                 Kind clusters + latest assessment (+ training if enough data)
 #   ./run.sh --all                   everything: clusters, snapshots, medium scenario, training, report
 #
@@ -261,11 +262,19 @@ cmd_test_cluster() {
   python3 src/generate_report.py "$REPORT_INPUT" "$REPORT_FILE"
 }
 
+cmd_train_11() {
+  echo "=== 11-MODEL TRAINING & BENCHMARK MATRIX ==="
+  require_tools python3
+  python3 "$ROOT/src/build_real_world_dataset.py"
+  python3 "$ROOT/src/train_11_models.py"
+}
+
 main() {
   trap cleanup EXIT
   case "$MODE" in
     --manifests|--midsem)          shift || true; cmd_manifests "$@" ;;
     --fleet|--pipeline)            shift || true; cmd_fleet "$@" ;;
+    --compare-11|--train-11)       cmd_train_11 ;;
     --final)                       cmd_final ;;
     --all)                         cmd_all ;;
     --test-cluster|--test_cluster) shift || true; cmd_test_cluster "$@" ;;
@@ -274,7 +283,7 @@ main() {
 
 MODE="${1:---manifests}"
 case "$MODE" in
-  --manifests|--midsem|--fleet|--pipeline|--final|--all|--test-cluster|--test_cluster) ;;
+  --manifests|--midsem|--fleet|--pipeline|--compare-11|--train-11|--final|--all|--test-cluster|--test_cluster) ;;
   -h|--help) usage; exit 0 ;;
   *)
     echo "Unknown option: $MODE" >&2

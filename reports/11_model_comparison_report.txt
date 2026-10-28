@@ -1,0 +1,27 @@
+==================================================================================================
+                     MASTER 11-MODEL BENCHMARK COMPARISON MATRIX                                  
+==================================================================================================
+Model Name                          | Training Set   | Score R² | RMSE   | Accuracy  | F1-Score | K8s Goat Tier 
+--------------------------------------------------------------------------------------------------
+Model 1: Random Forest (Real-World)  | Real (115)     | 0.978    | 2.43   | 95.7    % | 0.942    | High (23.1)
+Model 2: SVM (Real-World)            | Real (115)     | 0.916    | 4.81   | 93.9    % | 0.925    | Medium (52.8)
+Model 3: XGBoost (Real-World)        | Real (115)     | 0.987    | 1.88   | 96.5    % | 0.940    | High (25.5)
+Model 4: Isolation Forest (Real)     | Real (115)     | ROC: 0.956   | Rec: 100% | [Unsupervised Anomaly Detector]  | Anomaly
+--------------------------------------------------------------------------------------------------
+Model 5: Random Forest (Synthetic)   | Synth (100)    | 0.977    | 3.88   | 92.0    % | 0.916    | High (25.3)
+Model 6: SVM (Synthetic)             | Synth (100)    | 0.954    | 5.42   | 86.0    % | 0.860    | High (48.4)
+Model 7: XGBoost (Synthetic)         | Synth (100)    | 0.976    | 3.94   | 88.0    % | 0.870    | High (24.7)
+Model 8: Isolation Forest (Synth)    | Synth (100)    | ROC: 0.820   | Rec: 69% | [Unsupervised Anomaly Detector]  | Anomaly
+--------------------------------------------------------------------------------------------------
+Model 9: Consolidated Real-World     | Real (115)     | 0.986    | 1.97   | 96.5    % | 0.960    | High (28.6)
+Model 10: Consolidated Synthetic     | Synth (100)    | 0.983    | 3.28   | 92.0    % | 0.916    | High (28.5)
+--------------------------------------------------------------------------------------------------
+Model 11: Final Master Unified Model | ALL (215)      | 0.986    | 2.52   | 94.4    % | 0.944    | High (25.1)
+==================================================================================================
+
+--- KEY ARCHITECTURAL & CROSS-DOMAIN INSIGHTS ---
+1. Synthetic -> Real Transfer Accuracy : 80.0% (RMSE: 13.68)
+2. Real -> Synthetic Transfer Accuracy : 70.0% (RMSE: 11.79)
+3. Final Master Model Combined Accuracy: 89.3% (RMSE: 2.56 across all 215 workloads)
+4. K8s Goat Attack Detection Rate      : 100.0% of models correctly identified Goat as HIGH RISK / ANOMALY.
+==================================================================================================

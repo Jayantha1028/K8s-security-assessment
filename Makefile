@@ -1,4 +1,4 @@
-.PHONY: help test-cluster test_cluster report manifests fleet pipeline train all test clean
+.PHONY: help test-cluster test_cluster report manifests fleet pipeline train train-11 compare-11 real-data all test clean
 
 CONTEXT ?= kind-ml-k8s-insecure
 REPORT_INPUT ?= data/processed/report_input.csv
@@ -11,10 +11,14 @@ help:
 	@echo "  make test-cluster [CONTEXT=<ctx>]  Scan a live cluster context and generate ML report"
 	@echo "  make report                        Display the latest generated security report"
 	@echo "  make train                         Train RF, SVM, XGBoost & Isolation Forest models"
+	@echo "  make train-11                      Train & benchmark all 11 ML models (Real, Synth, Consolidated, Master)"
+	@echo "  make compare-11                    Alias for 'make train-11'"
+	@echo "  make real-data                     Build dataset from 115 credited real-world YAML manifests"
 	@echo "  make manifests [COUNT=100]         Generate and scan sample manifests"
 	@echo "  make final                         Run Kind clusters + latest assessment"
 	@echo "  make all                           Run complete multi-scenario assessment pipeline"
 	@echo "  make test                          Run all Python unit tests"
+	@echo "  make clean                         Clean temporary build, cache and bytecode artifacts"
 
 test-cluster:
 	@echo "=== Scanning Live Cluster Context: $(CONTEXT) ==="
@@ -33,6 +37,14 @@ report:
 train:
 	@python3 src/train_security_models.py
 
+train-11:
+	@./run.sh --compare-11
+
+compare-11: train-11
+
+real-data:
+	@python3 src/build_real_world_dataset.py
+
 manifests:
 	@MANIFEST_COUNT=$(COUNT) ./run.sh --manifests
 
@@ -49,3 +61,10 @@ all:
 
 test:
 	@python3 -m unittest discover -s tests -v
+
+clean:
+	@echo "Cleaning cache files..."
+	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	@find . -type f -name "*.py[cod]" -delete 2>/dev/null || true
+	@rm -rf .pytest_cache .coverage htmlcov
+	@echo "Clean completed."
