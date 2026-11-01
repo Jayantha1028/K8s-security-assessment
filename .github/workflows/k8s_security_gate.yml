@@ -28,18 +28,31 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Test Suite Verification (48 Tests)
+        id: unit_tests
         run: |
-          python -m unittest discover -s tests -v
+          export PYTHONPATH="src:$PYTHONPATH"
+          set -o pipefail
+          python -m unittest discover -s tests -v 2>&1 | tee test_suite_output.log
+
+      - name: Output Test Failure Diagnostics
+        if: failure() && steps.unit_tests.outcome == 'failure'
+        run: |
+          echo "### ❌ Unit Test Suite Diagnostics" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -n 60 test_suite_output.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Execute Shift-Left Security Gate Linter
         id: security_gate
         run: |
+          export PYTHONPATH="src:$PYTHONPATH"
           python src/ci_security_gate.py "manifests/**/*.yaml" --ignore-insecure
 
       - name: Verify Gate Interception of Hostile Insecure Manifest (Demonstration)
         id: security_gate_insecure_demo
         continue-on-error: true
         run: |
+          export PYTHONPATH="src:$PYTHONPATH"
           python src/ci_security_gate.py "manifests/insecure/weak-deployment.yaml"
 
       - name: Post PR Summary Comment
@@ -65,5 +78,6 @@ jobs:
         with:
           name: security-gate-report
           path: |
+            test_suite_output.log
             reports/github_actions_gate_summary.md
             reports/11_model_comparison_report.txt
