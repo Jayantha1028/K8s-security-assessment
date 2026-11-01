@@ -33,21 +33,9 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Test Suite Verification (48 Tests)
-        id: unit_tests
         run: |
           export PYTHONPATH="src:$PYTHONPATH"
-          python -m unittest discover -s tests -v 2>&1 | tee test_suite_output.log
-
-      - name: Output Test Failure Diagnostics to Debug Branch
-        if: failure()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -B ci-debug-log
-          tail -n 120 test_suite_output.log > ci_failure.txt
-          git add ci_failure.txt
-          git commit -m "debug: capture CI test failure output" || true
-          git push -f origin ci-debug-log || true
+          python -m unittest discover -s tests -v
 
       - name: Execute Shift-Left Security Gate Linter
         id: security_gate
