@@ -1,7 +1,7 @@
 ================================================================================
               SECURITY CHAOS ENGINEERING RESILIENCE AUDIT REPORT
 ================================================================================
-Execution Duration : 0.24 seconds
+Execution Duration : 0.23 seconds
 Scenarios Executed : 6
 Passed Scenarios   : 6 / 6 (100.0%)
 Failed Scenarios   : 0
