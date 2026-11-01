@@ -6,7 +6,8 @@
 #   ./run.sh --live        live cluster telemetry collection & model training
 #   ./run.sh --test        execute test suite (48 unit tests)
 #   ./run.sh --report      generate & display security assessment & benchmark reports
-#   ./run.sh --all         run end-to-end pipeline across all domains
+#   ./run.sh --run-all     execute every feature in the project at once (18 stages)
+#   ./run.sh --all         run live-cluster Kind snapshots pipeline
 #
 # Settings for --all (environment variables):
 #   SNAPSHOTS  snapshots per scenario, minimum 5   (default 6)
@@ -380,21 +381,23 @@ main() {
     --fleet|--pipeline)            shift || true; cmd_fleet "$@" ;;
     --compare-11|--train-11)       cmd_train_11 ;;
     --test-cluster|--test_cluster) shift || true; cmd_test_cluster "$@" ;;
+    --run-all|--features)          shift || true; exec "$ROOT/run_all.sh" "$@" ;;
   esac
 }
 
 MODE="${1:---manifests}"
 case "$MODE" in
-  manifests|real|live|final|all|test|report|fleet|pipeline|clean|clean-deep|clean_deep|deep-clean|deep)
+  manifests|real|live|final|all|test|report|fleet|pipeline|clean|clean-deep|clean_deep|deep-clean|deep|run-all|features)
     case "$MODE" in
       clean_deep|deep-clean|deep) MODE="--clean-deep" ;;
+      run-all|features) MODE="--run-all" ;;
       *) MODE="--$MODE" ;;
     esac
     ;;
 esac
 
 case "$MODE" in
-  --manifests|--midsem|--real|--live|--final|--all|--test|--report|--clean|--clean-deep|--fleet|--pipeline|--compare-11|--train-11|--test-cluster|--test_cluster) ;;
+  --manifests|--midsem|--real|--live|--final|--all|--test|--report|--clean|--clean-deep|--fleet|--pipeline|--compare-11|--train-11|--test-cluster|--test_cluster|--run-all|--features) ;;
   -h|--help) usage; exit 0 ;;
   *)
     echo "Unknown option: $MODE" >&2

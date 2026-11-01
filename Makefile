@@ -1,4 +1,4 @@
-.PHONY: help manifests Manifests real Real live Live test Test report Report gate Gate chaos Chaos snowflake-full snowflake-update all All clean Clean clean-deep clean_deep deep-clean deep
+.PHONY: help manifests Manifests real Real live Live test Test report Report gate Gate chaos Chaos audit Audit pdf Pdf snowflake-full snowflake-update all All clean Clean clean-deep clean_deep deep-clean deep run-all run_all all-features
 
 COUNT ?=
 BATCH_SIZE ?=
@@ -18,9 +18,11 @@ help:
 	@echo "  make report                               Display security & benchmark reports"
 	@echo "  make gate                                 Execute Shift-Left CI/CD Security Gate"
 	@echo "  make chaos                                Execute Security Chaos Engineering Resilience Suite"
+	@echo "  make audit (or make pdf)                  Generate Executive Compliance Audit HTML & 9-Page PDF"
 	@echo "  make snowflake-full                       Push all baseline tables & views to Snowflake once"
 	@echo "  make snowflake-update                     Update only necessary dynamic data (Assessment & SHAP)"
-	@echo "  make all [SNAPSHOTS=N] [PAUSE=N]          Run full end-to-end pipeline across all domains"
+	@echo "  make run-all (or make all-features)       Execute EVERY feature in the project at once (18 stages)"
+	@echo "  make all [SNAPSHOTS=N] [PAUSE=N]          Run live-cluster Kind snapshots pipeline"
 	@echo "  make clean                                Remove cache, bytecode, and temp logs"
 	@echo "  make clean-deep (or make clean deep)      Remove all previous run scans, snapshots & models"
 	@echo "=========================================================================="
@@ -61,11 +63,24 @@ chaos:
 
 Chaos: chaos
 
+audit:
+	@python3 src/generate_executive_audit.py
+
+Audit: audit
+pdf: audit
+Pdf: audit
+
 snowflake-full:
 	@python3 src/export_to_snowflake.py --full
 
 snowflake-update:
 	@python3 src/export_to_snowflake.py --incremental
+
+run-all:
+	@./run_all.sh
+
+run_all: run-all
+all-features: run-all
 
 all:
 	@SNAPSHOTS=$(SNAPSHOTS) PAUSE=$(PAUSE) ./run.sh --all

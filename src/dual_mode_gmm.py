@@ -106,3 +106,21 @@ class DualModeGMM(BaseEstimator):
         """Returns +1 for normal inlier, -1 for anomaly."""
         scores = self.decision_function(X)
         return np.where(scores >= 0, 1, -1)
+
+
+if __name__ == "__main__":
+    print("=" * 75)
+    print("  DUAL-MODE GAUSSIAN MIXTURE MODEL (GMM) ZERO-DAY DETECTOR")
+    print("=" * 75)
+    X_sample = np.random.RandomState(42).randn(100, 17)
+    gmm_detector = DualModeGMM(n_components=3, contamination=0.10)
+    gmm_detector.fit(X_sample)
+    print("DualModeGMM fitted successfully across 3 latent Gaussian components.")
+    print(f"Decision Boundary Contamination Threshold: {gmm_detector.threshold:.4f}")
+    zero_day = np.full((1, 17), 50.0)
+    score = gmm_detector.decision_function(zero_day)[0]
+    is_anomaly = gmm_detector.predict_anomaly(zero_day)[0]
+    status_label = "[ANOMALY / ZERO-DAY OUTLIER (-1)]" if is_anomaly == -1 else "[NORMAL INLIER (+1)]"
+    print(f"Zero-Day Test Vector Decision Score: {score:.2f} -> {status_label}")
+    print("=" * 75)
+

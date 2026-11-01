@@ -238,3 +238,29 @@ def clean_dataset(
 
     report.rows_after = len(df)
     return df.reset_index(drop=True), report
+
+
+if __name__ == "__main__":
+    from pathlib import Path
+    print("=" * 75)
+    print("  DATASET INTEGRITY & CLEANSING AUDIT")
+    print("=" * 75)
+    dataset_candidates = [
+        Path("data/dataset_500_workloads.csv"),
+        Path("data/processed/combined_security_dataset.csv"),
+        Path("data/processed/final_security_dataset.csv"),
+    ]
+    target_path = None
+    for p in dataset_candidates:
+        if p.exists():
+            target_path = p
+            break
+
+    if target_path:
+        df_raw = pd.read_csv(target_path)
+        _, rep = clean_dataset(df_raw, key_columns=["workload", "namespace"])
+        rep.print(label=target_path.name)
+    else:
+        print("No processed datasets found to audit. Run build_real_world_dataset.py first.")
+    print("=" * 75)
+

@@ -3,23 +3,23 @@
 ========================================
 Assessment         : latest / secure
 Evidence Score     : 82.2/100
-Posture Bar        : [████████████████░░░░] 82.2/100
-RF Predicted Score : 82.2/100 (Risk: Low)
-SVM Predicted Score: 81.7/100 (Risk: Low)
-XGB Predicted Score: 82.3/100 (Risk: Low)
-Isolation Forest   : [Normal Inlier] (Decision Score: +0.022)
-Model Delta (|Δ|)  : 0.03 points (High ML Alignment)
-Bayesian Posterior : 82.2/100 [95% CI: 82.2 - 82.2] (Uncertainty: Low (High Confidence))
+Posture Bar        : [████████████████░░░░] 79.7/100
+RF Predicted Score : 79.7/100 (Risk: Low)
+SVM Predicted Score: 80.1/100 (Risk: Low)
+XGB Predicted Score: 75.5/100 (Risk: Low)
+Isolation Forest   : [Normal Inlier] (Decision Score: +0.029)
+Model Delta (|Δ|)  : 2.48 points (High ML Alignment)
+Bayesian Posterior : 79.7/100 [95% CI: 79.7 - 79.7] (Uncertainty: Low (High Confidence))
 AHP Calibrated Base: 82.2/100 (AHP Consistency Ratio: 0.0024 < 0.10)
 
 Explainable AI (TreeSHAP) Feature Threat Attribution:
-  Population Expected Base Score: 70.0/100
+  Population Expected Base Score: 60.4/100
   Top Marginal Drivers of Predicted Posture:
-    • Compliance Control Violations     : +11.32 pts [SECURITY BONUS] (Observed: 2.0)
-    • Container Root Execution (UID 0)  : -3.37 pts [RISK PENALTY] (Observed: 1.0)
-    • Critical Image CVEs (CVSS >= 9)   : +2.85 pts [SECURITY BONUS] (Observed: 0.0)
-    • Privileged Container Execution    : +1.21 pts [SECURITY BONUS] (Observed: 0.0)
-    • Excessive ServiceAccount Permissions: -0.86 pts [RISK PENALTY] (Observed: 15.0)
+    • Compliance Control Violations     : +16.61 pts [SECURITY BONUS] (Observed: 2.0)
+    • High Image CVEs (CVSS 7.0-8.9)    : -6.35 pts [RISK PENALTY] (Observed: 10.0)
+    • High NSA Compliance Failures      : +2.33 pts [SECURITY BONUS] (Observed: 0.0)
+    • Critical Image CVEs (CVSS >= 9)   : +2.09 pts [SECURITY BONUS] (Observed: 0.0)
+    • Overprivileged RBAC Roles         : +1.21 pts [SECURITY BONUS] (Observed: 6.0)
 Primary Vuln Type  : Vulnerability (Active Vectors: Resource, Network, Vulnerability)
 
 Security Indicators (Telemetry Breakdown)
@@ -150,23 +150,23 @@ Posture Trace : 52/56 vectors passed | 4 security vector(s) triggered.
 ========================================
 Assessment         : latest / insecure
 Evidence Score     : 25.2/100
-Posture Bar        : [█████░░░░░░░░░░░░░░░] 25.4/100
-RF Predicted Score : 25.4/100 (Risk: High)
-SVM Predicted Score: 26.2/100 (Risk: High)
-XGB Predicted Score: 26.2/100 (Risk: High)
-Isolation Forest   : [ANOMALY (Outlier)] (Decision Score: -0.204)
-Model Delta (|Δ|)  : 0.12 points (High ML Alignment)
-Bayesian Posterior : 25.4/100 [95% CI: 25.3 - 25.4] (Uncertainty: Low (High Confidence))
+Posture Bar        : [███░░░░░░░░░░░░░░░░░] 15.1/100
+RF Predicted Score : 15.1/100 (Risk: High)
+SVM Predicted Score: 29.4/100 (Risk: High)
+XGB Predicted Score: 38.7/100 (Risk: High)
+Isolation Forest   : [ANOMALY (Outlier)] (Decision Score: -0.129)
+Model Delta (|Δ|)  : 10.17 points (Moderate Alignment)
+Bayesian Posterior : 15.1/100 [95% CI: 15.0 - 15.1] (Uncertainty: Low (High Confidence))
 AHP Calibrated Base: 27.5/100 (AHP Consistency Ratio: 0.0024 < 0.10)
 
 Explainable AI (TreeSHAP) Feature Threat Attribution:
-  Population Expected Base Score: 70.0/100
+  Population Expected Base Score: 60.4/100
   Top Marginal Drivers of Predicted Posture:
-    • Compliance Control Violations     : -26.70 pts [RISK PENALTY] (Observed: 14.0)
-    • Critical Image CVEs (CVSS >= 9)   : -6.99 pts [RISK PENALTY] (Observed: 31.0)
-    • High Image CVEs (CVSS 7.0-8.9)    : -5.48 pts [RISK PENALTY] (Observed: 82.0)
-    • Privileged Container Execution    : -3.11 pts [RISK PENALTY] (Observed: 1.0)
-    • Container Root Execution (UID 0)  : -0.79 pts [RISK PENALTY] (Observed: 2.0)
+    • Compliance Control Violations     : -30.50 pts [RISK PENALTY] (Observed: 14.0)
+    • High Image CVEs (CVSS 7.0-8.9)    : -7.08 pts [RISK PENALTY] (Observed: 82.0)
+    • Critical Image CVEs (CVSS >= 9)   : -3.61 pts [RISK PENALTY] (Observed: 31.0)
+    • High NSA Compliance Failures      : -2.45 pts [RISK PENALTY] (Observed: 5.0)
+    • Excessive ServiceAccount Permissions: -2.05 pts [RISK PENALTY] (Observed: 45.0)
 Primary Vuln Type  : Vulnerability (Active Vectors: Resource, Access, Network, Vulnerability)
 
 Security Indicators (Telemetry Breakdown)
@@ -308,6 +308,6 @@ Posture Trace : 48/56 vectors passed | 8 security vector(s) triggered.
 ==========================================================================================================
 Environment            Evidence    RF Score    SVM Score   XGB Score   Risk Tier   Iso Status   Posture
 ----------------------------------------------------------------------------------------------------------
-latest / secure        82.2/100    82.2/100    81.7/100    82.3/100    Low         Inlier        [████████░░]
-latest / insecure      25.2/100    25.4/100    26.2/100    26.2/100    High        ANOMALY!      [███░░░░░░░]
+latest / secure        82.2/100    79.7/100    80.1/100    75.5/100    Low         Inlier        [████████░░]
+latest / insecure      25.2/100    15.1/100    29.4/100    38.7/100    High        ANOMALY!      [██░░░░░░░░]
 ==========================================================================================================

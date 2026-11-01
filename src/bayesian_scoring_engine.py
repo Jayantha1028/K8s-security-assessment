@@ -175,3 +175,23 @@ class BayesianSecurityScorer:
         ci_high = np.clip(np.round(mu + 1.96 * std, 2), 0.0, 100.0)
         mu_clipped = np.clip(np.round(mu, 2), 0.0, 100.0)
         return mu_clipped, std, ci_low, ci_high
+
+
+if __name__ == "__main__":
+    print("=" * 75)
+    print("  BAYESIAN PROBABILISTIC SCORING ENGINE & AHP CONSISTENCY")
+    print("=" * 75)
+    weights, cr = compute_ahp_weights()
+    print(f"Analytic Hierarchy Process (AHP) Consistency Ratio (CR): {cr:.4f} (Valid: {cr < 0.10})")
+    print("\nPillar Priority Weights:")
+    pillars = [
+        "P1: Workload & Pod Hardening",
+        "P2: Vulnerabilities & Supply Chain",
+        "P3: RBAC & Identity",
+        "P4: Compliance & Network Policies",
+        "P5: Runtime Kernel Telemetry"
+    ]
+    for p_name, w in zip(pillars, weights):
+        print(f"  • {p_name:<36} : {w*100:.1f}%")
+    print("=" * 75)
+

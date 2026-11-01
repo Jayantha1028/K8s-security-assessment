@@ -135,7 +135,7 @@ def audit_all_56_vulnerabilities():
     print()
     print("[4/4] Syncing 56-Point Audit Traceability Matrix to Snowflake (K8S_SECURITY)...")
     try:
-        from export_to_snowflake import get_connection, DATABASE, SCHEMA
+        from export_to_snowflake import get_connection, DATABASE, SCHEMA, suspend_warehouse
         from snowflake.connector.pandas_tools import write_pandas
 
         df_audit = pd.DataFrame(audit_rows)
@@ -149,6 +149,7 @@ def audit_all_56_vulnerabilities():
             auto_create_table=True,
             overwrite=True
         )
+        suspend_warehouse(ctx)
         ctx.close()
         print(f"      Successfully uploaded {nrows} vulnerability audit records into Snowflake table: K8S_VULNERABILITY_AUDIT_56.")
     except Exception as e:

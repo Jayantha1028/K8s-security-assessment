@@ -5,14 +5,14 @@ Benchmark Target   : Kubernetes Goat (Intentionally Vulnerable K8s Environment)
 Evaluation Mode    : Ground-Truth Scenario Profile (Madhu Akula)
 Evidence Baseline  : 8.7/100 (Critical Compound Security Risk)
 Primary Vuln Type  : Vulnerability (Active Vectors: Resource, Access, Network, Vulnerability)
-Posture Bar        : [█████░░░░░░░░░░░░░░░] 25.3/100
+Posture Bar        : [██░░░░░░░░░░░░░░░░░░] 10.9/100
 
 --- 4-MODEL INDEPENDENT INFERENCE & COMPARISON ---
-  1. Random Forest (Classifier Baseline) : 25.3/100  | Risk Tier: HIGH (Delta vs Evidence: 16.60)
-  2. Support Vector Machine (SVM)        : 48.4/100  | Risk Tier: HIGH (Delta vs Evidence: 39.69)
-  3. XGBoost Regressor (Top Predictor)   : 24.7/100  | Risk Tier: HIGH (Delta vs Evidence: 16.00)
+  1. Random Forest (Classifier Baseline) : 10.9/100  | Risk Tier: HIGH (Delta vs Evidence: 2.17)
+  2. Support Vector Machine (SVM)        : 34.1/100  | Risk Tier: HIGH (Delta vs Evidence: 25.45)
+  3. XGBoost Regressor (Top Predictor)   : 10.6/100  | Risk Tier: HIGH (Delta vs Evidence: 1.90)
   4. Isolation Forest (Anomaly Detector) : [EXTREME OUTLIER (Anomaly)]
-     • Decision Function Outlier Score   : -0.198 (Significant Negative Outlier)
+     • Decision Function Outlier Score   : -0.226 (Significant Negative Outlier)
      • Unsupervised Threat Detection     : 100% Unseen Attack Flagged without Ground Truth
 
 --- TELEMETRY BREAKDOWN (KUBERNETES GOAT FINDINGS) ---
@@ -44,9 +44,9 @@ Posture Bar        : [█████░░░░░░░░░░░░░░�
 ==================================================================================
 Environment            Evidence   RF Score   SVM Score  XGB Score  Risk Tier  Iso Status   Posture
 ----------------------------------------------------------------------------------
-Internal Secure         83.0/100   83.0/100  83.6/100    83.0/100   LOW        Inlier       [████████░░]
+Internal Secure         82.2/100   82.2/100  83.6/100    82.2/100   LOW        Inlier       [████████░░]
 Internal Insecure       25.2/100  25.6/100   26.2/100   25.8/100   HIGH       ANOMALY!     [███░░░░░░░]
-K8s Goat (External)      8.7/100   25.3/100   48.4/100   24.7/100   HIGH       OUTLIER!     [█░░░░░░░░░]
+K8s Goat (External)      8.7/100   10.9/100   34.1/100   10.6/100   HIGH       OUTLIER!     [█░░░░░░░░░]
 ==================================================================================
 
 Validation Conclusion:
