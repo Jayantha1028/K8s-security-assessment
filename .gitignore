@@ -10,6 +10,11 @@ venv/
 data/raw/
 !data/raw/samples/real_world/MANIFEST_CATALOG.md
 
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
 # Local Kubernetes state / editor / OS files
 .kube/
 .DS_Store

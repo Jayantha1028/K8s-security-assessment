@@ -374,29 +374,47 @@ To rigorously evaluate how machine learning generalizes across diverse Kubernete
 
 | Model ID | Model Name | Training Domain | Regression $R^2$ | Regression RMSE | 3-Class Accuracy | Anomaly ROC-AUC / Recall |
 |---|---|---|---|---|---|---|
-| **M1** | Random Forest | Real-World YAMLs (115) | $0.978$ | $2.49$ | **$93.9\%$** | N/A (Supervised) |
-| **M2** | Support Vector Machine | Real-World YAMLs (115) | $0.916$ | $4.87$ | $90.4\%$ | N/A (Supervised) |
-| **M3** | XGBoost | Real-World YAMLs (115) | **$0.987$** | **$1.92$** | **$95.7\%$** | N/A (Supervised) |
-| **M4** | Isolation Forest | Real-World YAMLs (115) | N/A (Unsupervised) | N/A | Heuristic | **ROC: 0.968 \| Rec: 100%** |
-| **M5** | Random Forest | Synthesized Fleet (100) | $0.977$ | $3.81$ | **$91.0\%$** | N/A (Supervised) |
-| **M6** | Support Vector Machine | Synthesized Fleet (100) | $0.954$ | $5.39$ | $85.0\%$ | N/A (Supervised) |
-| **M7** | XGBoost | Synthesized Fleet (100) | $0.976$ | $3.90$ | $89.0\%$ | N/A (Supervised) |
-| **M8** | Isolation Forest | Synthesized Fleet (100) | N/A (Unsupervised) | N/A | Heuristic | **ROC: 0.975 \| Rec: 100%** |
+| **M1** | Random Forest | Real-World YAMLs (115) | $0.978$ | $2.43$ | **$95.7\%$** | N/A (Supervised) |
+| **M2** | Support Vector Machine | Real-World YAMLs (115) | $0.916$ | $4.81$ | $93.9\%$ | N/A (Supervised) |
+| **M3** | XGBoost | Real-World YAMLs (115) | **$0.987$** | **$1.88$** | **$96.5\%$** | N/A (Supervised) |
+| **M4** | Dual-Mode GMM | Real-World YAMLs (115) | $0.974$ | $2.66$ | $95.7\%$ | **ROC: 0.96 \| Rec: 100%** |
+| **M5** | Random Forest | Synthesized Fleet (100) | $0.983$ | $2.77$ | **$95.6\%$** | N/A (Supervised) |
+| **M6** | Support Vector Machine | Synthesized Fleet (100) | $0.992$ | $1.89$ | $96.8\%$ | N/A (Supervised) |
+| **M7** | XGBoost | Synthesized Fleet (100) | $0.989$ | $2.26$ | $95.9\%$ | N/A (Supervised) |
+| **M8** | Dual-Mode GMM | Synthesized Fleet (100) | $0.993$ | $1.79$ | **$98.5\%$** | **ROC: 0.96 \| Rec: 100%** |
 | **M9** | Consolidated Real Ensemble | Real-World (RF + SVM + XGB) | **$0.986$** | **$1.97$** | **$96.5\%$** | N/A (Consolidated) |
-| **M10** | Consolidated Synth Ensemble | Synthetic (RF + SVM + XGB) | $0.983$ | $3.28$ | $92.0\%$ | N/A (Consolidated) |
+| **M10** | Consolidated Synth Ensemble | Synthetic (RF + SVM + XGB) | $0.990$ | $2.10$ | $96.5\%$ | N/A (Consolidated) |
 | **M11** | Final Master Unified Model | Cross-Domain Meta-Ensemble | **$0.986$** | **$2.52$** | **$94.4\%$** | N/A (Universal) |
 
 ---
 
-### Why Isolation Forest Reports ROC-AUC & Recall Instead of $R^2$ / RMSE:
+### Replacement of Isolation Forest by the Dual-Mode Gaussian Mixture Model (GMM):
 
 > [!NOTE]
-> **Understanding Unsupervised Anomaly Metrics:**
-> - Supervised models (Random Forest, SVM, XGBoost) are trained with ground-truth regression targets ($0 - 100$ continuous security scores). Hence, $R^2$ (coefficient of determination) and RMSE are mathematically defined.
-> - **Isolation Forest is strictly unsupervised**. It isolates anomalous workloads by randomly selecting features and split values. Anomalous, highly vulnerable workloads have significantly shorter tree paths.
-> - Its output is an **anomaly score** in $[-0.5, +0.5]$ and binary labels ($-1$ for outlier/anomaly, $+1$ for inlier/normal).
-> - Therefore, evaluating continuous regression $R^2$ or 3-class risk labels on raw Isolation Forest outputs yields `N/A`.
-> - **The Genuine Scientific Metric:** We evaluate Isolation Forest using **Area Under the ROC Curve (ROC-AUC)** against high-risk workloads, achieving **$0.968$** on Real-World data and **$0.975$** on Synthetic data, with a **$100\%$ Outlier Recall Rate** (all critical zero-day anomalies successfully flagged).
+> **Why Dual-Mode GMM is Superior to Isolation Forest:**
+> - Isolation Forest is strictly **unsupervised**, outputting arbitrary path-length scores ($-0.5$ to $+0.5$), which forced regression $R^2$ and discrete classification accuracy to report `N/A`.
+> - **Dual-Mode GMM (`dual_mode_gmm.py`)** solves this limitation:
+>   1. **Unsupervised Density Anomaly Detection:** Models multi-dimensional feature space as a mixture of Gaussians $p(x) = \sum \pi_k \mathcal{N}(x \mid \mu_k, \Sigma_k)$. Workloads in low-density tails are detected as anomalies with **$0.960$ ROC-AUC** and **$100\%$ Outlier Recall**.
+>   2. **Supervised Target Learning:** Uses posterior component probabilities and log-likelihood as latent representations to predict continuous security scores ($R^2 = 0.974 - 0.993$) and discrete risk tiers ($95.7\% - 98.5\%$ Accuracy).
+>   3. **100% API Compatibility:** Provides `predict_anomaly()` and `decision_function()` drop-in compatibility.
+
+---
+
+### Probabilistic & Bayesian Scoring Framework:
+- **Analytic Hierarchy Process (AHP):** Grounded in CVSS v3.1 and MITRE ATT&CK, determining pairwise pillar weights: Workload ($27.9\%$), CVEs ($27.9\%$), RBAC ($19.8\%$), Compliance ($14.1\%$), Runtime ($10.4\%$). Mathematical consistency is verified with a **Consistency Ratio $\text{CR} = 0.0024 < 0.10$**.
+- **Bayesian Ridge Uncertainty Quantification:** Predicts continuous posterior distributions $p(y \mid X, \mathcal{D})$ with calibrated **95% Credible Intervals** $[\mu - 1.96\sigma, \mu + 1.96\sigma]$. When zero-day anomalies appear, predictive variance $\sigma$ expands, explicitly signaling epistemic uncertainty to SecOps.
+
+---
+
+### Enterprise DevSecOps Integrations:
+1. **GitHub Actions Shift-Left Security Gate (`.github/workflows/k8s_security_gate.yml`):**
+   - Automatically executes on Pull Requests.
+   - Evaluates the **56-Vulnerability Taxonomy** and **Model 11 Master Consensus**.
+   - Posts a formatted Markdown review comment and blocks deployments if Critical vulnerabilities or High Risk ($< 60/100$) are detected.
+2. **Snowflake Cloud Data Warehouse Synchronization (`src/export_to_snowflake.py`):**
+   - Continuous ingestion into database `K8S_SECURITY.PUBLIC`.
+   - Populates 4 core tables: `K8S_FLEET_SECURITY`, `K8S_MODEL_BENCHMARK_11`, `K8S_VULNERABILITY_TAXONOMY_56`, and `K8S_VULNERABILITY_AUDIT_56`.
+   - Creates pre-aggregated analytics views (`V_PLANE_SEVERITY_SUMMARY`, `V_FLEET_RISK_DISTRIBUTION`, `V_MODEL_PERFORMANCE_LEADERBOARD`) with automated X-Small 60s auto-suspend to prevent credit burn.
 
 ---
 

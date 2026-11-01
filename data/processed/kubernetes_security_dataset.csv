@@ -99,3 +99,317 @@ sample-0097:sample-97,1,0,1,1,1,2,1,1,1,1,2,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Reso
 sample-0098:sample-98,0,0,0,1,0,1,1,0,1,1,1,0,1,0,1,1,1,60.0,8,12,0,0,3,4,1,Resource,"Resource, Access, Network, Vulnerability"
 sample-0099:sample-99,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,1,50.0,10,10,0,0,4,5,1,Resource,"Resource, Network, Vulnerability"
 sample-0100:sample-100,0,0,0,0,0,1,0,1,1,1,2,0,0,0,0,0,2,65.0,7,13,0,0,2,4,1,Resource,"Resource, Network"
+real-0001:adservice,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0002:shippingservice,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0003:checkoutservice,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0004:currencyservice,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0005:emailservice,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0006:productcatalogservice,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0007:frontend,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0008:recommendationservice,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0009:loadgenerator,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,2,85.0,3,17,0,0,0,3,0,Access,Access
+real-0010:cartservice,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0011:redis-cart,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0012:paymentservice,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0013:details-v1,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0014:ratings-v1,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0015:reviews-v1,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0016:reviews-v2,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0017:reviews-v3,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0018:productpage-v1,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0019:argocd-applicationset-controller,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,75.0,5,15,0,0,2,3,0,Access,Access
+real-0020:argocd-dex-server,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,2,75.0,5,15,0,0,2,3,0,Access,Access
+real-0021:argocd-notifications-controller,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,75.0,5,15,0,0,2,3,0,Access,Access
+real-0022:argocd-redis,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,2,75.0,5,15,0,0,2,3,0,Access,Access
+real-0023:argocd-repo-server,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,2,80.0,4,16,0,0,2,2,0,Hardened,Clean
+real-0024:argocd-server,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,75.0,5,15,0,0,2,3,0,Access,Access
+real-0025:argocd-application-controller,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,75.0,5,15,0,0,2,3,0,Access,Access
+real-0026:argo-server,0,0,0,0,0,0,0,1,1,0,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Access,"Resource, Access"
+real-0027:minio,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access"
+real-0028:workflow-controller,0,0,0,0,0,0,0,1,1,0,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Access,"Resource, Access"
+real-0029:argo-rollouts,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,75.0,5,15,0,0,2,3,0,Access,Access
+real-0030:controller-manager,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Access,"Resource, Access"
+real-0031:cert-manager-cainjector,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,75.0,5,15,0,0,2,3,0,Access,Access
+real-0032:cert-manager,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,75.0,5,15,0,0,2,3,0,Access,Access
+real-0033:cert-manager-webhook,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,75.0,5,15,0,0,2,3,0,Access,Access
+real-0034:ingress-nginx-controller,0,0,0,0,0,0,0,0,1,0,1,0,1,1,0,1,1,70.0,6,14,0,0,2,3,1,Access,"Resource, Access"
+real-0035:ingress-nginx-admission-create,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,80.0,4,16,0,0,2,2,0,Access,Access
+real-0036:ingress-nginx-admission-patch,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,80.0,4,16,0,0,2,2,0,Access,Access
+real-0037:metrics-server,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,75.0,5,15,0,0,2,3,0,Access,Access
+real-0038:kubernetes-dashboard,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,1,1,80.0,4,16,0,0,2,2,0,Access,Access
+real-0039:dashboard-metrics-scraper,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,1,1,80.0,4,16,0,0,2,2,0,Access,Access
+real-0040:tekton-pipelines-controller,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,80.0,4,16,0,0,2,2,0,Access,Access
+real-0041:tekton-events-controller,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,80.0,4,16,0,0,2,2,0,Access,Access
+real-0042:tekton-pipelines-remote-resolvers,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0043:tekton-pipelines-webhook,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,1,2,0,Access,Access
+real-0044:activator,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0045:autoscaler,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0046:controller,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0047:webhook,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+real-0048:speaker,0,1,0,0,0,0,1,0,0,0,1,1,1,1,0,1,1,60.0,8,12,0,0,4,4,0,Resource,"Resource, Access, Network"
+real-0049:kube-flannel-ds,0,1,0,0,4,0,1,1,1,1,2,1,1,1,0,1,3,50.0,10,10,0,0,4,5,1,Resource,"Resource, Access, Network"
+real-0050:calico-node,1,1,0,0,12,0,1,1,1,1,0,1,1,1,0,1,4,50.0,10,10,0,0,4,5,1,Resource,"Resource, Access, Network"
+real-0051:calico-kube-controllers,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0052:envoy-gateway,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,1,1,75.0,5,15,0,0,0,4,1,Access,Access
+real-0053:eg-gateway-helm-certgen,0,0,0,0,0,0,0,1,1,1,0,1,1,1,0,1,1,65.0,7,13,0,0,2,4,1,Access,"Resource, Access"
+real-0054:opentelemetry-operator-controller-manager,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,2,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0055:fluentd,0,0,0,0,2,0,1,1,1,1,0,1,1,0,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0056:dex,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0057:batch-check-job,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0058:build-code-deployment,0,0,0,0,0,0,1,1,1,1,0,1,0,0,1,1,1,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access, Vulnerability"
+real-0059:cache-store-deployment,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0060:docker-bench-security,1,1,1,1,10,0,1,1,1,1,1,1,1,1,1,1,2,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Network, Vulnerability"
+real-0061:health-check-deployment-simple,1,0,0,0,3,0,1,1,1,1,0,1,0,0,1,1,1,65.0,7,13,0,0,1,5,1,Resource,"Resource, Access, Vulnerability"
+real-0062:health-check-deployment,1,0,0,0,3,0,1,1,1,1,0,1,1,1,1,1,2,65.0,7,13,0,0,1,5,1,Resource,"Resource, Access, Vulnerability"
+real-0063:hidden-in-layers,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0064:hunger-check-deployment,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0065:internal-proxy-deployment,0,0,0,0,0,0,1,1,1,1,0,1,0,0,1,1,2,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access, Vulnerability"
+real-0066:kube-bench-master,0,0,1,0,13,0,1,1,1,1,0,1,1,1,1,1,1,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Vulnerability"
+real-0067:kube-bench-node,0,0,1,0,11,0,1,1,1,1,0,1,1,1,1,1,1,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Vulnerability"
+real-0068:kubernetes-goat-home-deployment,0,0,0,0,0,0,1,1,1,1,0,1,0,0,1,1,1,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access, Vulnerability"
+real-0069:poor-registry-deployment,0,0,0,0,0,0,1,1,1,1,0,1,0,0,1,1,1,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access, Vulnerability"
+real-0070:system-monitor-deployment,1,0,1,1,1,0,1,1,1,1,0,1,0,0,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0071:tf-serving,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0072:prometheus-adapter,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0073:vllm-gemma-deployment,0,0,0,0,0,0,1,1,1,1,0,1,0,0,0,1,1,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access"
+real-0074:dns-frontend,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0075:cockroachdb,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,2,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0076:be,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0077:exclusive-1,0,0,0,0,0,0,1,1,1,1,0,1,0,0,1,1,1,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access, Vulnerability"
+real-0078:exclusive-2,0,0,0,0,0,0,1,1,1,1,0,1,0,0,1,1,1,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access, Vulnerability"
+real-0079:exclusive-3,0,0,0,0,0,0,1,1,1,1,0,1,0,0,1,1,1,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access, Vulnerability"
+real-0080:exclusive-4,0,0,0,0,0,0,1,1,1,1,0,1,0,0,1,1,1,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access, Vulnerability"
+real-0081:shared,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0082:explorer,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0083:mysql-pod,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Vulnerability"
+real-0084:javaweb-2,0,0,0,0,0,1,1,1,1,1,0,1,1,1,0,1,2,55.0,9,11,0,0,2,6,1,Resource,"Resource, Access, Network"
+real-0085:javaweb,0,0,0,0,0,1,1,1,1,1,0,1,1,1,0,1,2,55.0,9,11,0,0,2,6,1,Resource,"Resource, Access, Network"
+real-0086:newrelic-infra-agent,1,1,1,1,4,0,1,1,1,1,0,1,1,1,1,1,1,45.0,11,9,0,0,5,5,1,Resource,"Resource, Access, Network, Vulnerability"
+real-0087:newrelic-agent,1,1,1,1,4,0,1,1,1,1,0,1,1,1,1,1,1,45.0,11,9,0,0,5,5,1,Resource,"Resource, Access, Network, Vulnerability"
+real-0088:etcd,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Vulnerability"
+real-0089:etcd-discovery,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0090:openshift,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0091:nginx,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0092:selenium-hub,0,0,0,0,0,0,1,1,1,1,0,1,0,0,0,1,1,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access"
+real-0093:selenium-node-chrome,0,0,0,0,0,0,1,1,1,1,0,1,0,0,0,1,1,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access"
+real-0094:selenium-node-firefox,0,0,0,0,0,0,1,1,1,1,0,1,0,0,0,1,1,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access"
+real-0095:hazelcast,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0096:minio,0,0,0,0,0,1,1,1,1,1,0,1,1,1,1,1,1,50.0,10,10,0,0,3,6,1,Resource,"Resource, Access, Network, Vulnerability"
+real-0097:minio-deployment,0,0,0,0,0,1,1,1,1,1,0,1,1,1,1,1,1,50.0,10,10,0,0,3,6,1,Resource,"Resource, Access, Network, Vulnerability"
+real-0098:redis-master,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,2,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0099:rethinkdb-admin,0,0,0,0,0,0,1,1,1,1,0,1,1,1,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+real-0100:vttablet-{{uid}},0,0,0,0,2,0,1,1,1,1,0,1,0,0,0,1,2,70.0,6,14,0,0,0,5,1,Resource,"Resource, Access"
+real-0101:storm-worker-controller,0,0,0,0,0,4,1,1,1,1,0,1,0,0,1,1,1,65.0,7,13,0,0,0,6,1,Network,"Resource, Access, Network, Vulnerability"
+real-0102:sysdig-agent,1,1,1,0,6,0,1,1,1,1,0,1,1,1,1,1,1,40.0,12,8,0,0,6,5,1,Resource,"Resource, Access, Network, Vulnerability"
+real-0103:aws-web,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0104:azure,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0105:pod-uses-account-hdd-5g,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0106:pod-uses-dedicated-hdd-5g,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0107:pod-uses-shared-hdd-5g,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0108:pod-uses-shared-ssd-5g,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0109:pod-uses-managed-hdd-5g,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0110:pod-uses-managed-ssd-5g,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0111:azure-2,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0112:cephfs2,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0113:cephfs,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0114:cinder-web,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+real-0115:fibre-channel-example-pod,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Vulnerability"
+sample-0001:sample-1,0,0,0,1,0,1,0,0,0,1,2,1,0,0,0,1,1,60.0,8,12,0,0,3,5,0,Resource,"Resource, Access, Network"
+sample-0002:sample-2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0003:sample-3,0,1,1,1,1,0,1,1,1,1,2,1,1,1,1,1,1,45.0,11,9,0,0,5,5,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0004:sample-4,0,0,0,1,0,1,1,1,0,1,2,1,1,0,0,0,2,55.0,9,11,0,0,4,5,0,Resource,"Resource, Network"
+sample-0005:sample-5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,90.0,2,18,0,0,0,2,0,Vulnerability,Vulnerability
+sample-0006:sample-6,0,1,0,0,0,1,0,0,1,0,0,1,1,1,1,0,1,60.0,8,12,0,0,3,4,1,Network,"Network, Vulnerability"
+sample-0007:sample-7,1,0,0,0,1,1,1,1,1,1,3,0,1,0,1,1,2,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0008:sample-8,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,85.0,3,17,0,0,0,3,0,Network,Network
+sample-0009:sample-9,0,0,0,0,0,1,0,1,1,0,0,0,0,1,0,0,2,70.0,6,14,0,0,1,4,1,Resource,"Resource, Network"
+sample-0010:sample-10,0,0,0,1,0,1,0,1,1,1,2,0,0,1,0,1,1,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Network"
+sample-0011:sample-11,0,0,0,0,0,0,1,1,0,1,2,0,0,0,0,1,1,75.0,5,15,0,0,1,4,0,Resource,"Resource, Access"
+sample-0012:sample-12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+sample-0013:sample-13,0,1,0,1,0,1,1,1,1,0,0,0,0,0,1,1,1,60.0,8,12,0,0,2,5,1,Network,"Resource, Access, Network, Vulnerability"
+sample-0014:sample-14,1,0,0,1,1,1,1,1,1,1,2,1,1,1,0,0,1,45.0,11,9,0,0,5,5,1,Resource,"Resource, Network"
+sample-0015:sample-15,1,0,0,0,0,1,0,0,0,1,2,1,0,0,0,1,1,65.0,7,13,0,0,2,5,0,Resource,"Resource, Access, Network"
+sample-0016:sample-16,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,45.0,11,9,0,0,4,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0017:sample-17,0,0,0,0,1,1,0,0,1,0,0,1,0,1,1,0,1,70.0,6,14,0,0,1,4,1,Resource,"Resource, Network, Vulnerability"
+sample-0018:sample-18,0,0,0,0,0,0,1,1,1,1,2,1,0,1,1,1,2,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Vulnerability"
+sample-0019:sample-19,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,1,1,80.0,4,16,0,0,0,3,1,Resource,"Resource, Access"
+sample-0020:sample-20,1,0,1,1,0,1,1,1,1,0,0,1,1,1,0,1,1,45.0,11,9,0,0,4,6,1,Resource,"Resource, Access, Network"
+sample-0021:sample-21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,90.0,2,18,0,0,0,2,0,Vulnerability,Vulnerability
+sample-0022:sample-22,1,0,1,1,1,1,1,1,1,1,3,1,1,0,1,1,2,45.0,11,9,0,0,4,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0023:sample-23,1,1,1,0,0,1,1,1,1,1,4,1,1,1,1,1,2,35.0,13,7,0,0,6,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0024:sample-24,1,1,0,0,1,1,1,1,1,1,3,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0025:sample-25,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,80.0,4,16,0,0,1,3,0,Access,Access
+sample-0026:sample-26,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,75.0,5,15,0,0,1,4,0,Access,"Resource, Access, Network"
+sample-0027:sample-27,0,0,0,1,0,1,1,0,1,1,2,0,0,0,0,0,1,65.0,7,13,0,0,3,3,1,Resource,"Resource, Network"
+sample-0028:sample-28,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0029:sample-29,0,0,0,0,0,0,1,1,1,1,1,1,0,1,1,0,2,65.0,7,13,0,0,2,4,1,Resource,"Resource, Vulnerability"
+sample-0030:sample-30,1,1,0,0,1,2,1,1,1,1,3,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0031:sample-31,1,1,0,0,1,2,1,1,1,1,3,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0032:sample-32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+sample-0033:sample-33,0,0,1,0,1,1,0,1,1,1,1,0,1,1,0,1,1,50.0,10,10,0,0,4,5,1,Resource,"Resource, Access, Network"
+sample-0034:sample-34,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,1,85.0,3,17,0,0,0,3,0,Vulnerability,Vulnerability
+sample-0035:sample-35,0,0,0,1,0,1,0,1,0,1,2,0,0,0,0,1,1,60.0,8,12,0,0,3,5,0,Resource,"Resource, Access, Network"
+sample-0036:sample-36,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1,75.0,5,15,0,0,1,4,0,Access,Access
+sample-0037:sample-37,0,1,1,1,1,0,1,1,1,0,0,1,0,1,1,1,1,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0038:sample-38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+sample-0039:sample-39,1,1,1,0,1,1,1,1,1,1,2,1,1,0,1,1,1,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0040:sample-40,0,0,0,1,0,1,0,0,1,1,1,0,0,0,0,0,1,65.0,7,13,0,0,3,3,1,Resource,"Resource, Network"
+sample-0041:sample-41,0,0,0,0,0,0,0,0,0,1,2,0,0,0,1,0,1,80.0,4,16,0,0,2,2,0,Resource,"Resource, Vulnerability"
+sample-0042:sample-42,0,0,0,0,0,2,0,1,1,1,3,0,0,1,0,0,2,65.0,7,13,0,0,2,4,1,Resource,"Resource, Network"
+sample-0043:sample-43,0,1,0,0,1,1,0,1,0,0,0,1,0,0,0,0,1,70.0,6,14,0,0,1,5,0,Resource,"Resource, Network"
+sample-0044:sample-44,0,0,0,0,0,1,0,0,1,1,1,0,0,0,0,1,1,70.0,6,14,0,0,1,4,1,Access,"Resource, Access, Network"
+sample-0045:sample-45,0,0,0,0,1,0,1,1,1,0,0,0,0,0,1,1,1,75.0,5,15,0,0,0,4,1,Resource,"Resource, Access, Vulnerability"
+sample-0046:sample-46,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,85.0,3,17,0,0,0,3,0,Hardened,Clean
+sample-0047:sample-47,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,90.0,2,18,0,0,0,2,0,Vulnerability,Vulnerability
+sample-0048:sample-48,1,0,1,1,0,0,1,1,1,1,1,1,1,0,0,1,1,50.0,10,10,0,0,4,5,1,Resource,"Resource, Access"
+sample-0049:sample-49,0,0,0,1,0,1,0,0,1,0,0,0,0,0,1,1,1,70.0,6,14,0,0,1,4,1,Access,"Access, Network, Vulnerability"
+sample-0050:sample-50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0052:sample-52,0,0,0,1,0,1,0,1,1,1,1,1,1,1,0,1,1,45.0,11,9,0,0,4,6,1,Resource,"Resource, Access, Network"
+sample-0053:sample-53,0,0,0,1,0,1,1,0,1,0,0,0,1,0,0,0,1,70.0,6,14,0,0,2,3,1,Resource,"Resource, Network"
+sample-0054:sample-54,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,1,1,75.0,5,15,0,0,2,3,0,Access,"Resource, Access"
+sample-0055:sample-55,1,1,0,1,1,1,0,1,1,0,0,1,1,1,1,1,1,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0056:sample-56,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,85.0,3,17,0,0,1,2,0,Hardened,Clean
+sample-0057:sample-57,0,0,0,0,0,2,1,0,0,1,1,0,1,1,0,1,2,65.0,7,13,0,0,3,4,0,Resource,"Resource, Access, Network"
+sample-0058:sample-58,1,1,1,1,1,1,1,1,1,0,0,1,1,1,0,1,1,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network"
+sample-0059:sample-59,0,0,0,1,0,1,1,1,1,1,1,0,0,1,0,1,1,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Network"
+sample-0060:sample-60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0061:sample-61,0,0,1,0,0,1,0,0,1,1,2,0,1,0,0,0,1,60.0,8,12,0,0,4,3,1,Resource,"Resource, Network"
+sample-0062:sample-62,0,1,1,0,1,1,1,1,1,1,2,0,1,1,1,1,1,45.0,11,9,0,0,5,5,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0063:sample-63,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,2,85.0,3,17,0,0,1,2,0,Hardened,Clean
+sample-0064:sample-64,1,1,1,1,1,1,0,1,1,1,2,1,1,1,1,0,1,40.0,12,8,0,0,6,5,1,Resource,"Resource, Network, Vulnerability"
+sample-0065:sample-65,1,1,0,0,1,1,0,1,0,1,2,1,1,1,1,1,1,45.0,11,9,0,0,5,6,0,Resource,"Resource, Access, Network, Vulnerability"
+sample-0066:sample-66,0,0,0,0,0,1,1,1,1,1,1,1,0,1,0,1,2,50.0,10,10,0,0,3,6,1,Resource,"Resource, Access, Network"
+sample-0067:sample-67,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,90.0,2,18,0,0,0,2,0,Vulnerability,Vulnerability
+sample-0068:sample-68,1,0,0,1,1,1,1,1,1,1,3,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0069:sample-69,0,0,0,0,1,0,0,0,1,1,2,1,1,0,0,1,2,65.0,7,13,0,0,2,4,1,Resource,"Resource, Access"
+sample-0070:sample-70,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,85.0,3,17,0,0,0,3,0,Hardened,Clean
+sample-0071:sample-71,1,0,0,0,1,1,1,1,1,0,0,1,1,1,0,1,1,50.0,10,10,0,0,3,6,1,Resource,"Resource, Access, Network"
+sample-0072:sample-72,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,1,40.0,12,8,0,0,6,5,1,Resource,"Resource, Access, Network"
+sample-0073:sample-73,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network"
+sample-0074:sample-74,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,80.0,4,16,0,0,1,2,1,Hardened,Clean
+sample-0075:sample-75,1,0,0,0,0,1,1,1,1,1,3,0,0,1,0,1,2,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Network"
+sample-0076:sample-76,0,0,0,0,1,1,1,0,1,1,1,0,0,1,0,1,1,60.0,8,12,0,0,3,4,1,Resource,"Resource, Access, Network"
+sample-0077:sample-77,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,0,1,45.0,11,9,0,0,5,5,1,Resource,"Resource, Network, Vulnerability"
+sample-0078:sample-78,1,0,1,1,1,1,0,1,1,1,2,1,1,1,0,0,1,45.0,11,9,0,0,5,5,1,Resource,"Resource, Network"
+sample-0079:sample-79,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,2,85.0,3,17,0,0,0,3,0,Hardened,Clean
+sample-0080:sample-80,1,1,0,1,1,0,0,1,0,1,1,1,0,0,1,1,1,55.0,9,11,0,0,4,5,0,Resource,"Resource, Access, Network, Vulnerability"
+sample-0081:sample-81,1,0,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,50.0,10,10,0,0,5,4,1,Resource,"Resource, Access, Vulnerability"
+sample-0082:sample-82,1,1,0,0,1,0,1,1,1,1,1,1,1,1,1,0,1,50.0,10,10,0,0,5,4,1,Resource,"Resource, Network, Vulnerability"
+sample-0083:sample-83,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,85.0,3,17,0,0,1,2,0,Hardened,Clean
+sample-0084:sample-84,0,1,0,0,0,1,0,1,1,0,0,0,0,1,0,1,1,60.0,8,12,0,0,2,5,1,Network,"Resource, Access, Network"
+sample-0085:sample-85,0,0,0,0,0,2,1,1,1,1,2,1,0,0,0,0,2,65.0,7,13,0,0,1,5,1,Resource,"Resource, Network"
+sample-0086:sample-86,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,1,1,75.0,5,15,0,0,1,4,0,Resource,"Resource, Access"
+sample-0087:sample-87,1,0,0,0,0,1,0,0,1,0,0,0,0,1,0,1,1,65.0,7,13,0,0,2,4,1,Resource,"Resource, Access, Network"
+sample-0088:sample-88,0,0,0,1,1,0,0,0,1,0,0,0,1,0,0,1,1,70.0,6,14,0,0,2,3,1,Access,"Resource, Access"
+sample-0089:sample-89,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0090:sample-90,0,1,0,0,0,0,1,1,1,1,1,1,0,0,1,0,1,65.0,7,13,0,0,2,4,1,Resource,"Resource, Network, Vulnerability"
+sample-0091:sample-91,0,0,0,1,0,0,0,0,0,1,2,1,0,0,0,0,1,75.0,5,15,0,0,2,3,0,Resource,Resource
+sample-0092:sample-92,0,0,0,1,0,1,1,1,0,1,2,0,1,1,0,0,1,55.0,9,11,0,0,5,4,0,Resource,"Resource, Network"
+sample-0093:sample-93,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,1,1,75.0,5,15,0,0,0,5,0,Access,"Resource, Access, Network, Vulnerability"
+sample-0094:sample-94,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0095:sample-95,1,1,1,1,1,0,1,1,1,0,0,1,1,1,1,1,1,45.0,11,9,0,0,5,5,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0096:sample-96,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0097:sample-97,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network"
+sample-0098:sample-98,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,90.0,2,18,0,0,0,2,0,Vulnerability,Vulnerability
+sample-0099:sample-99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0100:sample-100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0101:sample-101,1,0,0,1,0,0,1,1,1,1,2,1,1,1,1,1,1,45.0,11,9,0,0,5,5,1,Resource,"Resource, Access, Vulnerability"
+sample-0102:sample-102,1,1,0,1,1,1,1,1,1,1,3,1,1,1,0,1,2,35.0,13,7,0,0,6,6,1,Resource,"Resource, Access, Network"
+sample-0103:sample-103,1,1,0,1,1,1,1,1,1,1,2,1,0,1,1,1,1,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0104:sample-104,0,0,0,0,0,1,1,1,1,0,0,0,1,0,0,1,1,65.0,7,13,0,0,1,5,1,Resource,"Resource, Access, Network"
+sample-0105:sample-105,1,0,1,1,1,1,1,1,1,1,3,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0106:sample-106,1,1,1,1,1,2,1,1,1,1,2,1,1,1,1,1,2,35.0,13,7,0,0,6,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0107:sample-107,0,0,0,1,0,2,1,0,1,1,2,1,1,0,0,1,2,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Network"
+sample-0108:sample-108,0,0,0,1,1,0,0,0,0,0,0,0,1,1,1,1,1,70.0,6,14,0,0,3,3,0,Access,"Resource, Access, Vulnerability"
+sample-0109:sample-109,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,2,90.0,2,18,0,0,0,2,0,Vulnerability,Vulnerability
+sample-0110:sample-110,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,85.0,3,17,0,0,0,3,0,Network,Network
+sample-0111:sample-111,0,1,0,1,0,1,1,1,1,1,1,1,0,1,0,1,2,45.0,11,9,0,0,4,6,1,Resource,"Resource, Access, Network"
+sample-0112:sample-112,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,35.0,13,7,0,0,6,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0113:sample-113,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,75.0,5,15,0,0,0,4,1,Access,"Resource, Access, Vulnerability"
+sample-0114:sample-114,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,85.0,3,17,0,0,1,2,0,Hardened,Clean
+sample-0115:sample-115,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,1,85.0,3,17,0,0,0,2,1,Vulnerability,Vulnerability
+sample-0116:sample-116,0,0,0,1,0,0,0,0,1,1,3,1,0,1,0,0,2,60.0,8,12,0,0,4,3,1,Resource,Resource
+sample-0117:sample-117,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0118:sample-118,0,0,0,0,0,0,0,1,1,1,2,1,1,1,0,1,1,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access"
+sample-0119:sample-119,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0120:sample-120,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,1,1,65.0,7,13,0,0,2,5,0,Access,"Resource, Access, Network"
+sample-0121:sample-121,0,0,0,0,1,0,1,0,1,1,1,1,1,0,0,1,1,65.0,7,13,0,0,2,4,1,Resource,"Resource, Access"
+sample-0122:sample-122,0,0,0,0,1,0,0,1,0,1,2,0,0,1,1,0,1,70.0,6,14,0,0,3,3,0,Resource,"Resource, Vulnerability"
+sample-0123:sample-123,1,1,0,1,1,2,1,1,1,1,3,1,1,1,1,1,2,35.0,13,7,0,0,6,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0124:sample-124,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,85.0,3,17,0,0,1,2,0,Hardened,Clean
+sample-0125:sample-125,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,2,90.0,2,18,0,0,0,2,0,Vulnerability,Vulnerability
+sample-0126:sample-126,0,1,0,0,0,2,0,1,1,1,1,1,0,0,0,0,2,60.0,8,12,0,0,2,5,1,Network,"Resource, Network"
+sample-0127:sample-127,1,0,1,0,1,2,1,1,1,1,4,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0128:sample-128,1,1,0,1,1,1,1,1,1,1,2,0,1,1,1,0,1,45.0,11,9,0,0,6,4,1,Resource,"Resource, Network, Vulnerability"
+sample-0129:sample-129,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,85.0,3,17,0,0,1,2,0,Hardened,Clean
+sample-0130:sample-130,1,1,0,1,0,0,1,1,1,1,2,1,0,1,0,1,1,45.0,11,9,0,0,5,5,1,Resource,"Resource, Access, Network"
+sample-0131:sample-131,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0132:sample-132,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,80.0,4,16,0,0,0,3,1,Resource,Resource
+sample-0133:sample-133,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,2,85.0,3,17,0,0,0,3,0,Vulnerability,"Network, Vulnerability"
+sample-0134:sample-134,0,0,0,1,0,1,0,0,1,0,0,0,1,0,0,1,1,65.0,7,13,0,0,2,4,1,Access,"Access, Network"
+sample-0135:sample-135,1,0,0,1,1,1,1,1,1,1,2,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0136:sample-136,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,1,85.0,3,17,0,0,1,2,0,Resource,Resource
+sample-0137:sample-137,0,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,45.0,11,9,0,0,4,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0138:sample-138,0,0,0,1,0,1,1,0,1,0,0,0,0,0,0,1,1,70.0,6,14,0,0,1,4,1,Access,"Resource, Access, Network"
+sample-0139:sample-139,1,0,0,1,1,2,1,1,1,1,3,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0140:sample-140,0,0,0,0,0,1,0,1,1,1,2,1,0,1,1,1,1,55.0,9,11,0,0,2,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0141:sample-141,0,1,0,1,1,1,0,0,1,1,2,0,1,1,0,1,1,50.0,10,10,0,0,5,4,1,Resource,"Resource, Access, Network"
+sample-0142:sample-142,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0143:sample-143,0,0,0,1,0,1,1,1,1,1,1,0,0,0,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access, Network"
+sample-0144:sample-144,0,0,0,0,0,1,0,1,1,1,2,1,1,0,1,0,1,55.0,9,11,0,0,3,5,1,Resource,"Resource, Network, Vulnerability"
+sample-0145:sample-145,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,80.0,4,16,0,0,1,2,1,Hardened,Clean
+sample-0146:sample-146,0,0,0,0,0,0,0,1,1,1,2,0,0,0,0,1,1,65.0,7,13,0,0,2,4,1,Resource,"Resource, Access"
+sample-0147:sample-147,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,80.0,4,16,0,0,1,2,1,Hardened,Clean
+sample-0148:sample-148,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,85.0,3,17,0,0,0,2,1,Hardened,Clean
+sample-0149:sample-149,1,0,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0150:sample-150,0,0,0,1,0,1,1,1,1,1,2,0,0,1,0,1,2,55.0,9,11,0,0,3,5,1,Resource,"Resource, Access, Network"
+sample-0151:sample-151,0,0,0,0,0,1,0,1,1,0,0,1,0,0,0,1,2,65.0,7,13,0,0,0,6,1,Access,"Resource, Access, Network"
+sample-0152:sample-152,0,1,0,0,0,1,0,0,1,1,1,0,0,0,0,1,1,65.0,7,13,0,0,2,4,1,Network,"Resource, Access, Network"
+sample-0153:sample-153,0,0,0,0,0,0,0,0,1,1,1,1,0,1,0,0,1,70.0,6,14,0,0,2,3,1,Resource,Resource
+sample-0154:sample-154,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+sample-0155:sample-155,1,1,0,1,1,0,1,1,1,0,0,1,1,1,1,1,1,45.0,11,9,0,0,5,5,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0156:sample-156,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,1,1,75.0,5,15,0,0,0,4,1,Access,"Access, Vulnerability"
+sample-0157:sample-157,0,1,0,1,1,2,1,1,1,1,4,1,1,1,1,1,2,35.0,13,7,0,0,6,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0158:sample-158,1,1,1,1,1,2,1,1,1,1,3,1,0,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0159:sample-159,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,1,1,75.0,5,15,0,0,0,5,0,Access,"Resource, Access, Network"
+sample-0160:sample-160,1,1,1,1,0,1,1,1,1,1,3,1,1,1,1,0,2,40.0,12,8,0,0,6,5,1,Resource,"Resource, Network, Vulnerability"
+sample-0161:sample-161,0,0,0,1,0,0,0,0,1,0,0,1,1,0,0,1,1,65.0,7,13,0,0,2,4,1,Access,Access
+sample-0162:sample-162,1,0,0,1,0,0,0,1,1,0,0,1,0,0,0,1,1,60.0,8,12,0,0,2,5,1,Resource,"Resource, Access"
+sample-0163:sample-163,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,80.0,4,16,0,0,0,4,0,Access,"Access, Network"
+sample-0164:sample-164,1,0,1,0,0,0,1,1,0,1,1,0,0,1,0,1,1,60.0,8,12,0,0,4,4,0,Resource,"Resource, Access"
+sample-0165:sample-165,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+sample-0166:sample-166,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0167:sample-167,1,1,1,0,0,1,1,1,1,1,2,1,1,1,0,1,2,35.0,13,7,0,0,6,6,1,Resource,"Resource, Access, Network"
+sample-0168:sample-168,0,0,0,1,0,0,0,1,1,1,1,1,0,1,0,0,1,60.0,8,12,0,0,3,4,1,Resource,Resource
+sample-0169:sample-169,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,85.0,3,17,0,0,1,2,0,Hardened,Clean
+sample-0170:sample-170,0,0,0,0,0,0,0,0,0,1,2,0,0,0,1,0,1,85.0,3,17,0,0,1,2,0,Resource,"Resource, Vulnerability"
+sample-0171:sample-171,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,90.0,2,18,0,0,0,2,0,Vulnerability,Vulnerability
+sample-0172:sample-172,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,1,85.0,3,17,0,0,0,3,0,Vulnerability,Vulnerability
+sample-0173:sample-173,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0174:sample-174,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,1,80.0,4,16,0,0,2,2,0,Resource,Resource
+sample-0175:sample-175,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,1,1,70.0,6,14,0,0,1,4,1,Access,"Access, Network"
+sample-0176:sample-176,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0177:sample-177,0,0,0,0,0,1,1,1,0,1,1,0,1,1,0,1,1,60.0,8,12,0,0,3,5,0,Resource,"Resource, Access, Network"
+sample-0178:sample-178,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,1,1,70.0,6,14,0,0,1,4,1,Access,"Resource, Access"
+sample-0179:sample-179,1,0,0,1,1,1,1,1,1,1,2,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0180:sample-180,1,1,0,1,0,1,1,1,1,0,0,1,1,1,1,1,1,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0181:sample-181,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,90.0,2,18,0,0,0,2,0,Hardened,Clean
+sample-0182:sample-182,1,1,1,1,1,2,1,1,1,1,3,1,1,1,0,1,2,35.0,13,7,0,0,6,6,1,Resource,"Resource, Access, Network"
+sample-0183:sample-183,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,90.0,2,18,0,0,0,2,0,Vulnerability,Vulnerability
+sample-0184:sample-184,1,0,1,1,1,2,1,1,1,1,4,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0185:sample-185,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,85.0,3,17,0,0,0,3,0,Access,Access
+sample-0186:sample-186,0,0,0,0,1,1,1,1,1,0,0,1,0,1,1,0,2,65.0,7,13,0,0,1,5,1,Resource,"Resource, Network, Vulnerability"
+sample-0187:sample-187,1,0,1,1,1,2,1,1,1,1,4,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0188:sample-188,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,85.0,3,17,0,0,1,2,0,Hardened,Clean
+sample-0189:sample-189,0,0,0,1,0,0,0,1,1,0,0,1,0,0,1,1,1,65.0,7,13,0,0,1,5,1,Access,"Resource, Access, Vulnerability"
+sample-0190:sample-190,0,0,0,1,1,2,0,1,0,1,1,1,0,0,0,1,2,55.0,9,11,0,0,3,6,0,Resource,"Resource, Access, Network"
+sample-0191:sample-191,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,1,60.0,8,12,0,0,2,6,0,Resource,"Resource, Access, Network"
+sample-0192:sample-192,0,0,0,0,1,1,0,1,1,1,1,1,0,0,0,1,1,60.0,8,12,0,0,1,6,1,Resource,"Resource, Access, Network"
+sample-0193:sample-193,0,0,0,1,1,0,1,1,0,0,0,1,0,0,0,1,1,70.0,6,14,0,0,1,5,0,Resource,"Resource, Access"
+sample-0194:sample-194,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,90.0,2,18,0,0,0,2,0,Resource,"Resource, Vulnerability"
+sample-0195:sample-195,1,1,1,0,1,2,1,1,1,1,4,1,1,1,0,1,2,35.0,13,7,0,0,6,6,1,Resource,"Resource, Access, Network"
+sample-0196:sample-196,0,0,0,0,0,1,0,0,1,1,1,0,0,0,0,0,1,75.0,5,15,0,0,1,3,1,Resource,"Resource, Network"
+sample-0197:sample-197,1,0,1,1,1,2,1,1,1,1,4,1,1,1,1,1,2,40.0,12,8,0,0,5,6,1,Resource,"Resource, Access, Network, Vulnerability"
+sample-0198:sample-198,0,0,0,0,0,1,1,0,1,1,1,1,1,1,0,0,2,60.0,8,12,0,0,3,4,1,Resource,"Resource, Network"
+sample-0199:sample-199,0,0,0,1,1,2,1,0,1,1,1,1,0,0,0,0,2,65.0,7,13,0,0,2,4,1,Resource,"Resource, Network"
+sample-0200:sample-200,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,65.0,7,13,0,0,2,4,1,Access,"Resource, Access"

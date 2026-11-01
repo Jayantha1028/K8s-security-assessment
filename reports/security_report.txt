@@ -1,127 +1,313 @@
 ========================================
       KUBERNETES SECURITY ASSESSMENT
 ========================================
-Assessment         : cluster-0001 / cluster
-Evidence Score     : 91.5/100
-Posture Bar        : [██████████████████░░] 90.0/100
-RF Predicted Score : 90.0/100 (Risk: Low)
-SVM Predicted Score: 91.9/100 (Risk: Low)
-XGB Predicted Score: 91.0/100 (Risk: Low)
-Isolation Forest   : [Normal Inlier] (Decision Score: +0.106)
-Model Delta (|Δ|)  : 1.46 points (High ML Alignment)
-Primary Vuln Type  : Vulnerability (Active Vectors: Network, Vulnerability)
+Assessment         : latest / secure
+Evidence Score     : 82.2/100
+Posture Bar        : [████████████████░░░░] 82.2/100
+RF Predicted Score : 82.2/100 (Risk: Low)
+SVM Predicted Score: 81.7/100 (Risk: Low)
+XGB Predicted Score: 82.3/100 (Risk: Low)
+Isolation Forest   : [Normal Inlier] (Decision Score: +0.022)
+Model Delta (|Δ|)  : 0.03 points (High ML Alignment)
+Bayesian Posterior : 82.2/100 [95% CI: 82.2 - 82.2] (Uncertainty: Low (High Confidence))
+AHP Calibrated Base: 82.2/100 (AHP Consistency Ratio: 0.0024 < 0.10)
+
+Explainable AI (TreeSHAP) Feature Threat Attribution:
+  Population Expected Base Score: 70.0/100
+  Top Marginal Drivers of Predicted Posture:
+    • Compliance Control Violations     : +11.32 pts [SECURITY BONUS] (Observed: 2.0)
+    • Container Root Execution (UID 0)  : -3.37 pts [RISK PENALTY] (Observed: 1.0)
+    • Critical Image CVEs (CVSS >= 9)   : +2.85 pts [SECURITY BONUS] (Observed: 0.0)
+    • Privileged Container Execution    : +1.21 pts [SECURITY BONUS] (Observed: 0.0)
+    • Excessive ServiceAccount Permissions: -0.86 pts [RISK PENALTY] (Observed: 15.0)
+Primary Vuln Type  : Vulnerability (Active Vectors: Resource, Network, Vulnerability)
 
 Security Indicators (Telemetry Breakdown)
   [Vulnerabilities & Supply Chain]
     critical_cve_count                0     [PASS]   Clean
-    high_cve_count                    0     [PASS]   Clean
+    high_cve_count                    10    [WARN]   High risk (10)
     critical_misconfig_count          0     [PASS]   Clean
-    high_misconfig_count              2     [WARN]   High risk (2)
+    high_misconfig_count              0     [PASS]   Clean
     secret_count                      0     [PASS]   Clean
 
   [Configuration & Pod Hardening]
     privileged_count                  0     [PASS]   Clean
-    root_execution_count              0     [PASS]   Clean
+    root_execution_count              1     [WARN]   High risk (1)
     risky_capability_count            0     [PASS]   Clean
     host_path_count                   0     [PASS]   Clean
     host_port_count                   0     [PASS]   Clean
     missing_network_policies          1     [NOTE]   Active finding (1)
 
   [Access & Identity (RBAC)]
-    rbac_risk_score                   0     [PASS]   Clean
-    service_account_permission_score  0     [PASS]   Clean
+    rbac_risk_score                   6     [WARN]   High risk (6)
+    service_account_permission_score  15    [NOTE]   Active finding (15)
 
   [Compliance & Runtime Detection]
-    kubescape_failed                  3     [NOTE]   Active finding (3)
+    kubescape_failed                  2     [NOTE]   Active finding (2)
     kubescape_critical                0     [PASS]   Clean
     kubescape_high                    0     [PASS]   Clean
     falco_alert_count                 0     [PASS]   Clean
 
 Detected Risk Indicators & Remediation Action Plan
-- [HIGH] high_misconfig_count (observed: 2)
-  Action: Remediate high-severity Kubernetes misconfigurations.
-- [MEDIUM] kubescape_failed (observed: 3)
-- [MEDIUM] missing_network_policies (observed: 1)
-  Action: Add restrictive NetworkPolicies.
-
-Assessment
-The evidence score is the transparent baseline computed from collected security indicators.
-The ML prediction estimates the security condition from the same underlying indicators without using the final score itself as an input feature.
-
-========================================
-      KUBERNETES SECURITY ASSESSMENT
-========================================
-Assessment         : cluster-0005 / cluster
-Evidence Score     : 35.0/100
-Posture Bar        : [██████░░░░░░░░░░░░░░] 31.7/100
-RF Predicted Score : 31.7/100 (Risk: High)
-SVM Predicted Score: 34.0/100 (Risk: High)
-XGB Predicted Score: 35.0/100 (Risk: High)
-Isolation Forest   : [ANOMALY (Outlier)] (Decision Score: -0.040)
-Model Delta (|Δ|)  : 3.29 points (High ML Alignment)
-Primary Vuln Type  : Vulnerability (Active Vectors: Resource, Access, Network, Vulnerability)
-
-Security Indicators (Telemetry Breakdown)
-  [Vulnerabilities & Supply Chain]
-    critical_cve_count                18    [FAIL]   Critical alert (18)
-    high_cve_count                    42    [WARN]   High risk (42)
-    critical_misconfig_count          1     [FAIL]   Critical alert (1)
-    high_misconfig_count              8     [WARN]   High risk (8)
-    secret_count                      0     [PASS]   Clean
-
-  [Configuration & Pod Hardening]
-    privileged_count                  1     [FAIL]   Critical alert (1)
-    root_execution_count              1     [WARN]   High risk (1)
-    risky_capability_count            0     [PASS]   Clean
-    host_path_count                   0     [PASS]   Clean
-    host_port_count                   1     [NOTE]   Active finding (1)
-    missing_network_policies          1     [NOTE]   Active finding (1)
-
-  [Access & Identity (RBAC)]
-    rbac_risk_score                   25    [WARN]   High risk (25)
-    service_account_permission_score  20    [NOTE]   Active finding (20)
-
-  [Compliance & Runtime Detection]
-    kubescape_failed                  11    [NOTE]   Active finding (11)
-    kubescape_critical                0     [PASS]   Clean
-    kubescape_high                    5     [NOTE]   Active finding (5)
-    falco_alert_count                 3     [NOTE]   Active finding (3)
-
-Detected Risk Indicators & Remediation Action Plan
-- [CRITICAL] critical_cve_count (observed: 18)
-  Action: Update or replace images with critical CVEs.
-- [CRITICAL] critical_misconfig_count (observed: 1)
-  Action: Remediate critical Kubernetes misconfigurations.
-- [CRITICAL] privileged_count (observed: 1)
-  Action: Remove privileged containers.
-- [HIGH] high_cve_count (observed: 42)
+- [HIGH] high_cve_count (observed: 10)
   Action: Update or replace images with high-severity CVEs.
-- [HIGH] high_misconfig_count (observed: 8)
-  Action: Remediate high-severity Kubernetes misconfigurations.
-- [HIGH] rbac_risk_score (observed: 25)
+- [HIGH] rbac_risk_score (observed: 6)
   Action: Apply least-privilege Roles and RoleBindings.
 - [HIGH] root_execution_count (observed: 1)
   Action: Run containers as non-root users.
-- [MEDIUM] falco_alert_count (observed: 3)
-  Action: Investigate recent runtime security alerts.
-- [MEDIUM] host_port_count (observed: 1)
-  Action: Prefer Kubernetes Services instead of hostPort.
-- [MEDIUM] kubescape_failed (observed: 11)
-- [MEDIUM] kubescape_high (observed: 5)
+- [MEDIUM] kubescape_failed (observed: 2)
 - [MEDIUM] missing_network_policies (observed: 1)
   Action: Add restrictive NetworkPolicies.
-- [MEDIUM] service_account_permission_score (observed: 20)
+- [MEDIUM] service_account_permission_score (observed: 15)
   Action: Reduce unnecessary service-account permissions.
 
 Assessment
 The evidence score is the transparent baseline computed from collected security indicators.
 The ML prediction estimates the security condition from the same underlying indicators without using the final score itself as an input feature.
 
+56-Point Vulnerability Coverage & Operational Plane Mapping (MITRE / CIS / NSA)
+----------------------------------------------------------------------------------------
+Taxonomy Scope: 56 standard vulnerabilities across 7 defense planes.
+Posture Trace : 52/56 vectors passed | 4 security vector(s) triggered.
+
+  [Plane 1: Pod Security & Kernel Capabilities] -> 1 TRIGGERED
+    [PASS] V01 (CRITICAL): Privileged Container Execution [MITRE:T1611 | CIS 5.2.1 / C-0057]
+    [FAIL] V02 (HIGH    ): Root User Execution (UID 0) [MITRE:T1611 | CIS 5.2.6 / C-0013]
+           Remediation: Set securityContext.runAsNonRoot: true and specify a non-zero runAsUser
+    [PASS] V03 (HIGH    ): Privilege Escalation Allowed [MITRE:T1548 | CIS 5.2.5 / C-0016]
+    [PASS] V04 (MEDIUM  ): Writable Root Filesystem [MITRE:T1222 | CIS 5.2.12 / C-0017]
+    [PASS] V05 (CRITICAL): Dangerous Capability CAP_SYS_ADMIN Added [MITRE:T1611 | MITRE T1611 / C-0046]
+    [PASS] V06 (HIGH    ): Dangerous Capabilities CAP_NET_ADMIN/RAW Added [MITRE:T1040 | MITRE T1040 / C-0046]
+    [PASS] V07 (HIGH    ): Dangerous Capability CAP_SYS_PTRACE Added [MITRE:T1055 | MITRE T1055 / C-0046]
+    [PASS] V08 (MEDIUM  ): Capabilities Not Dropped (Missing drop: ALL) [MITRE:T1611 | CIS 5.2.7 / C-0046]
+    [PASS] V09 (HIGH    ): Host Network Namespace Sharing (hostNetwork: true) [MITRE:T1611 | CIS 5.2.4 / C-0041]
+    [PASS] V10 (CRITICAL): Host PID Namespace Sharing (hostPID: true) [MITRE:T1611 | CIS 5.2.2 / C-0042]
+    [PASS] V11 (HIGH    ): Host IPC Namespace Sharing (hostIPC: true) [MITRE:T1611 | CIS 5.2.3 / C-0043]
+    [PASS] V12 (MEDIUM  ): Missing Seccomp Profile [MITRE:T1059 | CIS 5.7.2 / C-0030]
+    [PASS] V13 (LOW     ): Missing CPU Resource Limit [MITRE:T1496 | CIS 5.2.13 / C-0009]
+    [PASS] V14 (MEDIUM  ): Missing Memory Resource Limit [MITRE:T1496 | CIS 5.2.14 / C-0009]
+
+  [Plane 2: Supply Chain & Container Images] -> 1 TRIGGERED
+    [PASS] V15 (MEDIUM  ): Floating or Untagged Image Tag (:latest) [MITRE:T1525 | NSA Ch. 2 / C-0019]
+    [PASS] V16 (CRITICAL): Critical Severity Image CVE (CVSS >= 9.0) [MITRE:T1190 | NIST SP 800-190]
+    [FAIL] V17 (HIGH    ): High Severity Image CVE (CVSS 7.0 - 8.9) [MITRE:T1190 | NIST SP 800-190]
+           Remediation: Update package dependencies or rebuild on patched base image
+    [PASS] V18 (CRITICAL): Plaintext Secrets Hardcoded in Manifests/Images [MITRE:T1552 | MITRE T1552 / Trivy]
+    [PASS] V19 (HIGH    ): Unverified Image Signature (Missing Cosign/Notary) [MITRE:T1525 | NSA Ch. 2]
+    [PASS] V20 (LOW     ): Outdated / Heavyweight Base OS Image [MITRE:T1059 | CIS 5.4.1]
+    [PASS] V21 (MEDIUM  ): Risky ImagePullPolicy (IfNotPresent with mutable tags) [MITRE:T1525 | NSA Ch. 2]
+    [PASS] V22 (HIGH    ): Default or Hardcoded Root Password Configured [MITRE:T1078 | MITRE T1078]
+
+  [Plane 3: Identity, RBAC & Service Accounts] -> CLEAN
+    [PASS] V23 (MEDIUM  ): Unnecessary Service Account Token Auto-Mount [MITRE:T1078.004 | CIS 5.1.5 / C-0034]
+    [PASS] V24 (CRITICAL): Wildcard Resource Access in RBAC (resources: ['*']) [MITRE:T1078 | CIS 5.1.3 / C-0021]
+    [PASS] V25 (CRITICAL): Wildcard Verb Access in RBAC (verbs: ['*']) [MITRE:T1078 | CIS 5.1.3 / C-0021]
+    [PASS] V26 (CRITICAL): Cluster-Admin Privileges Bound to Workload [MITRE:T1078 | CIS 5.1.1 / C-0035]
+    [PASS] V27 (HIGH    ): RBAC Permission to Exec into Pods (pods/exec) [MITRE:T1609 | MITRE T1609]
+    [PASS] V28 (CRITICAL): RBAC Permission to Read/List Secrets [MITRE:T1552 | MITRE T1552.007]
+    [PASS] V29 (CRITICAL): RBAC Privilege Escalation Verbs (bind / escalate) [MITRE:T1548 | CIS 5.1.4]
+    [PASS] V30 (MEDIUM  ): Default Service Account Assigned Permissions [MITRE:T1078.004 | CIS 5.1.5]
+
+  [Plane 4: Network Perimeter & Ingress] -> 2 TRIGGERED
+    [FAIL] V31 (HIGH    ): Missing Default-Deny Ingress NetworkPolicy [MITRE:T1210 | CIS 5.3.2 / C-0066]
+           Remediation: Deploy a default-deny ingress NetworkPolicy in every tenant namespace
+    [FAIL] V32 (HIGH    ): Missing Default-Deny Egress NetworkPolicy [MITRE:T1071 | NSA Ch. 3 / C-0066]
+           Remediation: Deploy a default-deny egress NetworkPolicy and allow only verified CIDRs
+    [PASS] V33 (HIGH    ): Direct hostPort Allocation [MITRE:T1046 | CIS 5.2.10]
+    [PASS] V34 (HIGH    ): Unrestricted Ingress CIDR (0.0.0.0/0 on sensitive ports) [MITRE:T1190 | MITRE T1190]
+    [PASS] V35 (MEDIUM  ): Plaintext In-Transit Traffic (Missing mTLS) [MITRE:T1040 | NSA Ch. 3]
+    [PASS] V36 (MEDIUM  ): Overexposed NodePort Service (Ports 30000-32767) [MITRE:T1046 | CIS 5.3.1]
+    [PASS] V37 (LOW     ): Unrestricted Internal CoreDNS Querying [MITRE:T1071 | MITRE T1071.004]
+
+  [Plane 5: Control Plane, Infrastructure & etcd] -> CLEAN
+    [PASS] V38 (CRITICAL): Anonymous Authentication Enabled on API Server [MITRE:T1078 | CIS 1.2.1]
+    [PASS] V39 (CRITICAL): Unencrypted etcd Client/Peer Communication [MITRE:T1552 | CIS 2.1-2.4]
+    [PASS] V40 (HIGH    ): Missing Kubernetes API Audit Logging [MITRE:T1562 | CIS 1.2.19-1.2.21]
+    [PASS] V41 (CRITICAL): Kubelet Anonymous Access Enabled (Port 10250) [MITRE:T1609 | CIS 4.2.1]
+    [PASS] V42 (HIGH    ): Kubelet Read-Only Port Enabled (Port 10255) [MITRE:T1082 | CIS 4.2.4]
+    [PASS] V43 (HIGH    ): Missing Admission Controllers (NodeRestriction/PodSecurity) [MITRE:T1562 | CIS 1.2.14-1.2.17]
+    [PASS] V44 (CRITICAL): Cloud Metadata Service (IMDSv1) Accessible to Pods [MITRE:T1552 | MITRE T1552.005]
+
+  [Plane 6: Volumes, Host Storage & Secrets Management] -> CLEAN
+    [PASS] V45 (CRITICAL): HostPath Mount: Root Directory (/) [MITRE:T1611 | CIS 5.2.8 / C-0048]
+    [PASS] V46 (CRITICAL): HostPath Mount: Docker / Containerd Socket [MITRE:T1611 | CIS 5.2.8 / MITRE T1611]
+    [PASS] V47 (HIGH    ): HostPath Mount: Node Configuration (/etc, /var/log) [MITRE:T1083 | CIS 5.2.8]
+    [PASS] V48 (HIGH    ): Unencrypted Kubernetes Secrets at Rest in etcd [MITRE:T1552 | CIS 1.2.29]
+    [PASS] V49 (MEDIUM  ): Sensitive Secrets Exposed via Environment Variables [MITRE:T1552 | NSA Ch. 4]
+    [PASS] V50 (LOW     ): Unconstrained PersistentVolume Access Mode [MITRE:T1083 | CIS 5.2.9]
+
+  [Plane 7: Runtime Kernel Telemetry & Exploitation Signals] -> CLEAN
+    [PASS] V51 (HIGH    ): Interactive Shell Spawned in Running Container [MITRE:T1059 | Falco: Terminal shell in container]
+    [PASS] V52 (HIGH    ): Outbound Network Reconnaissance Tool Launched [MITRE:T1046 | Falco: Network tool launched]
+    [PASS] V53 (CRITICAL): System Binary or /etc Modification Attempt [MITRE:T1222 | Falco: File below etc altered]
+    [PASS] V54 (CRITICAL): Kernel Module Loading Syscall (init_module / finit_module) [MITRE:T1547 | Falco: Kernel module injection]
+    [PASS] V55 (HIGH    ): Outbound Connection to Known Crypto-Mining Pool [MITRE:T1496 | Falco: Detect outbound cryptomining]
+    [PASS] V56 (CRITICAL): Reading Sensitive Kernel / Host Memory (/proc/kcore, /dev/mem) [MITRE:T1005 | Falco: Read sensitive file untrusted]
+
+
+========================================
+      KUBERNETES SECURITY ASSESSMENT
+========================================
+Assessment         : latest / insecure
+Evidence Score     : 25.2/100
+Posture Bar        : [█████░░░░░░░░░░░░░░░] 25.4/100
+RF Predicted Score : 25.4/100 (Risk: High)
+SVM Predicted Score: 26.2/100 (Risk: High)
+XGB Predicted Score: 26.2/100 (Risk: High)
+Isolation Forest   : [ANOMALY (Outlier)] (Decision Score: -0.204)
+Model Delta (|Δ|)  : 0.12 points (High ML Alignment)
+Bayesian Posterior : 25.4/100 [95% CI: 25.3 - 25.4] (Uncertainty: Low (High Confidence))
+AHP Calibrated Base: 27.5/100 (AHP Consistency Ratio: 0.0024 < 0.10)
+
+Explainable AI (TreeSHAP) Feature Threat Attribution:
+  Population Expected Base Score: 70.0/100
+  Top Marginal Drivers of Predicted Posture:
+    • Compliance Control Violations     : -26.70 pts [RISK PENALTY] (Observed: 14.0)
+    • Critical Image CVEs (CVSS >= 9)   : -6.99 pts [RISK PENALTY] (Observed: 31.0)
+    • High Image CVEs (CVSS 7.0-8.9)    : -5.48 pts [RISK PENALTY] (Observed: 82.0)
+    • Privileged Container Execution    : -3.11 pts [RISK PENALTY] (Observed: 1.0)
+    • Container Root Execution (UID 0)  : -0.79 pts [RISK PENALTY] (Observed: 2.0)
+Primary Vuln Type  : Vulnerability (Active Vectors: Resource, Access, Network, Vulnerability)
+
+Security Indicators (Telemetry Breakdown)
+  [Vulnerabilities & Supply Chain]
+    critical_cve_count                31    [FAIL]   Critical alert (31)
+    high_cve_count                    82    [WARN]   High risk (82)
+    critical_misconfig_count          0     [PASS]   Clean
+    high_misconfig_count              5     [WARN]   High risk (5)
+    secret_count                      0     [PASS]   Clean
+
+  [Configuration & Pod Hardening]
+    privileged_count                  1     [FAIL]   Critical alert (1)
+    root_execution_count              2     [WARN]   High risk (2)
+    risky_capability_count            0     [PASS]   Clean
+    host_path_count                   0     [PASS]   Clean
+    host_port_count                   0     [PASS]   Clean
+    missing_network_policies          2     [NOTE]   Active finding (2)
+
+  [Access & Identity (RBAC)]
+    rbac_risk_score                   43    [WARN]   High risk (43)
+    service_account_permission_score  45    [NOTE]   Active finding (45)
+
+  [Compliance & Runtime Detection]
+    kubescape_failed                  14    [NOTE]   Active finding (14)
+    kubescape_critical                0     [PASS]   Clean
+    kubescape_high                    5     [NOTE]   Active finding (5)
+    falco_alert_count                 0     [PASS]   Clean
+
+Detected Risk Indicators & Remediation Action Plan
+- [CRITICAL] critical_cve_count (observed: 31)
+  Action: Update or replace images with critical CVEs.
+- [CRITICAL] privileged_count (observed: 1)
+  Action: Remove privileged containers.
+- [HIGH] high_cve_count (observed: 82)
+  Action: Update or replace images with high-severity CVEs.
+- [HIGH] high_misconfig_count (observed: 5)
+  Action: Remediate high-severity Kubernetes misconfigurations.
+- [HIGH] rbac_risk_score (observed: 43)
+  Action: Apply least-privilege Roles and RoleBindings.
+- [HIGH] root_execution_count (observed: 2)
+  Action: Run containers as non-root users.
+- [MEDIUM] kubescape_failed (observed: 14)
+- [MEDIUM] kubescape_high (observed: 5)
+- [MEDIUM] missing_network_policies (observed: 2)
+  Action: Add restrictive NetworkPolicies.
+- [MEDIUM] service_account_permission_score (observed: 45)
+  Action: Reduce unnecessary service-account permissions.
+
+Assessment
+The evidence score is the transparent baseline computed from collected security indicators.
+The ML prediction estimates the security condition from the same underlying indicators without using the final score itself as an input feature.
+
+56-Point Vulnerability Coverage & Operational Plane Mapping (MITRE / CIS / NSA)
+----------------------------------------------------------------------------------------
+Taxonomy Scope: 56 standard vulnerabilities across 7 defense planes.
+Posture Trace : 48/56 vectors passed | 8 security vector(s) triggered.
+
+  [Plane 1: Pod Security & Kernel Capabilities] -> 2 TRIGGERED
+    [FAIL] V01 (CRITICAL): Privileged Container Execution [MITRE:T1611 | CIS 5.2.1 / C-0057]
+           Remediation: Set securityContext.privileged: false
+    [FAIL] V02 (HIGH    ): Root User Execution (UID 0) [MITRE:T1611 | CIS 5.2.6 / C-0013]
+           Remediation: Set securityContext.runAsNonRoot: true and specify a non-zero runAsUser
+    [PASS] V03 (HIGH    ): Privilege Escalation Allowed [MITRE:T1548 | CIS 5.2.5 / C-0016]
+    [PASS] V04 (MEDIUM  ): Writable Root Filesystem [MITRE:T1222 | CIS 5.2.12 / C-0017]
+    [PASS] V05 (CRITICAL): Dangerous Capability CAP_SYS_ADMIN Added [MITRE:T1611 | MITRE T1611 / C-0046]
+    [PASS] V06 (HIGH    ): Dangerous Capabilities CAP_NET_ADMIN/RAW Added [MITRE:T1040 | MITRE T1040 / C-0046]
+    [PASS] V07 (HIGH    ): Dangerous Capability CAP_SYS_PTRACE Added [MITRE:T1055 | MITRE T1055 / C-0046]
+    [PASS] V08 (MEDIUM  ): Capabilities Not Dropped (Missing drop: ALL) [MITRE:T1611 | CIS 5.2.7 / C-0046]
+    [PASS] V09 (HIGH    ): Host Network Namespace Sharing (hostNetwork: true) [MITRE:T1611 | CIS 5.2.4 / C-0041]
+    [PASS] V10 (CRITICAL): Host PID Namespace Sharing (hostPID: true) [MITRE:T1611 | CIS 5.2.2 / C-0042]
+    [PASS] V11 (HIGH    ): Host IPC Namespace Sharing (hostIPC: true) [MITRE:T1611 | CIS 5.2.3 / C-0043]
+    [PASS] V12 (MEDIUM  ): Missing Seccomp Profile [MITRE:T1059 | CIS 5.7.2 / C-0030]
+    [PASS] V13 (LOW     ): Missing CPU Resource Limit [MITRE:T1496 | CIS 5.2.13 / C-0009]
+    [PASS] V14 (MEDIUM  ): Missing Memory Resource Limit [MITRE:T1496 | CIS 5.2.14 / C-0009]
+
+  [Plane 2: Supply Chain & Container Images] -> 2 TRIGGERED
+    [PASS] V15 (MEDIUM  ): Floating or Untagged Image Tag (:latest) [MITRE:T1525 | NSA Ch. 2 / C-0019]
+    [FAIL] V16 (CRITICAL): Critical Severity Image CVE (CVSS >= 9.0) [MITRE:T1190 | NIST SP 800-190]
+           Remediation: Patch image base layers or update vulnerable dependencies
+    [FAIL] V17 (HIGH    ): High Severity Image CVE (CVSS 7.0 - 8.9) [MITRE:T1190 | NIST SP 800-190]
+           Remediation: Update package dependencies or rebuild on patched base image
+    [PASS] V18 (CRITICAL): Plaintext Secrets Hardcoded in Manifests/Images [MITRE:T1552 | MITRE T1552 / Trivy]
+    [PASS] V19 (HIGH    ): Unverified Image Signature (Missing Cosign/Notary) [MITRE:T1525 | NSA Ch. 2]
+    [PASS] V20 (LOW     ): Outdated / Heavyweight Base OS Image [MITRE:T1059 | CIS 5.4.1]
+    [PASS] V21 (MEDIUM  ): Risky ImagePullPolicy (IfNotPresent with mutable tags) [MITRE:T1525 | NSA Ch. 2]
+    [PASS] V22 (HIGH    ): Default or Hardcoded Root Password Configured [MITRE:T1078 | MITRE T1078]
+
+  [Plane 3: Identity, RBAC & Service Accounts] -> 2 TRIGGERED
+    [PASS] V23 (MEDIUM  ): Unnecessary Service Account Token Auto-Mount [MITRE:T1078.004 | CIS 5.1.5 / C-0034]
+    [FAIL] V24 (CRITICAL): Wildcard Resource Access in RBAC (resources: ['*']) [MITRE:T1078 | CIS 5.1.3 / C-0021]
+           Remediation: Explicitly enumerate required resources (e.g. pods, deployments)
+    [FAIL] V25 (CRITICAL): Wildcard Verb Access in RBAC (verbs: ['*']) [MITRE:T1078 | CIS 5.1.3 / C-0021]
+           Remediation: Scope verbs strictly to least-privilege operations (get, list)
+    [PASS] V26 (CRITICAL): Cluster-Admin Privileges Bound to Workload [MITRE:T1078 | CIS 5.1.1 / C-0035]
+    [PASS] V27 (HIGH    ): RBAC Permission to Exec into Pods (pods/exec) [MITRE:T1609 | MITRE T1609]
+    [PASS] V28 (CRITICAL): RBAC Permission to Read/List Secrets [MITRE:T1552 | MITRE T1552.007]
+    [PASS] V29 (CRITICAL): RBAC Privilege Escalation Verbs (bind / escalate) [MITRE:T1548 | CIS 5.1.4]
+    [PASS] V30 (MEDIUM  ): Default Service Account Assigned Permissions [MITRE:T1078.004 | CIS 5.1.5]
+
+  [Plane 4: Network Perimeter & Ingress] -> 2 TRIGGERED
+    [FAIL] V31 (HIGH    ): Missing Default-Deny Ingress NetworkPolicy [MITRE:T1210 | CIS 5.3.2 / C-0066]
+           Remediation: Deploy a default-deny ingress NetworkPolicy in every tenant namespace
+    [FAIL] V32 (HIGH    ): Missing Default-Deny Egress NetworkPolicy [MITRE:T1071 | NSA Ch. 3 / C-0066]
+           Remediation: Deploy a default-deny egress NetworkPolicy and allow only verified CIDRs
+    [PASS] V33 (HIGH    ): Direct hostPort Allocation [MITRE:T1046 | CIS 5.2.10]
+    [PASS] V34 (HIGH    ): Unrestricted Ingress CIDR (0.0.0.0/0 on sensitive ports) [MITRE:T1190 | MITRE T1190]
+    [PASS] V35 (MEDIUM  ): Plaintext In-Transit Traffic (Missing mTLS) [MITRE:T1040 | NSA Ch. 3]
+    [PASS] V36 (MEDIUM  ): Overexposed NodePort Service (Ports 30000-32767) [MITRE:T1046 | CIS 5.3.1]
+    [PASS] V37 (LOW     ): Unrestricted Internal CoreDNS Querying [MITRE:T1071 | MITRE T1071.004]
+
+  [Plane 5: Control Plane, Infrastructure & etcd] -> CLEAN
+    [PASS] V38 (CRITICAL): Anonymous Authentication Enabled on API Server [MITRE:T1078 | CIS 1.2.1]
+    [PASS] V39 (CRITICAL): Unencrypted etcd Client/Peer Communication [MITRE:T1552 | CIS 2.1-2.4]
+    [PASS] V40 (HIGH    ): Missing Kubernetes API Audit Logging [MITRE:T1562 | CIS 1.2.19-1.2.21]
+    [PASS] V41 (CRITICAL): Kubelet Anonymous Access Enabled (Port 10250) [MITRE:T1609 | CIS 4.2.1]
+    [PASS] V42 (HIGH    ): Kubelet Read-Only Port Enabled (Port 10255) [MITRE:T1082 | CIS 4.2.4]
+    [PASS] V43 (HIGH    ): Missing Admission Controllers (NodeRestriction/PodSecurity) [MITRE:T1562 | CIS 1.2.14-1.2.17]
+    [PASS] V44 (CRITICAL): Cloud Metadata Service (IMDSv1) Accessible to Pods [MITRE:T1552 | MITRE T1552.005]
+
+  [Plane 6: Volumes, Host Storage & Secrets Management] -> CLEAN
+    [PASS] V45 (CRITICAL): HostPath Mount: Root Directory (/) [MITRE:T1611 | CIS 5.2.8 / C-0048]
+    [PASS] V46 (CRITICAL): HostPath Mount: Docker / Containerd Socket [MITRE:T1611 | CIS 5.2.8 / MITRE T1611]
+    [PASS] V47 (HIGH    ): HostPath Mount: Node Configuration (/etc, /var/log) [MITRE:T1083 | CIS 5.2.8]
+    [PASS] V48 (HIGH    ): Unencrypted Kubernetes Secrets at Rest in etcd [MITRE:T1552 | CIS 1.2.29]
+    [PASS] V49 (MEDIUM  ): Sensitive Secrets Exposed via Environment Variables [MITRE:T1552 | NSA Ch. 4]
+    [PASS] V50 (LOW     ): Unconstrained PersistentVolume Access Mode [MITRE:T1083 | CIS 5.2.9]
+
+  [Plane 7: Runtime Kernel Telemetry & Exploitation Signals] -> CLEAN
+    [PASS] V51 (HIGH    ): Interactive Shell Spawned in Running Container [MITRE:T1059 | Falco: Terminal shell in container]
+    [PASS] V52 (HIGH    ): Outbound Network Reconnaissance Tool Launched [MITRE:T1046 | Falco: Network tool launched]
+    [PASS] V53 (CRITICAL): System Binary or /etc Modification Attempt [MITRE:T1222 | Falco: File below etc altered]
+    [PASS] V54 (CRITICAL): Kernel Module Loading Syscall (init_module / finit_module) [MITRE:T1547 | Falco: Kernel module injection]
+    [PASS] V55 (HIGH    ): Outbound Connection to Known Crypto-Mining Pool [MITRE:T1496 | Falco: Detect outbound cryptomining]
+    [PASS] V56 (CRITICAL): Reading Sensitive Kernel / Host Memory (/proc/kcore, /dev/mem) [MITRE:T1005 | Falco: Read sensitive file untrusted]
+
+
 ==========================================================================================================
                                     EXECUTIVE MULTI-CLUSTER COMPARISON                                    
 ==========================================================================================================
 Environment            Evidence    RF Score    SVM Score   XGB Score   Risk Tier   Iso Status   Posture
 ----------------------------------------------------------------------------------------------------------
-cluster-0001 / cluster 91.5/100    90.0/100    91.9/100    91.0/100    Low         Inlier        [█████████░]
-cluster-0005 / cluster 35.0/100    31.7/100    34.0/100    35.0/100    High        ANOMALY!      [███░░░░░░░]
+latest / secure        82.2/100    82.2/100    81.7/100    82.3/100    Low         Inlier        [████████░░]
+latest / insecure      25.2/100    25.4/100    26.2/100    26.2/100    High        ANOMALY!      [███░░░░░░░]
 ==========================================================================================================

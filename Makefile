@@ -1,70 +1,85 @@
-.PHONY: help test-cluster test_cluster report manifests fleet pipeline train train-11 compare-11 real-data all test clean
+.PHONY: help manifests Manifests real Real live Live test Test report Report gate Gate chaos Chaos snowflake-full snowflake-update all All clean Clean clean-deep clean_deep deep-clean deep
 
-CONTEXT ?= kind-ml-k8s-insecure
-REPORT_INPUT ?= data/processed/report_input.csv
-REPORT_FILE ?= reports/security_report.txt
+COUNT ?=
+BATCH_SIZE ?=
+SNAPSHOTS ?=
+PAUSE ?=
+SKIP_LIVE ?=
+FRESH ?=
 
 help:
-	@echo "Kubernetes ML Security Assessment - Makefile targets:"
-	@echo "  make pipeline [COUNT=100]          Run 100-cluster parallel assessment (Kubescape + Trivy + Kind/Falco)"
-	@echo "  make fleet                         Alias for 'make pipeline'"
-	@echo "  make test-cluster [CONTEXT=<ctx>]  Scan a live cluster context and generate ML report"
-	@echo "  make report                        Display the latest generated security report"
-	@echo "  make train                         Train RF, SVM, XGBoost & Isolation Forest models"
-	@echo "  make train-11                      Train & benchmark all 11 ML models (Real, Synth, Consolidated, Master)"
-	@echo "  make compare-11                    Alias for 'make train-11'"
-	@echo "  make real-data                     Build dataset from 115 credited real-world YAML manifests"
-	@echo "  make manifests [COUNT=100]         Generate and scan sample manifests"
-	@echo "  make final                         Run Kind clusters + latest assessment"
-	@echo "  make all                           Run complete multi-scenario assessment pipeline"
-	@echo "  make test                          Run all Python unit tests"
-	@echo "  make clean                         Clean temporary build, cache and bytecode artifacts"
-
-test-cluster:
-	@echo "=== Scanning Live Cluster Context: $(CONTEXT) ==="
-	@mkdir -p data/raw/latest/$(CONTEXT)
-	@scripts/collect_cluster.sh $(CONTEXT) data/raw/latest/$(CONTEXT)
-	@python3 src/build_cluster_dataset.py --report-input $(REPORT_INPUT)
-	@python3 src/generate_report.py $(REPORT_INPUT) $(REPORT_FILE)
-	@echo ""
-	@echo "Report saved to: $(REPORT_FILE)"
-
-test_cluster: test-cluster
-
-report:
-	@cat $(REPORT_FILE)
-
-train:
-	@python3 src/train_security_models.py
-
-train-11:
-	@./run.sh --compare-11
-
-compare-11: train-11
-
-real-data:
-	@python3 src/build_real_world_dataset.py
+	@echo "=========================================================================="
+	@echo "          Kubernetes ML Security Assessment - Primary Commands            "
+	@echo "=========================================================================="
+	@echo "  make manifests [COUNT=N] [FRESH=1]        Generate & scan manifests and train"
+	@echo "  make real                                 Process 200 real manifests & train 11 models"
+	@echo "  make live [COUNT=N] [BATCH_SIZE=N]        Collect live telemetry & train models"
+	@echo "  make test                                 Execute full test suite (48 unit tests)"
+	@echo "  make report                               Display security & benchmark reports"
+	@echo "  make gate                                 Execute Shift-Left CI/CD Security Gate"
+	@echo "  make chaos                                Execute Security Chaos Engineering Resilience Suite"
+	@echo "  make snowflake-full                       Push all baseline tables & views to Snowflake once"
+	@echo "  make snowflake-update                     Update only necessary dynamic data (Assessment & SHAP)"
+	@echo "  make all [SNAPSHOTS=N] [PAUSE=N]          Run full end-to-end pipeline across all domains"
+	@echo "  make clean                                Remove cache, bytecode, and temp logs"
+	@echo "  make clean-deep (or make clean deep)      Remove all previous run scans, snapshots & models"
+	@echo "=========================================================================="
 
 manifests:
-	@MANIFEST_COUNT=$(COUNT) ./run.sh --manifests
+	@COUNT=$(COUNT) MANIFEST_COUNT=$(COUNT) ./run.sh --manifests $(if $(filter 1 true,$(FRESH)),--fresh,)
+	@python3 src/train_security_models.py
 
-pipeline: fleet
+Manifests: manifests
 
-fleet:
-	@python3 src/run_cluster_fleet.py --count $(or $(COUNT),100) $(if $(BATCH_SIZE),--batch-size $(BATCH_SIZE),)
+real:
+	@./run.sh --real
 
-final:
-	@./run.sh --final
+Real: real
 
-all:
-	@./run.sh --all
+live:
+	@COUNT=$(COUNT) BATCH_SIZE=$(BATCH_SIZE) SKIP_LIVE=$(SKIP_LIVE) ./run.sh --live $(if $(COUNT),--count $(COUNT),) $(if $(BATCH_SIZE),--batch-size $(BATCH_SIZE),) $(if $(filter 1 true,$(SKIP_LIVE)),--skip-live,)
+
+Live: live
 
 test:
-	@python3 -m unittest discover -s tests -v
+	@./run.sh --test
+
+Test: test
+
+report:
+	@./run.sh --report
+
+Report: report
+
+gate:
+	@python3 src/ci_security_gate.py "manifests/**/*.yaml"
+
+Gate: gate
+
+chaos:
+	@python3 src/security_chaos_testing.py
+
+Chaos: chaos
+
+snowflake-full:
+	@python3 src/export_to_snowflake.py --full
+
+snowflake-update:
+	@python3 src/export_to_snowflake.py --incremental
+
+all:
+	@SNAPSHOTS=$(SNAPSHOTS) PAUSE=$(PAUSE) ./run.sh --all
+
+All: all
 
 clean:
-	@echo "Cleaning cache files..."
-	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	@find . -type f -name "*.py[cod]" -delete 2>/dev/null || true
-	@rm -rf .pytest_cache .coverage htmlcov
-	@echo "Clean completed."
+	@./run.sh --clean
+
+Clean: clean
+
+clean-deep:
+	@./run.sh --clean-deep
+
+clean_deep: clean-deep
+deep-clean: clean-deep
+deep: clean-deep

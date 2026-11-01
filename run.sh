@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Single entry point for the whole project.
+# Single entry point for the Kubernetes ML Security Assessment project.
 #
-#   ./run.sh --manifests [--fresh]   manifest pipeline (needs only Kubescape)
-#   ./run.sh --fleet [--count 100]   parallel fleet pipeline (100 YAMLs: Kubescape + Trivy + Kind/Falco)
-#   ./run.sh --compare-11            train and benchmark all 11 models (Real, Synth, Consolidated, Master)
-#   ./run.sh --final                 Kind clusters + latest assessment (+ training if enough data)
-#   ./run.sh --all                   everything: clusters, snapshots, medium scenario, training, report
+#   ./run.sh --manifests   manifest pipeline & model training (needs Kubescape)
+#   ./run.sh --real        200 real-world manifests & 11-model master matrix
+#   ./run.sh --live        live cluster telemetry collection & model training
+#   ./run.sh --test        execute test suite (48 unit tests)
+#   ./run.sh --report      generate & display security assessment & benchmark reports
+#   ./run.sh --all         run end-to-end pipeline across all domains
 #
 # Settings for --all (environment variables):
 #   SNAPSHOTS  snapshots per scenario, minimum 5   (default 6)
@@ -40,9 +41,16 @@ cleanup() {
 # Generate manifests -> scan with Kubescape -> build kubernetes_security_dataset.csv
 cmd_manifests() {
   local fresh=0
-  [[ "${1:-}" == "--fresh" ]] && fresh=1
   local count="${MANIFEST_COUNT:-${COUNT:-}}"
   local count_args=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --fresh) fresh=1; shift ;;
+      --count) count="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
   [ -n "$count" ] && count_args=(--count "$count")
 
   # Fail before generating anything if the scanner is missing.
@@ -245,6 +253,98 @@ cmd_all() {
   echo "All done. Outputs: $CLUSTER_DATASET, models/security_models.joblib, $REPORT_FILE"
 }
 
+cmd_real() {
+  echo "=== REAL-WORLD WORKLOAD PIPELINE & 11-MODEL MATRIX ==="
+  require_tools python3
+  python3 "$ROOT/src/build_real_world_dataset.py"
+  python3 "$ROOT/src/train_11_models.py"
+}
+
+cmd_live() {
+  local count="${COUNT:-}"
+  local batch_size="${BATCH_SIZE:-}"
+  local skip_live="${SKIP_LIVE:-}"
+  local fleet_mode=0
+  local fleet_args=()
+
+  local args=("$@")
+  local i=0
+  while [ $i -lt ${#args[@]} ]; do
+    case "${args[$i]}" in
+      --count)
+        fleet_mode=1
+        count="${args[$((i+1))]}"
+        i=$((i+2))
+        ;;
+      --batch-size)
+        fleet_mode=1
+        batch_size="${args[$((i+1))]}"
+        i=$((i+2))
+        ;;
+      --skip-live)
+        fleet_mode=1
+        skip_live=1
+        i=$((i+1))
+        ;;
+      *)
+        i=$((i+1))
+        ;;
+    esac
+  done
+
+  if [ -n "$count" ] || [ -n "$batch_size" ] || [ -n "$skip_live" ] || [ "$fleet_mode" -eq 1 ]; then
+    echo "=== LIVE CLUSTER FLEET PIPELINE ==="
+    require_tools python3 kubectl kubescape trivy
+    [ -n "$count" ] && fleet_args+=(--count "$count")
+    [ -n "$batch_size" ] && fleet_args+=(--batch-size "$batch_size")
+    if [ "$skip_live" = "1" ] || [ "$skip_live" = "true" ]; then
+      fleet_args+=(--skip-live)
+    fi
+    python3 "$ROOT/src/run_cluster_fleet.py" ${fleet_args[@]+"${fleet_args[@]}"}
+    python3 "$ROOT/src/train_security_models.py"
+  else
+    cmd_final "$@"
+  fi
+}
+
+cmd_report() {
+  echo "=== SECURITY & ML BENCHMARK REPORTS ==="
+  require_tools python3
+  if [ -f "$ROOT/reports/11_model_comparison_report.txt" ]; then
+    cat "$ROOT/reports/11_model_comparison_report.txt"
+    echo ""
+  fi
+  if [ -f "$REPORT_INPUT" ] && [ -f "$MODEL_FILE" ]; then
+    python3 "$ROOT/src/generate_report.py" "$REPORT_INPUT" "$REPORT_FILE"
+  elif [ -f "$REPORT_FILE" ]; then
+    cat "$REPORT_FILE"
+  else
+    echo "No cluster assessment report found. Run 'make live' or 'make all' first."
+  fi
+}
+
+cmd_clean() {
+  echo "Cleaning cache files and temporary logs..."
+  find "$ROOT" -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+  find "$ROOT" -type f -name "*.py[cod]" -delete 2>/dev/null || true
+  find "$ROOT" -name ".DS_Store" -delete 2>/dev/null || true
+  rm -rf "$ROOT/.pytest_cache" "$ROOT/.coverage" "$ROOT/htmlcov"
+  rm -rf "$ROOT/logs"/*.log
+  rm -rf "$ROOT/data/raw/.latest.tmp"
+  echo "Clean completed."
+}
+
+cmd_clean_deep() {
+  cmd_clean
+  echo "Deep cleaning previous run data, scans, snapshots, and runtime models..."
+  rm -rf "$ROOT/data/raw/manifest_scans"
+  rm -rf "$ROOT/data/raw/samples/synthetic"
+  rm -rf "$ROOT/data/raw/latest" "$ROOT/data/raw/snapshots" "$ROOT/data/raw/continuous_snapshots"
+  rm -rf "$ROOT/models/security_models.joblib" "$ROOT/models/random_forest_model.joblib" "$ROOT/models/svm_model.joblib" "$ROOT/models/xgboost_model.joblib" "$ROOT/models/isolation_forest_model.joblib"
+  rm -rf "$ROOT/logs"/*
+  echo "Deep clean completed. Repository reset to clean baseline."
+}
+
 cmd_fleet() {
   echo "=== 100-CLUSTER PARALLEL FLEET PIPELINE ==="
   require_tools python3 kubectl kubescape trivy
@@ -263,27 +363,38 @@ cmd_test_cluster() {
 }
 
 cmd_train_11() {
-  echo "=== 11-MODEL TRAINING & BENCHMARK MATRIX ==="
-  require_tools python3
-  python3 "$ROOT/src/build_real_world_dataset.py"
-  python3 "$ROOT/src/train_11_models.py"
+  cmd_real
 }
 
 main() {
   trap cleanup EXIT
   case "$MODE" in
     --manifests|--midsem)          shift || true; cmd_manifests "$@" ;;
+    --real)                        cmd_real ;;
+    --live|--final)                shift || true; cmd_live "$@" ;;
+    --test)                        python3 -m unittest discover -s tests -v ;;
+    --report)                      cmd_report ;;
+    --all)                         cmd_all ;;
+    --clean)                       cmd_clean ;;
+    --clean-deep)                  cmd_clean_deep ;;
     --fleet|--pipeline)            shift || true; cmd_fleet "$@" ;;
     --compare-11|--train-11)       cmd_train_11 ;;
-    --final)                       cmd_final ;;
-    --all)                         cmd_all ;;
     --test-cluster|--test_cluster) shift || true; cmd_test_cluster "$@" ;;
   esac
 }
 
 MODE="${1:---manifests}"
 case "$MODE" in
-  --manifests|--midsem|--fleet|--pipeline|--compare-11|--train-11|--final|--all|--test-cluster|--test_cluster) ;;
+  manifests|real|live|final|all|test|report|fleet|pipeline|clean|clean-deep|clean_deep|deep-clean|deep)
+    case "$MODE" in
+      clean_deep|deep-clean|deep) MODE="--clean-deep" ;;
+      *) MODE="--$MODE" ;;
+    esac
+    ;;
+esac
+
+case "$MODE" in
+  --manifests|--midsem|--real|--live|--final|--all|--test|--report|--clean|--clean-deep|--fleet|--pipeline|--compare-11|--train-11|--test-cluster|--test_cluster) ;;
   -h|--help) usage; exit 0 ;;
   *)
     echo "Unknown option: $MODE" >&2

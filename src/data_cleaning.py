@@ -126,7 +126,7 @@ def clean_dataset(
 
     # 1. String Sanitization: Strip leading/trailing whitespace across all text columns
     # and normalize standard categorical values.
-    text_cols = list(df.select_dtypes(include=["object", "string", "str"]).columns)
+    text_cols = list(df.select_dtypes(include=["object", "string"]).columns)
     for col in text_cols:
         mask_non_null = df[col].notna()
         stripped = df.loc[mask_non_null, col].astype(str).str.strip()
@@ -219,7 +219,7 @@ def clean_dataset(
         df[col] = df[col].clip(lower=low, upper=high)
 
     # 6. Fill remaining missing values in object/string columns to guarantee zero unhandled NaNs
-    text_cols = list(df.select_dtypes(include=["object", "string", "str"]).columns)
+    text_cols = list(df.select_dtypes(include=["object", "string"]).columns)
     for col in text_cols:
         missing_str = int(df[col].isna().sum())
         if missing_str > 0:

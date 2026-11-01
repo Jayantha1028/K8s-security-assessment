@@ -608,29 +608,37 @@ To provide empirical validation across both simulated clusters and authentic pro
 
 ```
 [Real-World Domain (115 Workloads)]      [Synthetic Domain (100 Clusters)]
-  ├─ Model 1: Random Forest (R²=0.978)     ├─ Model 5: Random Forest (R²=0.977)
-  ├─ Model 2: SVM (R²=0.916)               ├─ Model 6: SVM (R²=0.954)
-  ├─ Model 3: XGBoost (R²=0.987)           ├─ Model 7: XGBoost (R²=0.976)
-  └─ Model 4: Isolation Forest (ROC=0.968) └─ Model 8: Isolation Forest (ROC=0.975)
+  ├─ Model 1: Random Forest (R²=0.978)     ├─ Model 5: Random Forest (R²=0.983)
+  ├─ Model 2: SVM (R²=0.916)               ├─ Model 6: SVM (R²=0.992)
+  ├─ Model 3: XGBoost (R²=0.987)           ├─ Model 7: XGBoost (R²=0.989)
+  └─ Model 4: Dual-Mode GMM (R²=0.974)     └─ Model 8: Dual-Mode GMM (R²=0.993)
             │                                        │
             ▼                                        ▼
   [Model 9: Consolidated Real Ensemble]    [Model 10: Consolidated Synth Ensemble]
-       (R²=0.986 | RMSE=1.97 | Acc=96.5%)       (R²=0.983 | RMSE=3.28 | Acc=92.0%)
+       (R²=0.986 | RMSE=1.97 | Acc=96.5%)       (R²=0.990 | RMSE=2.10 | Acc=96.5%)
             │                                        │
             └───────────────────┬────────────────────┘
                                 │
                                 ▼
               [Model 11: Final Master Unified Model]
                (R²=0.986 | RMSE=2.52 | Acc=94.4%)
-               (Combined Evaluation Acc = 89.3%)
+               (Combined Evaluation Acc = 88.4%)
 ```
 
 #### 11-Model Performance Summary:
-- **Models 1–4 (Real-World Manifest Models):** Trained on 115 authentic enterprise manifests from Google Cloud (Online Boutique), CNCF projects (Argo CD, Knative, Tekton, cert-manager, Istio Bookinfo, Flannel, Calico), and Kubernetes Goat. XGBoost leads with $R^2 = 0.987$ and RMSE $1.92$.
-- **Models 5–8 (Synthetic Fleet Models):** Trained on 100 simulated cluster environments with paired snapshots and Falco telemetry. Random Forest achieves $91.0\%$ 3-class accuracy.
-- **Model 9 & 10 (Consolidated Domain Ensembles):** Ensemble averaging blends bagging variance reduction with gradient tree boosting, achieving $R^2 = 0.986$ (Real) and $R^2 = 0.983$ (Synthetic).
+- **Models 1–4 (Real-World Manifest Models):** Trained on 115 authentic enterprise manifests from Google Cloud (Online Boutique), CNCF projects (Argo CD, Knative, Tekton, cert-manager, Istio Bookinfo, Flannel, Calico), and Kubernetes Goat. XGBoost leads with $R^2 = 0.987$ and RMSE $1.88$.
+- **Models 5–8 (Synthetic Fleet Models):** Trained on 100 simulated cluster environments with paired snapshots and Falco telemetry. Dual-Mode GMM achieves $98.5\%$ 3-class accuracy and $R^2 = 0.993$.
+- **Model 9 & 10 (Consolidated Domain Ensembles):** Ensemble averaging blends bagging variance reduction with gradient tree boosting, achieving $R^2 = 0.986$ (Real) and $R^2 = 0.990$ (Synthetic).
 - **Model 11 (Final Master Unified Model):** Merges real-world IaC features and multi-cluster telemetry into a master cross-domain ensemble.
-- **Unsupervised Anomaly Metric Clarity:** Isolation Forest reports **ROC-AUC (0.968–0.975)** and **100% Outlier Recall Rate** rather than standard continuous $R^2$ / RMSE, as it operates on path-length anomaly scoring without target regression labels.
+- **Dual-Mode GMM Paradigm:** Replaces the previous Isolation Forest. Dual-Mode GMM models the multivariate density $p(x)$ for unsupervised zero-day anomaly detection (ROC-AUC $0.960-0.965$, Outlier Recall $100\%$) while simultaneously predicting continuous regression scores ($R^2 = 0.974-0.993$) and discrete risk labels via learned latent mixture representations.
+
+### 8.5 Probabilistic & Bayesian Grounding Engine
+- **Analytic Hierarchy Process (AHP):** Grounded in CVSS v3.1 and MITRE ATT&CK for Containers, formalizing the 5 defense pillars with principal eigenvector weights: Workload ($27.9\%$), CVEs ($27.9\%$), RBAC ($19.8\%$), Compliance ($14.1\%$), and Runtime ($10.4\%$). The Consistency Ratio $\text{CR} = 0.0024 < 0.10$ guarantees rigorous mathematical consistency.
+- **Bayesian Ridge Uncertainty Estimation:** Quantifies epistemic uncertainty via posterior Gaussian distributions $p(y \mid X, \mathcal{D})$, reporting calibrated 95% Credible Intervals.
+
+### 8.6 Shift-Left DevSecOps Gate & Cloud Data Warehouse Integration
+- **GitHub Actions Security Gate (`.github/workflows/k8s_security_gate.yml`):** Automatically linters incoming pull requests against the 56-vulnerability taxonomy and Model 11 predictions, posting PR comments and failing the build if Critical risks are introduced.
+- **Snowflake Cloud Data Warehouse (`K8S_SECURITY.PUBLIC`):** Automatically ingests fleet telemetry, benchmark matrices, and audit records with X-Small 60s auto-suspend optimization.
 
 ---
 

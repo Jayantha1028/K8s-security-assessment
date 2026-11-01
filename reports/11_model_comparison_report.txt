@@ -3,25 +3,26 @@
 ==================================================================================================
 Model Name                          | Training Set   | Score R² | RMSE   | Accuracy  | F1-Score | K8s Goat Tier 
 --------------------------------------------------------------------------------------------------
-Model 1: Random Forest (Real-World)  | Real (115)     | 0.978    | 2.43   | 95.7    % | 0.942    | High (23.1)
-Model 2: SVM (Real-World)            | Real (115)     | 0.916    | 4.81   | 93.9    % | 0.925    | Medium (52.8)
-Model 3: XGBoost (Real-World)        | Real (115)     | 0.987    | 1.88   | 96.5    % | 0.940    | High (25.5)
-Model 4: Isolation Forest (Real)     | Real (115)     | ROC: 0.956   | Rec: 100% | [Unsupervised Anomaly Detector]  | Anomaly
+Model 1: Random Forest (Real-World)  | Real (200)     | 0.989    | 1.93   | 96.0    % | 0.941    | High (21.5)
+Model 2: SVM (Real-World)            | Real (200)     | 0.989    | 1.92   | 97.0    % | 0.967    | Medium (49.1)
+Model 3: XGBoost (Real-World)        | Real (200)     | 0.993    | 1.50   | 97.5    % | 0.950    | High (20.3)
+Model 4: Dual-Mode GMM (Real-World)  | Real (200)     | 0.985    | 2.24   | 97.0    % | 0.956    | High (100.0) [ROC:0.96]
 --------------------------------------------------------------------------------------------------
-Model 5: Random Forest (Synthetic)   | Synth (100)    | 0.977    | 3.88   | 92.0    % | 0.916    | High (25.3)
-Model 6: SVM (Synthetic)             | Synth (100)    | 0.954    | 5.42   | 86.0    % | 0.860    | High (48.4)
-Model 7: XGBoost (Synthetic)         | Synth (100)    | 0.976    | 3.94   | 88.0    % | 0.870    | High (24.7)
-Model 8: Isolation Forest (Synth)    | Synth (100)    | ROC: 0.820   | Rec: 69% | [Unsupervised Anomaly Detector]  | Anomaly
+Model 5: Random Forest (Synthetic)   | Synth (200)    | 0.974    | 3.91   | 90.5    % | 0.893    | High (18.1)
+Model 6: SVM (Synthetic)             | Synth (200)    | 0.989    | 2.53   | 89.0    % | 0.870    | Medium (44.3)
+Model 7: XGBoost (Synthetic)         | Synth (200)    | 0.983    | 3.13   | 91.5    % | 0.901    | High (17.5)
+Model 8: Dual-Mode GMM (Synthetic)   | Synth (200)    | 0.989    | 2.50   | 96.0    % | 0.954    | High (0.0) [ROC:0.81]
 --------------------------------------------------------------------------------------------------
-Model 9: Consolidated Real-World     | Real (115)     | 0.986    | 1.97   | 96.5    % | 0.960    | High (28.6)
-Model 10: Consolidated Synthetic     | Synth (100)    | 0.983    | 3.28   | 92.0    % | 0.916    | High (28.5)
+Model 9: Consolidated Real-World     | Real (200)     | 0.994    | 1.38   | 97.0    % | 0.967    | High (25.0)
+Model 10: Consolidated Synthetic     | Synth (200)    | 0.985    | 2.99   | 93.0    % | 0.915    | High (21.8)
 --------------------------------------------------------------------------------------------------
-Model 11: Final Master Unified Model | ALL (215)      | 0.986    | 2.52   | 94.4    % | 0.944    | High (25.1)
+Model 11: Final Master Unified Model | ALL (500)      | 0.991    | 2.64   | 95.2    % | 0.944    | High (9.8)
 ==================================================================================================
 
 --- KEY ARCHITECTURAL & CROSS-DOMAIN INSIGHTS ---
-1. Synthetic -> Real Transfer Accuracy : 80.0% (RMSE: 13.68)
-2. Real -> Synthetic Transfer Accuracy : 70.0% (RMSE: 11.79)
-3. Final Master Model Combined Accuracy: 89.3% (RMSE: 2.56 across all 215 workloads)
-4. K8s Goat Attack Detection Rate      : 100.0% of models correctly identified Goat as HIGH RISK / ANOMALY.
+1. Synthetic -> Real Transfer Accuracy : 93.0% (RMSE: 4.70)
+2. Real -> Synthetic Transfer Accuracy : 81.0% (RMSE: 7.64)
+3. Final Master Model Combined Accuracy: 99.4% (RMSE: 1.09 across all 500 workloads)
+4. Live Cluster Feeds (100 Feeds) Generalization : 100.0% (RMSE: 1.24)
+5. K8s Goat Attack Detection Rate                 : 100.0% of models correctly identified Goat as HIGH RISK / ANOMALY.
 ==================================================================================================

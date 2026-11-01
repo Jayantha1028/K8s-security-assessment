@@ -28,6 +28,8 @@ PROCESSED_DIR="data/processed"
 CLUSTER_DATASET="$PROCESSED_DIR/final_security_dataset.csv"
 REPORT_INPUT="$PROCESSED_DIR/report_input.csv"
 REPORT_FILE="reports/security_report.txt"
+MODEL_FILE="models/security_models.joblib"
+MODELS_11_FILE="models/security_models_11.joblib"
 
 # require_tools <tool>...: exit 127 with a clear message if any is missing.
 require_tools() {
