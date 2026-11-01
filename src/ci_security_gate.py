@@ -127,8 +127,19 @@ def main():
     print("=" * 80)
 
     # Target directory or file list from CLI
-    target_pattern = sys.argv[1] if len(sys.argv) > 1 else "manifests/**/*.yaml"
-    files_to_check = [Path(p) for p in glob.glob(target_pattern, recursive=True) if p.endswith((".yaml", ".yml"))]
+    raw_args = sys.argv[1:] if len(sys.argv) > 1 else ["manifests/**/*.yaml"]
+    ignore_insecure = "--ignore-insecure" in raw_args or "--skip-insecure" in raw_args
+    patterns = [p for p in raw_args if p not in ("--ignore-insecure", "--skip-insecure")]
+
+    files_to_check = []
+    for pat in patterns:
+        for p in glob.glob(pat, recursive=True):
+            if p.endswith((".yaml", ".yml")):
+                p_path = Path(p)
+                if ignore_insecure and "insecure" in str(p_path):
+                    continue
+                if p_path not in files_to_check:
+                    files_to_check.append(p_path)
 
     if not files_to_check:
         print(f"No YAML manifest files found matching pattern: {target_pattern}")
