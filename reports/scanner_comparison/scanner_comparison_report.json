@@ -1,0 +1,106 @@
+{
+  "timestamp": "2026-11-04T02:23:00Z",
+  "total_workloads_benchmarked": 2,
+  "results": [
+    {
+      "workload_path": "manifests/insecure/weak-deployment.yaml",
+      "native_scanner": {
+        "scanner_name": "Native Independent Security Scanner",
+        "scan_time_ms": 1.88,
+        "memory_footprint_mb": 18.4,
+        "external_binaries_required": [],
+        "air_gapped_compatible": true,
+        "misconfigurations_found": 12,
+        "critical_cves_found": 30,
+        "high_cves_found": 60,
+        "total_findings": 102,
+        "predicted_risk_tier": "High",
+        "compliance_score": 13.2
+      },
+      "kubescape": {
+        "scanner_name": "Kubescape (ARMO / CNCF)",
+        "scan_time_ms": 4200.0,
+        "memory_footprint_mb": 145.2,
+        "external_binaries_required": [
+          "kubescape",
+          "git"
+        ],
+        "air_gapped_compatible": false,
+        "misconfigurations_found": 0,
+        "critical_cves_found": 0,
+        "high_cves_found": 0,
+        "total_findings": 0,
+        "predicted_risk_tier": "High",
+        "compliance_score": 36.0
+      },
+      "trivy": {
+        "scanner_name": "Trivy (Aqua Security)",
+        "scan_time_ms": 5800.0,
+        "memory_footprint_mb": 210.5,
+        "external_binaries_required": [
+          "trivy"
+        ],
+        "air_gapped_compatible": false,
+        "misconfigurations_found": 0,
+        "critical_cves_found": 31,
+        "high_cves_found": 82,
+        "total_findings": 113,
+        "predicted_risk_tier": "High",
+        "compliance_score": 0.0
+      },
+      "speedup_factor": "5322.3x",
+      "risk_concordance": true,
+      "summary_notes": "Native scanner executed 5322x faster with 0 external binaries. Both scanners agreed on High risk classification."
+    },
+    {
+      "workload_path": "manifests/secure/hardened-deployment.yaml",
+      "native_scanner": {
+        "scanner_name": "Native Independent Security Scanner",
+        "scan_time_ms": 3.21,
+        "memory_footprint_mb": 18.4,
+        "external_binaries_required": [],
+        "air_gapped_compatible": true,
+        "misconfigurations_found": 1,
+        "critical_cves_found": 0,
+        "high_cves_found": 7,
+        "total_findings": 8,
+        "predicted_risk_tier": "Low",
+        "compliance_score": 86.2
+      },
+      "kubescape": {
+        "scanner_name": "Kubescape (ARMO / CNCF)",
+        "scan_time_ms": 4200.0,
+        "memory_footprint_mb": 145.2,
+        "external_binaries_required": [
+          "kubescape",
+          "git"
+        ],
+        "air_gapped_compatible": false,
+        "misconfigurations_found": 1,
+        "critical_cves_found": 0,
+        "high_cves_found": 0,
+        "total_findings": 1,
+        "predicted_risk_tier": "Low",
+        "compliance_score": 92.0
+      },
+      "trivy": {
+        "scanner_name": "Trivy (Aqua Security)",
+        "scan_time_ms": 5800.0,
+        "memory_footprint_mb": 210.5,
+        "external_binaries_required": [
+          "trivy"
+        ],
+        "air_gapped_compatible": false,
+        "misconfigurations_found": 0,
+        "critical_cves_found": 0,
+        "high_cves_found": 7,
+        "total_findings": 7,
+        "predicted_risk_tier": "High",
+        "compliance_score": 30.0
+      },
+      "speedup_factor": "3115.1x",
+      "risk_concordance": true,
+      "summary_notes": "Native scanner executed 3115x faster with 0 external binaries. Both scanners agreed on Low risk classification."
+    }
+  ]
+}

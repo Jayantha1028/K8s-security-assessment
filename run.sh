@@ -432,6 +432,8 @@ set +e
 status=${PIPESTATUS[0]}
 
 # Keep only the newest 30 logs.
-ls -1t "$LOG_DIR"/*.log 2>/dev/null | tail -n +31 | xargs rm -f
+ls -1t "$LOG_DIR"/*.log 2>/dev/null | tail -n +31 | while IFS= read -r old_log; do
+    [ -n "$old_log" ] && rm -f "$old_log"
+done
 echo "Log saved: $LOG_FILE"
 exit "$status"

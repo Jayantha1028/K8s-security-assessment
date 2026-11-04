@@ -1,0 +1,134 @@
+{
+  "timestamp": "2026-11-04T02:23:14Z",
+  "clinical_metrics": {
+    "balanced_accuracy": 96.95645530939649,
+    "mcc": 0.9603873956392741,
+    "cohen_kappa": 0.9598447329674742,
+    "macro_f1": 96.63771356249934,
+    "top_accuracy": 97.6,
+    "fnr_high": 0.0,
+    "fpr_low_to_high": 0.0,
+    "rmse": 1.4713776537653414,
+    "r2": 0.997142195481858
+  },
+  "confusion_matrix": [
+    [
+      106,
+      0,
+      0
+    ],
+    [
+      10,
+      109,
+      0
+    ],
+    [
+      0,
+      2,
+      273
+    ]
+  ],
+  "probability_calibration": {
+    "ece": 0.03432812881590835,
+    "mce": 0.47018791637594015,
+    "brier_score": 0.010670985723376521
+  },
+  "golden_pair_monotonicity": {
+    "total_pairs": 20,
+    "monotonic_pairs": 20,
+    "inversions": 0,
+    "monotonicity_consistency_ratio": 100.0,
+    "mean_hardening_delta": 18.161,
+    "min_delta": 1.1099999999999994,
+    "max_delta": 61.53
+  },
+  "semantic_invariance": {
+    "max_drift": 0.0,
+    "mean_drift": 0.0,
+    "tier_flips": 0,
+    "invariance_pass_rate": 100.0
+  },
+  "ood_generalization": {
+    "generalization_gap": 1.0710300807306834,
+    "holdout_rmse": 4.036203230584519,
+    "train_rmse": 2.9651731498538356
+  },
+  "zero_shot_benchmark": {
+    "total_workloads": 10,
+    "correct_matches": 10,
+    "zero_shot_accuracy": 100.0,
+    "workload_breakdown": [
+      {
+        "name": "Bitnami Redis (Hardened)",
+        "expected_risk": "Low",
+        "predicted_risk": "Low",
+        "predicted_score": 96.53,
+        "match": true
+      },
+      {
+        "name": "Bitnami Redis (Default Root)",
+        "expected_risk": "Medium",
+        "predicted_risk": "Medium",
+        "predicted_score": 63.3,
+        "match": true
+      },
+      {
+        "name": "ArgoCD Server (Hardened)",
+        "expected_risk": "Low",
+        "predicted_risk": "Low",
+        "predicted_score": 96.8,
+        "match": true
+      },
+      {
+        "name": "ArgoCD Repo Server (Restricted)",
+        "expected_risk": "Low",
+        "predicted_risk": "Low",
+        "predicted_score": 96.53,
+        "match": true
+      },
+      {
+        "name": "Cert-Manager Controller",
+        "expected_risk": "Low",
+        "predicted_risk": "Low",
+        "predicted_score": 96.5,
+        "match": true
+      },
+      {
+        "name": "Prometheus Node-Exporter (HostPath/HostPID)",
+        "expected_risk": "Medium",
+        "predicted_risk": "Medium",
+        "predicted_score": 59.12,
+        "match": true
+      },
+      {
+        "name": "Kube-State-Metrics (Audited)",
+        "expected_risk": "Low",
+        "predicted_risk": "Low",
+        "predicted_score": 96.47,
+        "match": true
+      },
+      {
+        "name": "Grafana Dashboard (Hardened)",
+        "expected_risk": "Low",
+        "predicted_risk": "Low",
+        "predicted_score": 96.53,
+        "match": true
+      },
+      {
+        "name": "HashiCorp Vault Agent Injector",
+        "expected_risk": "Low",
+        "predicted_risk": "Low",
+        "predicted_score": 96.5,
+        "match": true
+      },
+      {
+        "name": "Kubernetes Dashboard (Over-Privileged ClusterAdmin)",
+        "expected_risk": "High",
+        "predicted_risk": "High",
+        "predicted_score": 35.0,
+        "match": true
+      }
+    ]
+  },
+  "all_gates_passed": true
+}

@@ -96,7 +96,7 @@ list_features() {
   echo "  2. build-dataset        : 500-Workload Multi-Source Dataset Aggregation Pipeline"
   echo "  3. data-cleaning        : Dataset Integrity, Range Clamping & Duplicate Sanitization"
   echo "  4. train-11-models      : 11-Model Machine Learning Matrix & Dynamic Meta-Stacking"
-  echo "  5. train-baseline-models: Runtime Random Forest, SVM, XGBoost & Isolation Forest Models"
+  echo "  5. evaluate-model-rigor : 12-Gate Statistical & Clinical Accuracy Rigor Benchmark"
   echo "  6. bayesian-scoring     : Hierarchical Bayesian Engine & AHP Multi-Criteria Consistency"
   echo "  7. dual-mode-gmm        : Dual-Mode Gaussian Mixture Model Zero-Day Anomaly Detector"
   echo "  8. xai-threat-attribution: Explainable AI (TreeSHAP) Marginal Risk Waterfall Drivers"
@@ -108,8 +108,9 @@ list_features() {
   echo " 14. interactive-dashboard: Responsive Single-Page HTML Operations Dashboard"
   echo " 15. security-chaos-testing: Security Chaos Engineering (SCE 1-6 Resilience Suite)"
   echo " 16. executive-audit      : Enterprise Compliance Audit HTML & 9-Page High-Res Vector PDF"
-  echo " 17. test-suite           : Full 48-Test System Verification & Chaos Assertion Suite"
-  echo " 18. snowflake-sync       : Enterprise Snowflake Cloud Data Warehouse Delta Export"
+  echo " 17. scanner-comparison   : Native Independent Scanner vs Kubescape vs Trivy Benchmark"
+  echo " 18. test-suite           : Full 67-Test Verification, Rigor & Chaos Assertion Suite"
+  echo " 19. snowflake-sync       : Enterprise Snowflake Cloud Data Warehouse Delta Export"
 }
 
 # Scorecard Tracker
@@ -244,9 +245,9 @@ main() {
   run_step "04" "11-Model Machine Learning Matrix" \
     "python3 src/train_11_models.py"
 
-  # 5. Train Baseline Production Models
-  run_step "05" "Baseline Production Models (RF, SVM, XGB, Iso)" \
-    "python3 src/train_security_models.py"
+  # 5. 12-Gate Statistical & Clinical Accuracy Rigor Benchmark
+  run_step "05" "12-Gate Statistical & Clinical Rigor Benchmark" \
+    "python3 src/evaluate_model_rigor.py"
 
   # 6. Bayesian Multi-Plane Threat Scoring Engine
   run_step "06" "Bayesian Threat Scoring & AHP Prior Engine" \
@@ -292,25 +293,29 @@ main() {
   run_step "16" "Executive Compliance Audit HTML & 9-Page PDF" \
     "python3 src/generate_executive_audit.py"
 
-  # 17. Full 48-Test System Verification & Regression Suite
+  # 17. Native Scanner vs Kubescape vs Trivy Benchmark
+  run_step "17" "Native Security Scanner & Industry Comparator" \
+    "python3 comparator/comparator_cli.py"
+
+  # 18. Full 67-Test Verification & Regression Suite
   if [ "$SKIP_TESTS" -eq 1 ]; then
-    STEP_NAMES+=("Full 48-Test Verification Suite")
+    STEP_NAMES+=("Full 67-Test Verification Suite")
     STEP_DURATIONS+=("0.00s")
     STEP_STATUS+=("SKIPPED")
-    echo -e "\n${YELLOW}ℹ [INFO] Skipping Stage 17 (--skip-tests specified).${RESET}"
+    echo -e "\n${YELLOW}ℹ [INFO] Skipping Stage 18 (--skip-tests specified).${RESET}"
   else
-    run_step "17" "Full 48-Test Verification Suite" \
+    run_step "18" "Full 67-Test Verification Suite" \
       "python3 -m unittest discover -s tests"
   fi
 
-  # 18. Enterprise Snowflake Cloud Data Warehouse Sync
+  # 19. Enterprise Snowflake Cloud Data Warehouse Sync
   if [ "$SKIP_SNOWFLAKE" -eq 1 ]; then
     STEP_NAMES+=("Snowflake Data Warehouse Delta Export")
     STEP_DURATIONS+=("0.00s")
     STEP_STATUS+=("SKIPPED")
-    echo -e "\n${YELLOW}ℹ [INFO] Skipping Stage 18 (--skip-snowflake specified).${RESET}"
+    echo -e "\n${YELLOW}ℹ [INFO] Skipping Stage 19 (--skip-snowflake specified).${RESET}"
   else
-    run_step "18" "Snowflake Data Warehouse Delta Export" \
+    run_step "19" "Snowflake Data Warehouse Delta Export" \
       "python3 src/export_to_snowflake.py --incremental" 1
   fi
 

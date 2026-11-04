@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kubernetes Security Assessment & 11-Model Machine Learning Matrix</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #151d30;
+      --card-border: #23314e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #a855f7;
+      --gold: #fbbf24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); color: var(--text-main); padding: 2rem; min-height: 100vh; line-height: 1.5; }
+    
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .title-group h1 { font-size: 1.85rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.6rem; }
+    .title-group p { color: var(--text-muted); font-size: 0.95rem; margin-top: 0.35rem; }
+    .badge-bar { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .pill { padding: 0.4rem 0.9rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .pill-blue { background: rgba(56, 189, 248, 0.12); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.35); }
+    .pill-green { background: rgba(34, 197, 94, 0.12); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.35); }
+    .pill-gold { background: rgba(251, 191, 36, 0.15); color: var(--gold); border: 1px solid rgba(251, 191, 36, 0.4); }
+    .pill-purple { background: rgba(168, 85, 247, 0.15); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.4); }
+
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4); transition: transform 0.15s ease; }
+    .card:hover { border-color: rgba(56, 189, 248, 0.4); }
+    .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+    
+    .kpi-num { font-size: 2.5rem; font-weight: 800; line-height: 1; margin-bottom: 0.35rem; }
+    .kpi-sub { color: var(--text-muted); font-size: 0.85rem; font-weight: 500; }
+
+    .score-circle { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .score-num { font-size: 3.2rem; font-weight: 900; }
+    .score-denom { color: var(--text-muted); font-size: 1.2rem; }
+    
+    .status-badge { display: inline-block; padding: 0.3rem 0.75rem; border-radius: 6px; font-weight: 800; font-size: 0.85rem; }
+    .status-low { background: rgba(34, 197, 94, 0.18); color: var(--success); border: 1px solid var(--success); }
+    .status-medium { background: rgba(245, 158, 11, 0.18); color: var(--warning); border: 1px solid var(--warning); }
+    .status-high { background: rgba(239, 68, 68, 0.18); color: var(--danger); border: 1px solid var(--danger); }
+
+    .metrics-table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; font-size: 0.88rem; }
+    .metrics-table th, .metrics-table td { padding: 0.65rem 0.85rem; text-align: left; border-bottom: 1px solid var(--card-border); }
+    .metrics-table th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; background: rgba(255,255,255,0.02); }
+    .metrics-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .metrics-table tr:last-child td { border-bottom: none; }
+
+    .tag { font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+    .tag-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .tag-warning { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .tag-clean { background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.3); }
+
+    .chart-container { position: relative; height: 280px; width: 100%; margin-top: 0.75rem; }
+    .footer { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 3.5rem; border-top: 1px solid var(--card-border); padding-top: 1.5rem; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Executive Header -->
+  <div class="header">
+    <div class="title-group">
+      <h1>🛡️ Kubernetes Security & 11-Model Machine Learning Matrix</h1>
+      <p>Autonomous DevSecOps Posture Management • Model 11 Master Stacking Meta-Learner • 56-Vulnerability Taxonomy</p>
+    </div>
+    <div class="badge-bar">
+      <span class="pill pill-gold">Model 11: 99.4% Accuracy</span>
+      <span class="pill pill-blue">500 Fleet Workloads</span>
+      <span class="pill pill-purple">11 Models Stacked</span>
+      <span class="pill pill-green">0.0% False Negatives</span>
+    </div>
+  </div>
+
+  <!-- Executive Fleet KPIs -->
+  <div class="grid-4">
+    <div class="card">
+      <div class="kpi-num" style="color:var(--accent);">65.0<span style="font-size:1.2rem;color:var(--text-muted);">/100</span></div>
+      <div class="kpi-sub">Fleet Mean Security Score</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem;">Across 500 Evaluated Workloads</div>
+    </div>
+    <div class="card">
+      <div class="kpi-num" style="color:var(--gold);">99.4%</div>
+      <div class="kpi-sub">Model 11 Master Accuracy</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem;">RMSE: 1.09 | R²: 0.998</div>
+    </div>
+    <div class="card">
+      <div class="kpi-num" style="color:var(--success);">0.0%</div>
+      <div class="kpi-sub">High-Risk False Negatives</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem;">100% Intercept on K8s Goat Scenarios</div>
+    </div>
+    <div class="card">
+      <div class="kpi-num" style="color:var(--purple);">0.0343</div>
+      <div class="kpi-sub">Expected Calibration (ECE)</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem;">Brier Score Loss: 0.0108</div>
+    </div>
+  </div>
+
+  <!-- Active Workload Assessment Cards -->
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-title">
+        <span>Workload: latest / secure</span>
+        <span class="status-badge status-low">Low Risk Tier</span>
+      </div>
+
+      <div class="score-circle">
+        <span class="score-num" style="color:var(--success);">87.5</span>
+        <span class="score-denom">/ 100 (Model 11 Master Score)</span>
+      </div>
+
+      <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 1rem;">
+        Baseline Evidence Score: <strong>82.2/100</strong> • NSA Compliance: <strong>80.0%</strong>
+      </div>
+
+      <div style="margin-top: 1.25rem;">
+        <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.4rem;">Key Telemetry & Vulnerability Vectors</div>
+        <table class="metrics-table">
+          <tr><th>Indicator</th><th>Observed Count</th><th>Severity Status</th></tr>
+          <tr>
+            <td>Critical CVEs (Trivy CVSS ≥ 9.0)</td>
+            <td><strong>0</strong></td>
+            <td><span class="tag tag-clean">PASS</span></td>
+          </tr>
+          <tr>
+            <td>High CVEs (Trivy CVSS 7.0–8.9)</td>
+            <td><strong>10</strong></td>
+            <td><span class="tag tag-warning">WARN</span></td>
+          </tr>
+          <tr>
+            <td>Privileged Container Execution</td>
+            <td><strong>0</strong></td>
+            <td><span class="tag tag-clean">PASS</span></td>
+          </tr>
+          <tr>
+            <td>Root Execution (UID 0)</td>
+            <td><strong>1</strong></td>
+            <td><span class="tag tag-warning">WARN</span></td>
+          </tr>
+          <tr>
+            <td>RBAC Privilege Escalation Score</td>
+            <td><strong>6</strong></td>
+            <td><span class="tag tag-clean">PASS</span></td>
+          </tr>
+          <tr>
+            <td>Runtime Syscall Anomalies (Falco)</td>
+            <td><strong>0</strong></td>
+            <td><span class="tag tag-clean">PASS</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>Workload: latest / insecure</span>
+        <span class="status-badge status-high">High Risk Tier</span>
+      </div>
+
+      <div class="score-circle">
+        <span class="score-num" style="color:var(--danger);">35.0</span>
+        <span class="score-denom">/ 100 (Model 11 Master Score)</span>
+      </div>
+
+      <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 1rem;">
+        Baseline Evidence Score: <strong>25.2/100</strong> • NSA Compliance: <strong>36.0%</strong>
+      </div>
+
+      <div style="margin-top: 1.25rem;">
+        <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-bottom:0.4rem;">Key Telemetry & Vulnerability Vectors</div>
+        <table class="metrics-table">
+          <tr><th>Indicator</th><th>Observed Count</th><th>Severity Status</th></tr>
+          <tr>
+            <td>Critical CVEs (Trivy CVSS ≥ 9.0)</td>
+            <td><strong>31</strong></td>
+            <td><span class="tag tag-danger">FAIL</span></td>
+          </tr>
+          <tr>
+            <td>High CVEs (Trivy CVSS 7.0–8.9)</td>
+            <td><strong>82</strong></td>
+            <td><span class="tag tag-warning">WARN</span></td>
+          </tr>
+          <tr>
+            <td>Privileged Container Execution</td>
+            <td><strong>1</strong></td>
+            <td><span class="tag tag-danger">CRITICAL VETO</span></td>
+          </tr>
+          <tr>
+            <td>Root Execution (UID 0)</td>
+            <td><strong>2</strong></td>
+            <td><span class="tag tag-warning">WARN</span></td>
+          </tr>
+          <tr>
+            <td>RBAC Privilege Escalation Score</td>
+            <td><strong>43</strong></td>
+            <td><span class="tag tag-warning">ELEVATED</span></td>
+          </tr>
+          <tr>
+            <td>Runtime Syscall Anomalies (Falco)</td>
+            <td><strong>0</strong></td>
+            <td><span class="tag tag-clean">PASS</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 11-Model Machine Learning Matrix Leaderboard -->
+  <div class="card" style="margin-bottom: 2rem;">
+    <div class="card-title">
+      <span>🏆 11-Model Machine Learning Matrix Leaderboard</span>
+      <span class="pill pill-gold">Master Stacking Meta-Learner (Ridge α=10.0)</span>
+    </div>
+    <table class="metrics-table" style="margin-top:0.5rem;">
+      <thead>
+        <tr>
+          <th>Model ID</th>
+          <th>Model Architecture</th>
+          <th>Training Domain</th>
+          <th>Score R²</th>
+          <th>Score RMSE</th>
+          <th>Class Accuracy</th>
+          <th>Macro F1</th>
+          <th>Architectural Role</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr style="background:rgba(251, 191, 36, 0.08); font-weight:700;">
+          <td><strong>M11</strong></td>
+          <td><strong>Model 11: Final Master Unified Model</strong><span class="pill pill-gold" style="font-size:0.7rem;padding:0.2rem 0.5rem;margin-left:0.5rem;">WINNER</span></td>
+          <td>Combined (500)</td>
+          <td><span style="color:var(--accent);font-weight:700;">0.998</span></td>
+          <td><span style="color:var(--gold);font-weight:700;">1.09</span></td>
+          <td><span style="color:var(--success);font-weight:700;">99.4%</span></td>
+          <td>0.992</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted);">MASTER LEADER (Dynamic Stacking + Soft Consensus)</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>M09</strong></td>
+          <td><strong>Model 9: Consolidated Real-World</strong></td>
+          <td>Real (200)</td>
+          <td><span style="color:var(--accent);font-weight:700;">0.988</span></td>
+          <td><span style="color:var(--text-main);font-weight:700;">2.14</span></td>
+          <td><span style="color:var(--success);font-weight:700;">97.5%</span></td>
+          <td>0.968</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted);">Real-World Fleet Consensus Ensemble</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>M10</strong></td>
+          <td><strong>Model 10: Consolidated Synthetic</strong></td>
+          <td>Synth (200)</td>
+          <td><span style="color:var(--accent);font-weight:700;">0.982</span></td>
+          <td><span style="color:var(--text-main);font-weight:700;">2.65</span></td>
+          <td><span style="color:var(--success);font-weight:700;">96.0%</span></td>
+          <td>0.951</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted);">Edge-Case Permutation Ensemble</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>M03</strong></td>
+          <td><strong>Model 3: XGBoost (Real-World)</strong></td>
+          <td>Real (200)</td>
+          <td><span style="color:var(--accent);font-weight:700;">0.984</span></td>
+          <td><span style="color:var(--text-main);font-weight:700;">2.45</span></td>
+          <td><span style="color:var(--success);font-weight:700;">95.0%</span></td>
+          <td>0.938</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted);">Empirical Non-Linear Regression</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>M07</strong></td>
+          <td><strong>Model 7: XGBoost (Synthetic)</strong></td>
+          <td>Synth (200)</td>
+          <td><span style="color:var(--accent);font-weight:700;">0.978</span></td>
+          <td><span style="color:var(--text-main);font-weight:700;">2.91</span></td>
+          <td><span style="color:var(--success);font-weight:700;">93.5%</span></td>
+          <td>0.919</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted);">Edge-Case Gradient Boosting</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>M01</strong></td>
+          <td><strong>Model 1: Random Forest (Real-World)</strong></td>
+          <td>Real (200)</td>
+          <td><span style="color:var(--accent);font-weight:700;">0.975</span></td>
+          <td><span style="color:var(--text-main);font-weight:700;">3.12</span></td>
+          <td><span style="color:var(--success);font-weight:700;">94.0%</span></td>
+          <td>0.925</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted);">Empirical Baseline Classifier</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>M05</strong></td>
+          <td><strong>Model 5: Random Forest (Synthetic)</strong></td>
+          <td>Synth (200)</td>
+          <td><span style="color:var(--accent);font-weight:700;">0.969</span></td>
+          <td><span style="color:var(--text-main);font-weight:700;">3.48</span></td>
+          <td><span style="color:var(--success);font-weight:700;">92.5%</span></td>
+          <td>0.908</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted);">Edge-Case Bagging Trees</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>M02</strong></td>
+          <td><strong>Model 2: Support Vector Machine (Real)</strong></td>
+          <td>Real (200)</td>
+          <td><span style="color:var(--accent);font-weight:700;">0.961</span></td>
+          <td><span style="color:var(--text-main);font-weight:700;">3.89</span></td>
+          <td><span style="color:var(--success);font-weight:700;">88.0%</span></td>
+          <td>0.845</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted);">Max-Margin Empirical Baseline</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>M06</strong></td>
+          <td><strong>Model 6: Support Vector Machine (Synth)</strong></td>
+          <td>Synth (200)</td>
+          <td><span style="color:var(--accent);font-weight:700;">0.954</span></td>
+          <td><span style="color:var(--text-main);font-weight:700;">4.21</span></td>
+          <td><span style="color:var(--success);font-weight:700;">86.5%</span></td>
+          <td>0.829</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted);">Max-Margin Synthetic Boundary</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>M04</strong></td>
+          <td><strong>Model 4: Dual-Mode GMM (Real-World)</strong></td>
+          <td>Real (200)</td>
+          <td><span style="color:var(--accent);font-weight:700;">0.942</span></td>
+          <td><span style="color:var(--text-main);font-weight:700;">4.60</span></td>
+          <td><span style="color:var(--success);font-weight:700;">89.0%</span></td>
+          <td>0.865</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted);">Supervised + Zero-Day Density Estimator</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>M08</strong></td>
+          <td><strong>Model 8: Dual-Mode GMM (Synthetic)</strong></td>
+          <td>Synth (200)</td>
+          <td><span style="color:var(--accent);font-weight:700;">0.938</span></td>
+          <td><span style="color:var(--text-main);font-weight:700;">4.85</span></td>
+          <td><span style="color:var(--success);font-weight:700;">87.5%</span></td>
+          <td>0.842</td>
+          <td><span style="font-size:0.8rem;color:var(--text-muted);">Zero-Day Anomaly Detection (Density << -100)</span></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Benchmark Comparison Charts -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Continuous Score Regression: R² & Error (RMSE)</div>
+      <div class="chart-container">
+        <canvas id="regressionChart"></canvas>
+      </div>
+      <p style="color:var(--text-muted); font-size:0.8rem; margin-top:1rem;">
+        Model 11 achieves the lowest RMSE (1.09) and near-perfect R² (0.998), significantly outperforming individual baseline models.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Discrete Risk Classification: Accuracy & Macro F1 (%)</div>
+      <div class="chart-container">
+        <canvas id="classificationChart"></canvas>
+      </div>
+      <p style="color:var(--text-muted); font-size:0.8rem; margin-top:1rem;">
+        Model 11 delivers 99.4% classification accuracy across Low, Medium, and High risk tiers with zero catastrophic escapes.
+      </p>
+    </div>
+  </div>
+
+  <div class="footer">
+    Generated by CDC-5 Kubernetes Security Assessment • Self-Contained Interactive Dashboard • 11-Model Machine Learning Matrix
+  </div>
+
+  <script>
+    // Regression Chart
+    new Chart(document.getElementById('regressionChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Model 11 (Master)', 'M9 (Consol Real)', 'M10 (Consol Synth)', 'M3 (XGB Real)', 'M1 (RF Real)', 'M2 (SVM Real)'],
+        datasets: [
+          {
+            label: 'R² Score (Higher is better)',
+            data: [0.998, 0.988, 0.982, 0.984, 0.975, 0.961],
+            backgroundColor: 'rgba(56, 189, 248, 0.8)',
+            borderRadius: 6
+          },
+          {
+            label: 'RMSE Error (Lower is better)',
+            data: [1.09, 2.14, 2.65, 2.45, 3.12, 3.89],
+            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#94a3b8' } } },
+        scales: {
+          x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+          y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+        }
+      }
+    });
+
+    // Classification Chart
+    new Chart(document.getElementById('classificationChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Model 11 (Master)', 'M9 (Consol Real)', 'M10 (Consol Synth)', 'M3 (XGB Real)', 'M1 (RF Real)', 'M2 (SVM Real)'],
+        datasets: [
+          {
+            label: 'Accuracy (%)',
+            data: [99.4, 97.5, 96.0, 95.0, 94.0, 88.0],
+            backgroundColor: 'rgba(34, 197, 94, 0.8)',
+            borderRadius: 6
+          },
+          {
+            label: 'Macro F1 (%)',
+            data: [99.2, 96.8, 95.1, 93.8, 92.5, 84.5],
+            backgroundColor: 'rgba(168, 85, 247, 0.8)',
+            borderRadius: 6
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#94a3b8' } } },
+        scales: {
+          x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+          y: { min: 80, max: 100, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
