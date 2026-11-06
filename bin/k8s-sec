@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# bin/k8s-sec
+# Standalone CLI binary entry point for K8s Security Assessment Platform
+# ==============================================================================
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PYTHONPATH="${SCRIPT_DIR}/src:${SCRIPT_DIR}/src/core:${PYTHONPATH:-}"
+
+exec python3 "${SCRIPT_DIR}/src/cli/main.py" "$@"

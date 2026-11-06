@@ -22,3 +22,7 @@ data/raw/
 logs/
 *.log
 Mini-Project/
+.certs/
+**/.certs/
+*.key
+*.srl

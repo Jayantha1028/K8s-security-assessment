@@ -1,0 +1,25 @@
+================================================================================
+  Kubernetes ML Security Assessment Platform & Admission Controller (v{{ .Chart.AppVersion }})
+================================================================================
+
+Thank you for deploying {{ .Chart.Name }}!
+
+1. Check controller status:
+   kubectl get pods -n {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "k8s-security.name" . }}"
+
+2. Verify Admission Webhook:
+   kubectl get validatingwebhookconfigurations {{ include "k8s-security.fullname" . }}-validate
+   kubectl get mutatingwebhookconfigurations {{ include "k8s-security.fullname" . }}-mutate
+
+3. Check live OpenMetrics endpoint:
+   kubectl port-forward svc/{{ include "k8s-security.fullname" . }} 8443:443 -n {{ .Release.Namespace }}
+   curl -k https://localhost:8443/metrics
+
+4. Real-time Admission Enforcement Policy:
+   • Risk Threshold     : Score >= {{ .Values.policy.riskThreshold }}/100
+   • Exploit Veto Rules : {{ .Values.policy.vetoRules }}
+   • Auto-Remediation   : {{ if .Values.policy.enableMutation }}ENABLED{{ else }}DISABLED{{ end }}
+
+For questions, CLI management, or documentation, run:
+  k8s-sec --help
+================================================================================

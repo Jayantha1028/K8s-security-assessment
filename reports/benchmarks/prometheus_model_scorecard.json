@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-11-06 01:01:51 UTC",
+  "model_name": "Model 12: Purely Unsupervised Prometheus Anomaly Detector",
+  "training_samples_unlabeled": 600,
+  "validation_samples_total": 150,
+  "metrics": {
+    "attack_recall": 1.0,
+    "false_positive_rate": 0.05,
+    "f1_score": 0.9524,
+    "roc_auc": 0.9834
+  },
+  "gates": {
+    "recall_pass": true,
+    "fpr_pass": true,
+    "f1_pass": true,
+    "roc_auc_pass": true
+  }
+}

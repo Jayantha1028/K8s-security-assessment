@@ -18,6 +18,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
+for _sub in ['core', 'data', 'scanners', 'models', 'evaluation', 'reporting', 'integrations']:
+    _p = str(ROOT / 'src' / _sub)
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+if str(ROOT / 'src') not in sys.path:
+    sys.path.insert(0, str(ROOT / 'src'))
+
 KUBESCAPE_REPORT = {
     "summaryDetails": {
         "complianceScore": 70.5,
@@ -218,39 +225,35 @@ class ManifestPipelineTests(PipelineCase):
         self.assertEqual(len(list(logs.glob("*.log"))), 30)
 
     def test_scan_failure_is_reported(self):
-        self.run_cmd("python3", "src/generate_samples.py", "--count", "3", "--seed", "1", check=True)
-        result = self.run_cmd("python3", "src/scan_manifests.py", env={"FAKE_KUBESCAPE_FAIL": "1"})
+        self.run_cmd("python3", "src/data/generate_samples.py", "--count", "3", "--seed", "1", check=True)
+        result = self.run_cmd("python3", "src/scanners/scan_manifests.py", env={"FAKE_KUBESCAPE_FAIL": "1"})
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("kubescape boom", result.stdout)
 
     def test_generate_samples_seed_reproducible_and_validated(self):
-        a = self.run_cmd("python3", "src/generate_samples.py", "--count", "5", "--seed", "7",
+        a = self.run_cmd("python3", "src/data/generate_samples.py", "--count", "5", "--seed", "7",
                          "--output-dir", "a", check=True)
-        self.run_cmd("python3", "src/generate_samples.py", "--count", "5", "--seed", "7",
+        self.run_cmd("python3", "src/data/generate_samples.py", "--count", "5", "--seed", "7",
                      "--output-dir", "b", check=True)
         for i in range(1, 6):
             self.assertEqual((self.work / "a" / f"sample-{i:04d}.yaml").read_text(),
                              (self.work / "b" / f"sample-{i:04d}.yaml").read_text())
-        bad = self.run_cmd("python3", "src/generate_samples.py", "--count", "0")
+        bad = self.run_cmd("python3", "src/data/generate_samples.py", "--count", "0")
         self.assertNotEqual(bad.returncode, 0)
 
     def test_all_generated_manifests_yield_features(self):
-        self.run_cmd("python3", "src/generate_samples.py", "--count", "60", "--seed", "3", check=True)
-        sys.path.insert(0, str(ROOT / "src"))
-        try:
-            from k8s_features import extract_features, load_workloads, FEATURE_COLS
-            for path in sorted((self.work / "data/raw/samples/synthetic").glob("*.yaml")):
-                workloads = load_workloads(path)
-                self.assertEqual(len(workloads), 1, path)
-                features = extract_features(workloads[0][1])
-                self.assertEqual(set(features), set(FEATURE_COLS))
-        finally:
-            sys.path.remove(str(ROOT / "src"))
+        self.run_cmd("python3", "src/data/generate_samples.py", "--count", "60", "--seed", "3", check=True)
+        from k8s_features import extract_features, load_workloads, FEATURE_COLS
+        for path in sorted((self.work / "data/raw/samples/synthetic").glob("*.yaml")):
+            workloads = load_workloads(path)
+            self.assertEqual(len(workloads), 1, path)
+            features = extract_features(workloads[0][1])
+            self.assertEqual(set(features), set(FEATURE_COLS))
 
 
 class ClusterDatasetTests(PipelineCase):
     def build(self):
-        return self.run_cmd("python3", "src/build_cluster_dataset.py")
+        return self.run_cmd("python3", "src/data/build_cluster_dataset.py")
 
     def test_complete_folder_becomes_row_and_counts_falco_correctly(self):
         self.write_collection("data/raw/snapshots/s1/secure")
@@ -295,7 +298,7 @@ class ClusterDatasetTests(PipelineCase):
         self.write_collection("data/raw/latest/insecure")
         self.write_collection("data/raw/snapshots/s1/secure")
         out = self.work / "ri.csv"
-        result = self.run_cmd("python3", "src/build_cluster_dataset.py", "--report-input", str(out))
+        result = self.run_cmd("python3", "src/data/build_cluster_dataset.py", "--report-input", str(out))
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         import pandas as pd
         ri = pd.read_csv(out)
@@ -304,7 +307,7 @@ class ClusterDatasetTests(PipelineCase):
 
     def test_report_input_fails_when_latest_missing(self):
         self.write_collection("data/raw/snapshots/s1/secure")
-        result = self.run_cmd("python3", "src/build_cluster_dataset.py",
+        result = self.run_cmd("python3", "src/data/build_cluster_dataset.py",
                               "--report-input", str(self.work / "ri.csv"))
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("No 'latest' rows", result.stdout + result.stderr)
@@ -363,7 +366,7 @@ class SnapshotScriptTests(PipelineCase):
         self.assertTrue((self.work / "data/raw/snapshots/snap_01/secure/falco.log").is_file())
         self.assertFalse((self.work / "data/processed/final_security_dataset.csv").exists())
         self.run_cmd("scripts/take_snapshot.sh", "snap_02", env={"BUILD_DATASET": "0"}, check=True)
-        self.run_cmd("python3", "src/build_cluster_dataset.py", check=True)
+        self.run_cmd("python3", "src/data/build_cluster_dataset.py", check=True)
         import pandas as pd
         df = pd.read_csv(self.work / "data/processed/final_security_dataset.csv")
         self.assertEqual(sorted(set(df["snapshot"])), ["snap_01", "snap_02"])
@@ -476,7 +479,7 @@ class RunAllTests(PipelineCase):
 
 class CollectorTests(PipelineCase):
     def test_cluster_features(self):
-        result = self.run_cmd("python3", "src/collect_cluster_features.py", "ctx", check=True)
+        result = self.run_cmd("python3", "src/data/collect_cluster_features.py", "ctx", check=True)
         data = json.loads(result.stdout)
         # deployment (1) + bare pod (1); the owned pod is not double counted
         self.assertEqual(data["workload_count"], 2)
@@ -488,7 +491,7 @@ class CollectorTests(PipelineCase):
         self.assertEqual(data["missing_network_policies"], 1)
 
     def test_cluster_features_kubectl_failure_is_clean(self):
-        result = self.run_cmd("python3", "src/collect_cluster_features.py", "ctx",
+        result = self.run_cmd("python3", "src/data/collect_cluster_features.py", "ctx",
                               env={"FAKE_KUBECTL_FAIL": "1"})
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("connection refused", result.stderr)
@@ -496,9 +499,9 @@ class CollectorTests(PipelineCase):
 
     def test_falco_collection_and_errors(self):
         out = self.work / "falco.log"
-        self.run_cmd("python3", "src/collect_falco.py", "ctx", str(out), check=True)
+        self.run_cmd("python3", "src/data/collect_falco.py", "ctx", str(out), check=True)
         self.assertIn("Sensitive file opened", out.read_text())
-        missing = self.run_cmd("python3", "src/collect_falco.py", "ctx", str(out),
+        missing = self.run_cmd("python3", "src/data/collect_falco.py", "ctx", str(out),
                                env={"FAKE_NO_FALCO": "1"})
         self.assertNotEqual(missing.returncode, 0)
         self.assertIn("No Falco pod found", missing.stderr)
@@ -531,13 +534,13 @@ class TrainAndReportTests(PipelineCase):
 
     def test_train_then_report_for_multiple_rows(self):
         df = self.make_dataset()
-        train = self.run_cmd("python3", "src/train_security_models.py")
+        train = self.run_cmd("python3", "src/models/train_security_models.py")
         self.assertEqual(train.returncode, 0, train.stdout + train.stderr)
         self.assertIn("grouped 5-fold", train.stdout)
         self.assertTrue((self.work / "models/security_models.joblib").is_file())
 
         df.iloc[[0, -1]].to_csv(self.work / "report_input.csv", index=False)
-        report = self.run_cmd("python3", "src/generate_report.py", "report_input.csv")
+        report = self.run_cmd("python3", "src/reporting/generate_report.py", "report_input.csv")
         self.assertEqual(report.returncode, 0, report.stdout + report.stderr)
         text = (self.work / "reports/security_report.txt").read_text()
         self.assertEqual(text.count("KUBERNETES SECURITY ASSESSMENT"), 2)
@@ -546,18 +549,18 @@ class TrainAndReportTests(PipelineCase):
 
     def test_train_refuses_too_little_data(self):
         self.make_dataset(per_class_snapshots=2)
-        result = self.run_cmd("python3", "src/train_security_models.py")
+        result = self.run_cmd("python3", "src/models/train_security_models.py")
         self.assertNotEqual(result.returncode, 0)
 
     def test_report_without_model_or_bad_input(self):
         self.make_dataset()
-        result = self.run_cmd("python3", "src/generate_report.py", "data/processed/final_security_dataset.csv")
+        result = self.run_cmd("python3", "src/reporting/generate_report.py", "data/processed/final_security_dataset.csv")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Model file not found", result.stderr)
 
-        self.run_cmd("python3", "src/train_security_models.py", check=True)
+        self.run_cmd("python3", "src/models/train_security_models.py", check=True)
         (self.work / "bad.csv").write_text("snapshot,environment\nx,secure\n")
-        bad = self.run_cmd("python3", "src/generate_report.py", "bad.csv")
+        bad = self.run_cmd("python3", "src/reporting/generate_report.py", "bad.csv")
         self.assertNotEqual(bad.returncode, 0)
         self.assertIn("missing model features", bad.stderr)
 

@@ -1,0 +1,44 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: {{ include "k8s-security.fullname" . }}-validate
+  labels:
+    {{- include "k8s-security.labels" . | nindent 4 }}
+  {{- if .Values.webhook.certManager.enabled }}
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "k8s-security.fullname" . }}-tls
+  {{- end }}
+webhooks:
+  - name: validate.{{ include "k8s-security.name" . }}.platform
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: {{ .Values.webhook.timeoutSeconds }}
+    failurePolicy: {{ .Values.webhook.failurePolicy }}
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "kube-public", "kube-node-lease", {{ .Release.Namespace | quote }}]
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+        scope: "Namespaced"
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+        scope: "Namespaced"
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        resources: ["jobs", "cronjobs"]
+        scope: "Namespaced"
+    clientConfig:
+      service:
+        name: {{ include "k8s-security.fullname" . }}
+        namespace: {{ .Release.Namespace }}
+        path: "/validate"
+        port: {{ .Values.service.port }}
+      caBundle: {{ .Values.webhook.caBundle | quote }}

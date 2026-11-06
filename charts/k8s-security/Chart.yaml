@@ -1,0 +1,17 @@
+apiVersion: v2
+name: k8s-security
+description: Production-grade Kubernetes ML Security Assessment Platform & Dynamic Admission Controller
+type: application
+version: 2.0.0
+appVersion: "2.0.0"
+keywords:
+  - security
+  - admission-controller
+  - machine-learning
+  - vulnerability-scanner
+  - compliance
+maintainers:
+  - name: Kubernetes Security Team
+    email: security@platform.internal
+sources:
+  - https://github.com/platform/k8s-security-assessment

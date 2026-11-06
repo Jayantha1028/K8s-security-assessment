@@ -22,6 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "src" / "core"))
+import paths
 
 from comparator.scanner_benchmark import ScannerComparator, BenchmarkComparisonResult
 

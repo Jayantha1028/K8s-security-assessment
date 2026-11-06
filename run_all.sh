@@ -109,8 +109,9 @@ list_features() {
   echo " 15. security-chaos-testing: Security Chaos Engineering (SCE 1-6 Resilience Suite)"
   echo " 16. executive-audit      : Enterprise Compliance Audit HTML & 9-Page High-Res Vector PDF"
   echo " 17. scanner-comparison   : Native Independent Scanner vs Kubescape vs Trivy Benchmark"
-  echo " 18. test-suite           : Full 67-Test Verification, Rigor & Chaos Assertion Suite"
-  echo " 19. snowflake-sync       : Enterprise Snowflake Cloud Data Warehouse Delta Export"
+  echo " 18. prometheus-metrics   : Prometheus Telemetry, Model 12 Unsupervised Anomaly Inference & Exporter"
+  echo " 19. test-suite           : Full 83-Test Verification, Rigor & Chaos Assertion Suite"
+  echo " 20. snowflake-sync       : Enterprise Snowflake Cloud Data Warehouse Delta Export"
 }
 
 # Scorecard Tracker
@@ -231,92 +232,96 @@ main() {
 
   # 1. 56-Vulnerability Taxonomy & Audit
   run_step "01" "56-Vulnerability Taxonomy Audit" \
-    "python3 src/audit_56_vulnerabilities.py"
+    "python3 src/scanners/audit_56_vulnerabilities.py"
 
   # 2. Build 500-Workload Dataset
   run_step "02" "500-Workload Dataset Aggregation" \
-    "python3 src/build_real_world_dataset.py"
+    "python3 src/data/build_real_world_dataset.py"
 
   # 3. Data Cleaning & Integrity Check
   run_step "03" "Dataset Cleaning & Schema Validation" \
-    "python3 src/data_cleaning.py"
+    "python3 src/data/data_cleaning.py"
 
   # 4. Train 11 Models Matrix & Dynamic Stacker
   run_step "04" "11-Model Machine Learning Matrix" \
-    "python3 src/train_11_models.py"
+    "python3 src/models/train_11_models.py"
 
   # 5. 12-Gate Statistical & Clinical Accuracy Rigor Benchmark
   run_step "05" "12-Gate Statistical & Clinical Rigor Benchmark" \
-    "python3 src/evaluate_model_rigor.py"
+    "python3 src/evaluation/evaluate_model_rigor.py"
 
   # 6. Bayesian Multi-Plane Threat Scoring Engine
   run_step "06" "Bayesian Threat Scoring & AHP Prior Engine" \
-    "python3 src/bayesian_scoring_engine.py"
+    "python3 src/models/bayesian_scoring_engine.py"
 
   # 7. Dual-Mode GMM Zero-Day Outlier Detector
   run_step "07" "Dual-Mode GMM Zero-Day Anomaly Detector" \
-    "python3 src/dual_mode_gmm.py"
+    "python3 src/models/dual_mode_gmm.py"
 
   # 8. Explainable AI (TreeSHAP) Threat Attribution
   run_step "08" "Explainable AI (TreeSHAP) Feature Attribution" \
-    "python3 src/xai_threat_attribution.py"
+    "python3 src/models/xai_threat_attribution.py"
 
   # 9. Automated Security Remediation Generator
   run_step "09" "Automated Security Remediation Engine" \
-    "python3 src/auto_remediate.py manifests/insecure/weak-deployment.yaml --output manifests/remediated/weak-deployment-hardened.yaml"
+    "python3 src/scanners/auto_remediate.py manifests/insecure/weak-deployment.yaml --output manifests/remediated/weak-deployment-hardened.yaml"
 
   # 10. Shift-Left CI/CD Admission Gate
   run_step "10" "Shift-Left CI/CD Gate & PR Linter" \
-    "python3 src/ci_security_gate.py 'manifests/secure/*.yaml'"
+    "python3 src/evaluation/ci_security_gate.py 'manifests/secure/*.yaml'"
 
   # 11. External Ground Truth (Kubernetes Goat Benchmark)
   run_step "11" "Kubernetes Goat Benchmark Validation" \
-    "python3 src/benchmark_k8s_goat.py"
+    "python3 src/evaluation/benchmark_k8s_goat.py"
 
   # 12. Publication-Grade Model Comparison Charts
   run_step "12" "Benchmark Charts Generator (SVG & PNG)" \
-    "python3 src/plot_benchmark.py"
+    "python3 src/reporting/plot_benchmark.py"
 
   # 13. Executive Multi-Cluster Security Report
   run_step "13" "Security Assessment Report & Posture Meter" \
-    "python3 src/generate_report.py"
+    "python3 src/reporting/generate_report.py"
 
   # 14. Responsive Single-Page HTML Dashboard
   run_step "14" "Interactive Single-Page HTML Dashboard" \
-    "python3 src/generate_dashboard.py"
+    "python3 src/reporting/generate_dashboard.py"
 
   # 15. Security Chaos Engineering (SCE 1-6 Resilience Suite)
   run_step "15" "Security Chaos Engineering Resilience Suite" \
-    "python3 src/security_chaos_testing.py"
+    "python3 src/evaluation/security_chaos_testing.py"
 
   # 16. Executive Compliance Audit & 9-Page Vector PDF Exporter
   run_step "16" "Executive Compliance Audit HTML & 9-Page PDF" \
-    "python3 src/generate_executive_audit.py"
+    "python3 src/reporting/generate_executive_audit.py"
 
   # 17. Native Scanner vs Kubescape vs Trivy Benchmark
   run_step "17" "Native Security Scanner & Industry Comparator" \
     "python3 comparator/comparator_cli.py"
 
-  # 18. Full 67-Test Verification & Regression Suite
+  # 18. Prometheus Runtime Telemetry, Model 12 Anomaly Inference & OpenMetrics Exporter
+  run_step "18" "Prometheus Telemetry & Model 12 Anomaly Detector" \
+    "python3 src/data/collect_prometheus.py --timeout 0.5 && python3 src/evaluation/evaluate_prometheus_anomalies.py && python3 src/integrations/prometheus_exporter.py --export-file"
+
+  # 19. Full 83-Test Verification & Regression Suite
   if [ "$SKIP_TESTS" -eq 1 ]; then
-    STEP_NAMES+=("Full 67-Test Verification Suite")
+    STEP_NAMES+=("Full 83-Test Verification Suite")
     STEP_DURATIONS+=("0.00s")
     STEP_STATUS+=("SKIPPED")
-    echo -e "\n${YELLOW}ℹ [INFO] Skipping Stage 18 (--skip-tests specified).${RESET}"
+    echo -e "\n${YELLOW}ℹ [INFO] Skipping Stage 19 (--skip-tests specified).${RESET}"
   else
-    run_step "18" "Full 67-Test Verification Suite" \
+    run_step "19" "Full 73-Test Verification Suite" \
       "python3 -m unittest discover -s tests"
   fi
 
-  # 19. Enterprise Snowflake Cloud Data Warehouse Sync
+  # 20. Enterprise Snowflake Cloud Data Warehouse Sync
   if [ "$SKIP_SNOWFLAKE" -eq 1 ]; then
     STEP_NAMES+=("Snowflake Data Warehouse Delta Export")
     STEP_DURATIONS+=("0.00s")
     STEP_STATUS+=("SKIPPED")
-    echo -e "\n${YELLOW}ℹ [INFO] Skipping Stage 19 (--skip-snowflake specified).${RESET}"
+    echo -e "\n${YELLOW}ℹ [INFO] Skipping Stage 20 (--skip-snowflake specified).${RESET}"
   else
-    run_step "19" "Snowflake Data Warehouse Delta Export" \
-      "python3 src/export_to_snowflake.py --incremental" 1
+    run_step "20" "Snowflake Data Warehouse Delta Export" \
+      "python3 src/integrations/export_to_snowflake.py --incremental" 1
   fi
 
   local overall_end

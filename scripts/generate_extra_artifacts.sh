@@ -11,20 +11,20 @@ echo "=== GENERATING OPTIONAL SIDE-OUTPUT ARTIFACTS ==="
 
 # 1. Standard Text Security Report
 echo "1. Generating Standard Assessment Report..."
-python3 src/generate_report.py > /dev/null
+python3 src/reporting/generate_report.py > /dev/null
 echo "Assessment report saved to: reports/security_report.txt"
 
 # 2. Interactive HTML Dashboard
 echo "2. Generating Interactive HTML Dashboard..."
-python3 src/generate_dashboard.py
+python3 src/reporting/generate_dashboard.py
 
 # 3. Comparative Benchmark Plots
 echo "3. Generating Comparative Benchmark Plot..."
-python3 src/plot_benchmark.py
+python3 src/reporting/plot_benchmark.py
 
 # 4. Auto-Remediation Example
 echo "4. Generating Remediation Patch Example..."
-python3 src/auto_remediate.py manifests/insecure/weak-deployment.yaml \
+python3 src/scanners/auto_remediate.py manifests/insecure/weak-deployment.yaml \
   --output data/processed/remediated-weak-deployment.yaml > /dev/null
 echo "Remediated manifest saved to: data/processed/remediated-weak-deployment.yaml"
 

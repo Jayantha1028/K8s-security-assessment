@@ -20,14 +20,17 @@ import joblib
 import pandas as pd
 import numpy as np
 
-# Add src to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Ensure core and parent src are in sys.path
+_CORE_DIR = Path(__file__).resolve().parents[1] / "core"
+if str(_CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(_CORE_DIR))
+    sys.path.insert(0, str(_CORE_DIR.parent))
+import paths
 import train_11_models
 from train_11_models import ConsolidatedSecurityModel, FinalMasterModel
 from vulnerability_taxonomy_56 import TAXONOMY_56, PLANES, scan_file_for_vulnerabilities
 from k8s_features import extract_features, load_workloads
 from bayesian_scoring_engine import compute_probabilistic_penalties, AHP_CR
-import paths
 
 FEATURES = [
     "kubescape_failed",

@@ -20,10 +20,12 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Ensure project root is in sys.path
+# Ensure project root and core paths are in sys.path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "src" / "core"))
+import paths
 
 from native_security_scanner import NativeSecurityScanner, ScanReport
 from comparator.cve_intelligence import lookup_image_cves, summarize_cve_counts

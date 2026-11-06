@@ -40,7 +40,7 @@ fi
 
 echo
 # 2. Run the 4-model evaluation and generate report
-python3 src/benchmark_k8s_goat.py "$OUTPUT_DIR" "$REPORT_FILE"
+python3 src/evaluation/benchmark_k8s_goat.py "$OUTPUT_DIR" "$REPORT_FILE"
 
 echo
 echo "✓ Benchmark completed successfully."

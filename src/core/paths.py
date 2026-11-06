@@ -8,12 +8,25 @@ scripts/lib.sh mirrors the data/ locations for the shell side.
 from pathlib import Path
 import sys
 
-# Ensure src/ and root directories are importable from anywhere
+# Ensure src/, core/, root, and all subpackages are importable from anywhere
 CORE_DIR = Path(__file__).resolve().parent
 SRC_DIR = CORE_DIR.parent
 ROOT = SRC_DIR.parent
 
-for p in (str(SRC_DIR), str(ROOT)):
+_DIRS_TO_ADD = [
+    str(SRC_DIR),
+    str(ROOT),
+    str(CORE_DIR),
+    str(SRC_DIR / "core"),
+    str(SRC_DIR / "data"),
+    str(SRC_DIR / "scanners"),
+    str(SRC_DIR / "models"),
+    str(SRC_DIR / "evaluation"),
+    str(SRC_DIR / "reporting"),
+    str(SRC_DIR / "integrations"),
+]
+
+for p in _DIRS_TO_ADD:
     if p not in sys.path:
         sys.path.insert(0, p)
 
@@ -50,6 +63,7 @@ REPORTS_SCANNER_COMP = REPORTS_DIR / "scanner_comparison"
 REPORTS_CI_CD = REPORTS_DIR / "ci_cd"
 REPORTS_SQL = REPORTS_DIR / "sql"
 REPORTS_LOGS = REPORTS_DIR / "logs"
+REPORTS_METRICS = REPORTS_DIR / "metrics"
 
 
 def rel(path):

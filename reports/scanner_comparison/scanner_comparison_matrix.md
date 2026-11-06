@@ -1,5 +1,5 @@
 # Kubernetes Security Scanner Comparison Matrix
-Generated: 2026-11-04 07:53:00
+Generated: 2026-11-06 11:18:59
 
 This benchmark evaluates the **Native Independent Security Scanner** against industry-standard scanners (**Kubescape** and **Trivy**) across finding recall, execution latency, and air-gapped capability.
 

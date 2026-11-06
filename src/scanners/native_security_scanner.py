@@ -37,6 +37,13 @@ SRC_DIR = Path(__file__).resolve().parent
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
+# Ensure core and parent src are in sys.path
+import sys
+from pathlib import Path
+_CORE_DIR = Path(__file__).resolve().parents[1] / "core"
+if str(_CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(_CORE_DIR))
+    sys.path.insert(0, str(_CORE_DIR.parent))
 import paths
 from vulnerability_taxonomy_56 import TAXONOMY_56
 
@@ -96,8 +103,16 @@ class NativeSecurityScanner:
     the 56-vulnerability taxonomy, CIS Benchmark v2.0, and NSA hardening standards.
     """
 
-    def __init__(self, entropy_threshold: float = 3.8):
+    def __init__(self, entropy_threshold: float = 3.8, enable_deep_layer_scan: bool = False):
         self.entropy_threshold = entropy_threshold
+        self.enable_deep_layer_scan = enable_deep_layer_scan
+        self._layer_scanner = None
+        if enable_deep_layer_scan:
+            try:
+                from container_layer_scanner import HybridContainerLayerScanner
+                self._layer_scanner = HybridContainerLayerScanner()
+            except Exception:
+                self._layer_scanner = None
 
     def scan_yaml_content(self, content: str, source_name: str = "raw_manifest") -> ScanReport:
         """Scan raw multi-document YAML string in memory."""
@@ -123,6 +138,17 @@ class NativeSecurityScanner:
 
         # Extract features and audit findings
         self._audit_documents(documents, report)
+        self._compile_features_and_score(report)
+        return report
+
+    def scan_dict(self, obj: Dict[str, Any], source_name: str = "k8s_api_object") -> ScanReport:
+        """Scan a pre-parsed Kubernetes object dictionary directly (e.g. from AdmissionReview)."""
+        report = ScanReport(manifest_path=source_name)
+        if not isinstance(obj, dict):
+            report.compliance_score = 0.0
+            report.risk_tier = "High"
+            return report
+        self._audit_documents([obj], report)
         self._compile_features_and_score(report)
         return report
 
@@ -323,10 +349,15 @@ class NativeSecurityScanner:
                                   desc="Risky ImagePullPolicy (IfNotPresent with mutable tags)",
                                   remed="Set imagePullPolicy: Always when using mutable tags")
 
-            # Native CVE Intelligence Lookup
+            # Native CVE Intelligence & Deep Layer Unpacking
             try:
-                from comparator.cve_intelligence import lookup_image_cves
-                cves = lookup_image_cves(image)
+                if self.enable_deep_layer_scan and self._layer_scanner:
+                    sbom_report = self._layer_scanner.scan_image(image)
+                    cves = sbom_report.critical_cves + sbom_report.high_cves
+                else:
+                    from comparator.cve_intelligence import lookup_image_cves
+                    cves = lookup_image_cves(image)
+
                 for cve in cves:
                     if cve.severity == "CRITICAL":
                         self._add_finding(report, "V16", target=f"{c_target}:{cve.package}",

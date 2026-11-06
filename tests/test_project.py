@@ -9,6 +9,11 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
+for _sub in ['core', 'data', 'scanners', 'models', 'evaluation', 'reporting', 'integrations']:
+    _p = str(ROOT / 'src' / _sub)
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
 
 from data_cleaning import clean_dataset
 from k8s_features import extract_features, image_is_floating, load_workloads

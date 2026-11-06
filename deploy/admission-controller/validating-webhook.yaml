@@ -1,0 +1,41 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: k8s-security-validating-webhook
+  labels:
+    app.kubernetes.io/name: k8s-security-webhook
+webhooks:
+  - name: validate.security.k8s.io
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: 3
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "kube-public", "kube-node-lease", "k8s-security"]
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+        scope: "Namespaced"
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+        scope: "Namespaced"
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        resources: ["jobs", "cronjobs"]
+        scope: "Namespaced"
+    clientConfig:
+      service:
+        name: k8s-security-webhook
+        namespace: k8s-security
+        path: "/validate"
+        port: 443
+      caBundle: ${CA_BUNDLE}

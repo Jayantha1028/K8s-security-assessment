@@ -1,0 +1,89 @@
+# HELP k8s_security_workload_master_score Model 11 Unified Security Assessment Score (0-100)
+# TYPE k8s_security_workload_master_score gauge
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0001",risk_tier="Medium"} 69.6
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0002",risk_tier="Medium"} 41.6
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0003",risk_tier="Medium"} 50.6
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0004",risk_tier="Low"} 70.2
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0005",risk_tier="Low"} 92.3
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0006",risk_tier="High"} 24.6
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0007",risk_tier="Low"} 84.3
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0008",risk_tier="Medium"} 55.9
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0009",risk_tier="Low"} 86.7
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0010",risk_tier="High"} 39.6
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0011",risk_tier="High"} 37.2
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0012",risk_tier="High"} 16.9
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0013",risk_tier="Medium"} 44.8
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0014",risk_tier="Low"} 90.3
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0015",risk_tier="Low"} 92.3
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0016",risk_tier="Low"} 89.3
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0017",risk_tier="Medium"} 57.8
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0018",risk_tier="Medium"} 43.7
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0019",risk_tier="Low"} 73.1
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0020",risk_tier="Low"} 91.9
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0021",risk_tier="Low"} 91.9
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0022",risk_tier="High"} 29.0
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0023",risk_tier="Medium"} 66.6
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0024",risk_tier="Low"} 75.2
+k8s_security_workload_master_score{namespace="synthetic",workload="sample-0025",risk_tier="High"} 21.8
+# HELP k8s_security_gmm_anomaly_status Dual-Mode GMM Zero-Day Outlier status (1=Normal, -1=Outlier)
+# TYPE k8s_security_gmm_anomaly_status gauge
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0001"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0002"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0003"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0004"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0005"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0006"} -1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0007"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0008"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0009"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0010"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0011"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0012"} -1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0013"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0014"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0015"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0016"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0017"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0018"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0019"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0020"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0021"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0022"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0023"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0024"} 1
+k8s_security_gmm_anomaly_status{namespace="synthetic",workload="sample-0025"} -1
+# HELP k8s_security_fleet_mean_score Average security posture score across all cluster workloads
+# TYPE k8s_security_fleet_mean_score gauge
+k8s_security_fleet_mean_score 61.49
+# HELP k8s_security_fleet_evaluated_workloads_total Total number of evaluated workloads
+# TYPE k8s_security_fleet_evaluated_workloads_total gauge
+k8s_security_fleet_evaluated_workloads_total 25
+# HELP k8s_security_audit_gate_passed Overall security compliance gate result (1=Pass, 0=Fail)
+# TYPE k8s_security_audit_gate_passed gauge
+k8s_security_audit_gate_passed 1
+# HELP k8s_security_assessment_timestamp_seconds Epoch timestamp of latest security assessment run
+# TYPE k8s_security_assessment_timestamp_seconds gauge
+k8s_security_assessment_timestamp_seconds 1793927137
+# HELP k8s_security_vulnerabilities_total Total vulnerabilities tracked across the 7 defense planes
+# TYPE k8s_security_vulnerabilities_total gauge
+k8s_security_vulnerabilities_total{plane="P1",severity="CRITICAL"} 3
+k8s_security_vulnerabilities_total{plane="P1",severity="HIGH"} 6
+k8s_security_vulnerabilities_total{plane="P1",severity="MEDIUM"} 4
+k8s_security_vulnerabilities_total{plane="P2",severity="CRITICAL"} 2
+k8s_security_vulnerabilities_total{plane="P2",severity="HIGH"} 3
+k8s_security_vulnerabilities_total{plane="P2",severity="MEDIUM"} 2
+k8s_security_vulnerabilities_total{plane="P3",severity="CRITICAL"} 5
+k8s_security_vulnerabilities_total{plane="P3",severity="HIGH"} 1
+k8s_security_vulnerabilities_total{plane="P3",severity="MEDIUM"} 2
+k8s_security_vulnerabilities_total{plane="P4",severity="CRITICAL"} 0
+k8s_security_vulnerabilities_total{plane="P4",severity="HIGH"} 4
+k8s_security_vulnerabilities_total{plane="P4",severity="MEDIUM"} 2
+k8s_security_vulnerabilities_total{plane="P5",severity="CRITICAL"} 4
+k8s_security_vulnerabilities_total{plane="P5",severity="HIGH"} 3
+k8s_security_vulnerabilities_total{plane="P5",severity="MEDIUM"} 0
+k8s_security_vulnerabilities_total{plane="P6",severity="CRITICAL"} 2
+k8s_security_vulnerabilities_total{plane="P6",severity="HIGH"} 2
+k8s_security_vulnerabilities_total{plane="P6",severity="MEDIUM"} 1
+k8s_security_vulnerabilities_total{plane="P7",severity="CRITICAL"} 3
+k8s_security_vulnerabilities_total{plane="P7",severity="HIGH"} 3
+k8s_security_vulnerabilities_total{plane="P7",severity="MEDIUM"} 0

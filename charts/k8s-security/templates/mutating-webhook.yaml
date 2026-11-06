@@ -1,0 +1,42 @@
+{{- if .Values.policy.enableMutation -}}
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ include "k8s-security.fullname" . }}-mutate
+  labels:
+    {{- include "k8s-security.labels" . | nindent 4 }}
+  {{- if .Values.webhook.certManager.enabled }}
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "k8s-security.fullname" . }}-tls
+  {{- end }}
+webhooks:
+  - name: mutate.{{ include "k8s-security.name" . }}.platform
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: {{ .Values.webhook.timeoutSeconds }}
+    failurePolicy: Ignore
+    reinvocationPolicy: IfNeeded
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "kube-public", "kube-node-lease", {{ .Release.Namespace | quote }}]
+    rules:
+      - operations: ["CREATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+        scope: "Namespaced"
+      - operations: ["CREATE"]
+        apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        resources: ["deployments", "daemonsets", "statefulsets"]
+        scope: "Namespaced"
+    clientConfig:
+      service:
+        name: {{ include "k8s-security.fullname" . }}
+        namespace: {{ .Release.Namespace }}
+        path: "/mutate"
+        port: {{ .Values.service.port }}
+      caBundle: {{ .Values.webhook.caBundle | quote }}
+{{- end }}

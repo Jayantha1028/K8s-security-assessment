@@ -56,6 +56,13 @@ from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, f1_score
 import xgboost as xgb
 
+# Ensure core and parent src are in sys.path
+import sys
+from pathlib import Path
+_CORE_DIR = Path(__file__).resolve().parents[1] / "core"
+if str(_CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(_CORE_DIR))
+    sys.path.insert(0, str(_CORE_DIR.parent))
 import paths
 import train_11_models
 from build_cluster_dataset import load_collection, score_row, visible_dirs, ENVIRONMENTS

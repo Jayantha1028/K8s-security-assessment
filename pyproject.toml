@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "k8s-sec"
+version = "2.0.0"
+description = "Kubernetes ML Security Assessment Platform & Dynamic Admission Controller"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "Kubernetes Security Assessment Team" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Topic :: Security",
+]
+
+[project.scripts]
+k8s-sec = "cli.main:main"

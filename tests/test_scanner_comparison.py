@@ -13,6 +13,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
+for _sub in ['core', 'data', 'scanners', 'models', 'evaluation', 'reporting', 'integrations']:
+    _p = str(ROOT / 'src' / _sub)
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
 
 from comparator.cve_intelligence import (
     lookup_image_cves,

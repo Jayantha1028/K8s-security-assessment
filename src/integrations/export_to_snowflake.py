@@ -36,10 +36,13 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 import snowflake.connector
 from snowflake.connector.pandas_tools import write_pandas
 
-# Add src to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from vulnerability_taxonomy_56 import TAXONOMY_56, PLANES, scan_file_for_vulnerabilities
+# Ensure core and parent src are in sys.path
+_CORE_DIR = Path(__file__).resolve().parents[1] / "core"
+if str(_CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(_CORE_DIR))
+    sys.path.insert(0, str(_CORE_DIR.parent))
 import paths
+from vulnerability_taxonomy_56 import TAXONOMY_56, PLANES, scan_file_for_vulnerabilities
 
 # Support optional .env file loading if present
 env_file = paths.ROOT / ".env"

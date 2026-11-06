@@ -15,10 +15,13 @@ from pathlib import Path
 from typing import Dict, Any, List, Set
 import pandas as pd
 
-# Add src to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from vulnerability_taxonomy_56 import TAXONOMY_56, PLANES, scan_file_for_vulnerabilities
+# Ensure core and parent src are in sys.path
+_CORE_DIR = Path(__file__).resolve().parents[1] / "core"
+if str(_CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(_CORE_DIR))
+    sys.path.insert(0, str(_CORE_DIR.parent))
 import paths
+from vulnerability_taxonomy_56 import TAXONOMY_56, PLANES, scan_file_for_vulnerabilities
 
 def audit_all_56_vulnerabilities():
     print("=" * 80)

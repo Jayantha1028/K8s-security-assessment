@@ -31,6 +31,13 @@ import numpy as np
 
 # Add src to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Ensure core and parent src are in sys.path
+import sys
+from pathlib import Path
+_CORE_DIR = Path(__file__).resolve().parents[1] / "core"
+if str(_CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(_CORE_DIR))
+    sys.path.insert(0, str(_CORE_DIR.parent))
 import paths
 from vulnerability_taxonomy_56 import TAXONOMY_56, PLANES
 from bayesian_scoring_engine import AHP_PAIRWISE_MATRIX, compute_ahp_weights
@@ -1008,6 +1015,8 @@ def main():
         print(f"  - PDF Document: {paths.rel(pdf_output_file)}")
     print("=" * 80)
 
+
+generate_compliance_reports = main
 
 if __name__ == "__main__":
     main()

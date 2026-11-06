@@ -1,0 +1,73 @@
+{
+  "cycle_count": 2,
+  "last_cycle_timestamp": 1793944138,
+  "total_workloads_monitored": 3,
+  "anomalies_intercepted_total": 4,
+  "clean_samples_learned_total": 2,
+  "workload_evaluations": [
+    {
+      "namespace": "production",
+      "workload": "secured-app",
+      "anomaly_score": 17.38,
+      "is_anomaly": false,
+      "drivers": []
+    },
+    {
+      "namespace": "staging",
+      "workload": "medium-app",
+      "anomaly_score": 84.25,
+      "is_anomaly": true,
+      "drivers": []
+    },
+    {
+      "namespace": "default",
+      "workload": "vulnerable-app",
+      "anomaly_score": 88.15,
+      "is_anomaly": true,
+      "drivers": [
+        {
+          "metric": "network_tx_kbps",
+          "observed_value": 1850.0,
+          "baseline_mean": 49.4,
+          "z_deviation": 81.68,
+          "threat_indication": "Potential C2 Data Exfiltration / Egress Spike (MITRE T1048)"
+        },
+        {
+          "metric": "restart_rate_per_hour",
+          "observed_value": 4.5,
+          "baseline_mean": 0.0,
+          "z_deviation": 21.86,
+          "threat_indication": "Exploit-Induced Crash-Loop / Segfault Attack"
+        },
+        {
+          "metric": "cpu_usage_cores",
+          "observed_value": 1.85,
+          "baseline_mean": 0.23,
+          "z_deviation": 5.15,
+          "threat_indication": "Suspected Cryptomining / CPU Exhaustion (MITRE T1496)"
+        },
+        {
+          "metric": "falco_alerts_rate",
+          "observed_value": 0.85,
+          "baseline_mean": 0.0,
+          "z_deviation": 4.55,
+          "threat_indication": "Kernel Syscall Security Violation (eBPF Alert)"
+        },
+        {
+          "metric": "apiserver_403_rate",
+          "observed_value": 0.45,
+          "baseline_mean": 0.0,
+          "z_deviation": 2.41,
+          "threat_indication": "Kubernetes API RBAC Probing / Reconnaissance"
+        },
+        {
+          "metric": "memory_working_set_mb",
+          "observed_value": 490.0,
+          "baseline_mean": 190.36,
+          "z_deviation": 2.21,
+          "threat_indication": "Elevated Operational Anomaly"
+        }
+      ]
+    }
+  ]
+}

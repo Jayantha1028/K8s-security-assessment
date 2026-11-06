@@ -56,10 +56,10 @@ trivy k8s \
   "$CONTEXT" &
 pids+=($!)
 
-python3 src/collect_cluster_features.py "$CONTEXT" > "$OUTPUT/cluster_features.json" &
+python3 src/data/collect_cluster_features.py "$CONTEXT" > "$OUTPUT/cluster_features.json" &
 pids+=($!)
 
-python3 src/collect_falco.py "$CONTEXT" "$OUTPUT/falco.log" &
+python3 src/data/collect_falco.py "$CONTEXT" "$OUTPUT/falco.log" &
 pids+=($!)
 
 fail=0

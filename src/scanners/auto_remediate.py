@@ -1,38 +1,61 @@
 #!/usr/bin/env python3
 """
-Automated Kubernetes Security Remediation Generator.
+auto_remediate.py
+=================
+Automated Kubernetes Security Remediation Engine.
 
-Analyzes an insecure Kubernetes workload manifest, applies NSA/CISA hardening
-rules, and generates a remediated, hardened YAML manifest with a unified diff.
+Applies NSA/CISA and CIS Benchmark v2.0 hardening rules across any Kubernetes workload:
+- Pod
+- Deployment
+- DaemonSet
+- StatefulSet
+- Job / CronJob
 
-Run separately as a side-output (NOT part of main pipeline):
-    python3 src/auto_remediate.py manifests/insecure/weak-deployment.yaml [--output manifests/remediated/hardened.yaml] [--diff]
+Functions:
+- remediate_workload_dict: In-memory dictionary hardening (used by Admission Controller)
+- remediate_yaml_string: In-memory YAML string hardening (used by Web Console & CLI)
+- remediate_manifest: File-based hardening with optional unified diff
 """
 
 import argparse
 import copy
 import difflib
-import sys
 from pathlib import Path
+import sys
+from typing import Any, Dict, List, Optional, Tuple
 import yaml
 
 
-def remediate_manifest(manifest_path, output_path=None, show_diff=True):
-    path = Path(manifest_path)
-    if not path.is_file():
-        raise SystemExit(f"File not found: {manifest_path}")
+def _get_pod_spec(workload_dict: Dict[str, Any]) -> Tuple[Optional[Dict[str, Any]], str]:
+    """Retrieve the mutable pod spec dictionary and path prefix based on workload kind."""
+    kind = workload_dict.get("kind", "")
+    if kind == "Pod":
+        return workload_dict.setdefault("spec", {}), "spec"
+    elif kind in ("Deployment", "DaemonSet", "StatefulSet", "Job", "ReplicaSet"):
+        spec = workload_dict.setdefault("spec", {})
+        template = spec.setdefault("template", {})
+        return template.setdefault("spec", {}), "spec.template.spec"
+    elif kind == "CronJob":
+        spec = workload_dict.setdefault("spec", {})
+        job_template = spec.setdefault("jobTemplate", {})
+        j_spec = job_template.setdefault("spec", {})
+        template = j_spec.setdefault("template", {})
+        return template.setdefault("spec", {}), "spec.jobTemplate.spec.template.spec"
+    return None, ""
 
-    raw_text = path.read_text(encoding="utf-8")
-    data = yaml.safe_load(raw_text)
 
-    if not isinstance(data, dict) or data.get("kind") != "Deployment":
-        print(f"Skipping {manifest_path}: Only Deployment manifests are currently auto-remediated.")
-        return
+def remediate_workload_dict(data: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str]]:
+    """
+    Apply least-privilege security context fixes to a Kubernetes workload dictionary in memory.
+    Returns: (hardened_dict, list_of_changes_applied)
+    """
+    if not isinstance(data, dict):
+        return data, []
 
     hardened = copy.deepcopy(data)
-    spec = hardened.setdefault("spec", {})
-    template = spec.setdefault("template", {})
-    pod_spec = template.setdefault("spec", {})
+    pod_spec, prefix = _get_pod_spec(hardened)
+    if pod_spec is None:
+        return data, []
 
     changes_applied = []
 
@@ -60,13 +83,14 @@ def remediate_manifest(manifest_path, output_path=None, show_diff=True):
     containers = pod_spec.get("containers", [])
     has_empty_dir = False
     for c in containers:
+        c_name = c.get("name", "container")
         c_sec = c.setdefault("securityContext", {})
         if c_sec.get("privileged"):
             c_sec["privileged"] = False
-            changes_applied.append(f"Revoked privileged container access on '{c.get('name')}'")
+            changes_applied.append(f"Revoked privileged container access on '{c_name}'")
         if c_sec.get("allowPrivilegeEscalation") is not False:
             c_sec["allowPrivilegeEscalation"] = False
-            changes_applied.append(f"Disabled allowPrivilegeEscalation on '{c.get('name')}'")
+            changes_applied.append(f"Disabled allowPrivilegeEscalation on '{c_name}'")
         if not c_sec.get("readOnlyRootFilesystem"):
             c_sec["readOnlyRootFilesystem"] = True
             c.setdefault("volumeMounts", []).extend([
@@ -74,29 +98,29 @@ def remediate_manifest(manifest_path, output_path=None, show_diff=True):
                 {"name": "var-run", "mountPath": "/var/run"}
             ])
             has_empty_dir = True
-            changes_applied.append(f"Enforced readOnlyRootFilesystem on '{c.get('name')}'")
+            changes_applied.append(f"Enforced readOnlyRootFilesystem on '{c_name}'")
 
         caps = c_sec.setdefault("capabilities", {})
         caps["drop"] = ["ALL"]
         if "NET_ADMIN" in caps.get("add", []):
             caps["add"].remove("NET_ADMIN")
-            changes_applied.append("Removed risky capability NET_ADMIN")
+            changes_applied.append(f"Removed risky capability NET_ADMIN on '{c_name}'")
         if not caps.get("add"):
             caps.pop("add", None)
-        changes_applied.append(f"Dropped ALL Linux capabilities on '{c.get('name')}'")
+        changes_applied.append(f"Dropped ALL Linux capabilities on '{c_name}'")
 
         # Clean hostPort if present
         for port in c.get("ports", []):
             if "hostPort" in port:
                 port.pop("hostPort")
-                changes_applied.append("Removed hostPort binding")
+                changes_applied.append(f"Removed hostPort binding on '{c_name}'")
 
         # Ensure resource limits exist
         res = c.setdefault("resources", {})
         if "limits" not in res:
             res["limits"] = {"cpu": "250m", "memory": "128Mi"}
             res["requests"] = {"cpu": "50m", "memory": "64Mi"}
-            changes_applied.append(f"Configured CPU & memory resource limits on '{c.get('name')}'")
+            changes_applied.append(f"Configured CPU & memory resource limits on '{c_name}'")
 
     if has_empty_dir:
         vols = pod_spec.setdefault("volumes", [])
@@ -105,7 +129,33 @@ def remediate_manifest(manifest_path, output_path=None, show_diff=True):
             {"name": "var-run", "emptyDir": {}}
         ])
 
-    new_yaml = yaml.dump(hardened, sort_keys=False)
+    return hardened, changes_applied
+
+
+def remediate_yaml_string(yaml_text: str) -> Tuple[str, List[str]]:
+    """Harden raw YAML string in-memory without writing to disk."""
+    try:
+        data = yaml.safe_load(yaml_text)
+    except Exception:
+        return yaml_text, []
+
+    hardened_dict, changes = remediate_workload_dict(data)
+    new_yaml = yaml.dump(hardened_dict, sort_keys=False)
+    return new_yaml, changes
+
+
+def remediate_manifest(manifest_path: str, output_path: Optional[str] = None, show_diff: bool = True):
+    """File-based CLI wrapper with unified diff output."""
+    path = Path(manifest_path)
+    if not path.is_file():
+        raise SystemExit(f"File not found: {manifest_path}")
+
+    raw_text = path.read_text(encoding="utf-8")
+    new_yaml, changes_applied = remediate_yaml_string(raw_text)
+
+    if not changes_applied:
+        print(f"Skipping {manifest_path}: No applicable workload spec found for auto-remediation.")
+        return
 
     print(f"\n=======================================================")
     print(f"   AUTO-REMEDIATION REPORT: {path.name}")
@@ -132,7 +182,7 @@ def remediate_manifest(manifest_path, output_path=None, show_diff=True):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Automated Kubernetes Security Remediation")
+    parser = argparse.ArgumentParser(description="Automated Kubernetes Security Remediation Engine")
     parser.add_argument("manifest", help="Path to input YAML manifest")
     parser.add_argument("--output", "-o", default=None, help="Path to write remediated YAML")
     parser.add_argument("--diff", action="store_true", default=True, help="Display unified diff")

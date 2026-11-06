@@ -1,0 +1,62 @@
+# Prometheus Alerting Rules for Kubernetes ML Security Assessment (CDC-5 Platform)
+# Compatible with Prometheus 2.x and Alertmanager
+
+groups:
+  - name: kubernetes_security_posture_alerts
+    interval: 30s
+    rules:
+      - alert: K8sWorkloadHighSecurityRisk
+        expr: k8s_security_workload_master_score < 40.0
+        for: 2m
+        labels:
+          severity: critical
+          defense_plane: multi_plane
+          component: ml_security_assessor
+        annotations:
+          summary: "Workload {{ $labels.workload }} in namespace {{ $labels.namespace }} has Critical/High security risk"
+          description: "Model 11 unified security assessment score is {{ $value }}/100 (below threshold 40.0). Immediate audit or automated remediation recommended."
+          runbook_url: "https://github.com/org/repo/blob/main/docs/remediation.md"
+
+      - alert: K8sWorkloadZeroDayAnomaly
+        expr: k8s_security_gmm_anomaly_status == -1
+        for: 1m
+        labels:
+          severity: critical
+          defense_plane: P6_runtime
+          component: dual_mode_gmm
+        annotations:
+          summary: "Zero-Day Out-of-Distribution (OOD) behavioral anomaly on {{ $labels.workload }}"
+          description: "Dual-Mode Gaussian Mixture Model flagged an unprecedented runtime exploit or behavioral outlier for workload {{ $labels.workload }} in namespace {{ $labels.namespace }}."
+
+      - alert: K8sCriticalVulnerabilitiesDetected
+        expr: k8s_security_vulnerabilities_total{severity="CRITICAL"} > 0
+        for: 1m
+        labels:
+          severity: warning
+          defense_plane: "{{ $labels.plane }}"
+          component: 56_taxonomy_scanner
+        annotations:
+          summary: "{{ $value }} Critical Vulnerabilities detected in {{ $labels.plane }}"
+          description: "56-Point Taxonomy audit detected active critical vulnerabilities in defense plane {{ $labels.plane }}."
+
+      - alert: K8sFleetSecurityPostureDegraded
+        expr: k8s_security_fleet_mean_score < 60.0
+        for: 5m
+        labels:
+          severity: warning
+          defense_plane: fleet_wide
+          component: master_evaluator
+        annotations:
+          summary: "Overall cluster fleet security score has dropped to {{ $value }}/100"
+          description: "Mean cluster fleet security score fell below acceptable baseline (60.0/100). Check recent CI/CD deployments and runtime alerts."
+
+      - alert: K8sCryptominingPrivilegeCorrelation
+        expr: rate(container_cpu_usage_seconds_total[5m]) > 0.85 and on(namespace, pod) k8s_security_workload_master_score < 50.0
+        for: 3m
+        labels:
+          severity: critical
+          defense_plane: P1_workload
+          component: prometheus_telemetry_correlation
+        annotations:
+          summary: "Potential Cryptomining / Resource Abuse on insecure workload {{ $labels.pod }}"
+          description: "Workload exhibits sustained CPU saturation (>85%) while failing baseline security controls (Score: {{ $value }})."

@@ -26,6 +26,13 @@ import shutil
 
 import yaml
 
+# Ensure core and parent src are in sys.path
+import sys
+from pathlib import Path
+_CORE_DIR = Path(__file__).resolve().parents[1] / "core"
+if str(_CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(_CORE_DIR))
+    sys.path.insert(0, str(_CORE_DIR.parent))
 import paths
 
 

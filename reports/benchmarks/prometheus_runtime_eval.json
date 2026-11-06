@@ -1,0 +1,102 @@
+{
+  "timestamp": "2026-11-06 01:05:37 UTC",
+  "model": "Model 12: Purely Unsupervised Prometheus Anomaly Detector",
+  "workloads_evaluated": 3,
+  "anomalies_detected": 2,
+  "evaluations": [
+    {
+      "namespace": "production",
+      "workload": "secured-app",
+      "anomaly_score": 17.38,
+      "status": "NORMAL",
+      "is_anomaly": false,
+      "threat_drivers": [],
+      "raw_telemetry": {
+        "cpu_usage_cores": 0.08,
+        "memory_working_set_mb": 42.5,
+        "restart_rate_per_hour": 0.0,
+        "network_tx_kbps": 12.4,
+        "network_rx_kbps": 0.0,
+        "falco_alerts_rate": 0.0,
+        "apiserver_403_rate": 0.0
+      }
+    },
+    {
+      "namespace": "staging",
+      "workload": "medium-app",
+      "anomaly_score": 84.25,
+      "status": "CRITICAL_ANOMALY",
+      "is_anomaly": true,
+      "threat_drivers": [],
+      "raw_telemetry": {
+        "cpu_usage_cores": 0.35,
+        "memory_working_set_mb": 115.0,
+        "restart_rate_per_hour": 0.2,
+        "network_tx_kbps": 45.0,
+        "network_rx_kbps": 0.0,
+        "falco_alerts_rate": 0.01,
+        "apiserver_403_rate": 0.02
+      }
+    },
+    {
+      "namespace": "default",
+      "workload": "vulnerable-app",
+      "anomaly_score": 88.15,
+      "status": "CRITICAL_ANOMALY",
+      "is_anomaly": true,
+      "threat_drivers": [
+        {
+          "metric": "network_tx_kbps",
+          "observed_value": 1850.0,
+          "baseline_mean": 51.35,
+          "z_deviation": 77.69,
+          "threat_indication": "Potential C2 Data Exfiltration / Egress Spike (MITRE T1048)"
+        },
+        {
+          "metric": "restart_rate_per_hour",
+          "observed_value": 4.5,
+          "baseline_mean": 0.0,
+          "z_deviation": 27.44,
+          "threat_indication": "Exploit-Induced Crash-Loop / Segfault Attack"
+        },
+        {
+          "metric": "falco_alerts_rate",
+          "observed_value": 0.85,
+          "baseline_mean": 0.0,
+          "z_deviation": 5.91,
+          "threat_indication": "Kernel Syscall Security Violation (eBPF Alert)"
+        },
+        {
+          "metric": "cpu_usage_cores",
+          "observed_value": 1.85,
+          "baseline_mean": 0.24,
+          "z_deviation": 5.79,
+          "threat_indication": "Suspected Cryptomining / CPU Exhaustion (MITRE T1496)"
+        },
+        {
+          "metric": "apiserver_403_rate",
+          "observed_value": 0.45,
+          "baseline_mean": 0.0,
+          "z_deviation": 3.13,
+          "threat_indication": "Kubernetes API RBAC Probing / Reconnaissance"
+        },
+        {
+          "metric": "memory_working_set_mb",
+          "observed_value": 490.0,
+          "baseline_mean": 198.14,
+          "z_deviation": 2.04,
+          "threat_indication": "Elevated Operational Anomaly"
+        }
+      ],
+      "raw_telemetry": {
+        "cpu_usage_cores": 1.85,
+        "memory_working_set_mb": 490.0,
+        "restart_rate_per_hour": 4.5,
+        "network_tx_kbps": 1850.0,
+        "network_rx_kbps": 0.0,
+        "falco_alerts_rate": 0.85,
+        "apiserver_403_rate": 0.45
+      }
+    }
+  ]
+}

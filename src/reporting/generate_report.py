@@ -5,6 +5,13 @@ import joblib
 import pandas as pd
 import numpy as np
 
+# Ensure core and parent src are in sys.path
+import sys
+from pathlib import Path
+_CORE_DIR = Path(__file__).resolve().parents[1] / "core"
+if str(_CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(_CORE_DIR))
+    sys.path.insert(0, str(_CORE_DIR.parent))
 import paths
 from vulnerability_taxonomy_56 import TAXONOMY_56, PLANES, scan_manifest_for_vulnerabilities
 from bayesian_scoring_engine import (

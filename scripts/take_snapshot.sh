@@ -54,7 +54,7 @@ echo
 echo "Snapshot saved under $BASE"
 
 if [ "$BUILD_DATASET" = "1" ]; then
-  if ! python3 src/build_cluster_dataset.py; then
+  if ! python3 src/data/build_cluster_dataset.py; then
     echo "Dataset rebuild failed; snapshot kept under $BASE." >&2
     exit 1
   fi

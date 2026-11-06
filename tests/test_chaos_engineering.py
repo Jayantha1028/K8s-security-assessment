@@ -10,6 +10,11 @@ from pathlib import Path
 
 # Add src to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+for _sub in ['core', 'data', 'scanners', 'models', 'evaluation', 'reporting', 'integrations']:
+    _p = str(Path(__file__).resolve().parent.parent / 'src' / _sub)
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
 
 import paths
 from train_11_models import ConsolidatedSecurityModel, FinalMasterModel

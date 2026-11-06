@@ -63,19 +63,19 @@ cmd_manifests() {
     echo "Fresh run: clearing samples, scans and the existing dataset."
     rm -rf "$RAW_DIR/samples" "$RAW_DIR/manifest_scans"
     rm -f "$PROCESSED_DIR/kubernetes_security_dataset.csv"
-    python3 src/generate_samples.py --fresh ${count_args[@]+"${count_args[@]}"}
+    python3 src/data/generate_samples.py --fresh ${count_args[@]+"${count_args[@]}"}
   else
     echo "Incremental run: adding new samples on top of what's already on disk."
     echo "(use './run.sh --manifests --fresh' to start over instead)"
-    python3 src/generate_samples.py ${count_args[@]+"${count_args[@]}"}
+    python3 src/data/generate_samples.py ${count_args[@]+"${count_args[@]}"}
   fi
 
-  python3 src/scan_manifests.py
+  python3 src/scanners/scan_manifests.py
 
   if [ "$fresh" -eq 1 ]; then
-    python3 src/create_dataset.py --fresh
+    python3 src/data/create_dataset.py --fresh
   else
-    python3 src/create_dataset.py
+    python3 src/data/create_dataset.py
   fi
 
   echo
@@ -113,7 +113,7 @@ cmd_final() {
 
   # Also writes the 'latest' rows (both environments) to $REPORT_INPUT, so the
   # report covers the assessment this run just collected.
-  python3 src/build_cluster_dataset.py --report-input "$REPORT_INPUT"
+  python3 src/data/build_cluster_dataset.py --report-input "$REPORT_INPUT"
 
   local rows=$(( $(wc -l < "$CLUSTER_DATASET") - 1 ))
   echo
@@ -133,12 +133,12 @@ cmd_final() {
     echo
     echo "At least 20 diverse assessment rows are recommended."
     echo "Once trained, generate the report with:"
-    echo "  python3 src/generate_report.py"
+    echo "  python3 src/reporting/generate_report.py"
     return 0
   fi
 
-  python3 src/train_security_models.py
-  python3 src/generate_report.py "$REPORT_INPUT"
+  python3 src/models/train_security_models.py
+  python3 src/reporting/generate_report.py "$REPORT_INPUT"
   echo
   echo "╔════════════════════════════════════════════════════════════════════════════╗"
   echo "║                   LIVE CLUSTER SECURITY ASSESSMENT COMPLETE                ║"
@@ -226,10 +226,10 @@ cmd_all() {
 
   echo
   echo "=== Step 5/5: dataset, training, report ==="
-  python3 src/build_cluster_dataset.py --report-input "$REPORT_INPUT"
+  python3 src/data/build_cluster_dataset.py --report-input "$REPORT_INPUT"
 
   # The trainer prints distinct snapshots per risk class before checking them.
-  if ! python3 src/train_security_models.py; then
+  if ! python3 src/models/train_security_models.py; then
     echo >&2
     echo "Training did not run. The table above shows which risk class has too" >&2
     echo "few snapshots. Re-run with a larger SNAPSHOTS value, e.g.:" >&2
@@ -237,7 +237,7 @@ cmd_all() {
     exit 1
   fi
 
-  python3 src/generate_report.py "$REPORT_INPUT"
+  python3 src/reporting/generate_report.py "$REPORT_INPUT"
 
   echo
   echo "╔════════════════════════════════════════════════════════════════════════════╗"
@@ -257,8 +257,8 @@ cmd_all() {
 cmd_real() {
   echo "=== REAL-WORLD WORKLOAD PIPELINE & 11-MODEL MATRIX ==="
   require_tools python3
-  python3 "$ROOT/src/build_real_world_dataset.py"
-  python3 "$ROOT/src/train_11_models.py"
+  python3 "$ROOT/src/data/build_real_world_dataset.py"
+  python3 "$ROOT/src/models/train_11_models.py"
 }
 
 cmd_live() {
@@ -301,8 +301,8 @@ cmd_live() {
     if [ "$skip_live" = "1" ] || [ "$skip_live" = "true" ]; then
       fleet_args+=(--skip-live)
     fi
-    python3 "$ROOT/src/run_cluster_fleet.py" ${fleet_args[@]+"${fleet_args[@]}"}
-    python3 "$ROOT/src/train_security_models.py"
+    python3 "$ROOT/src/integrations/run_cluster_fleet.py" ${fleet_args[@]+"${fleet_args[@]}"}
+    python3 "$ROOT/src/models/train_security_models.py"
   else
     cmd_final "$@"
   fi
@@ -316,7 +316,7 @@ cmd_report() {
     echo ""
   fi
   if [ -f "$REPORT_INPUT" ] && [ -f "$MODEL_FILE" ]; then
-    python3 "$ROOT/src/generate_report.py" "$REPORT_INPUT" "$REPORT_FILE"
+    python3 "$ROOT/src/reporting/generate_report.py" "$REPORT_INPUT" "$REPORT_FILE"
   elif [ -f "$REPORT_FILE" ]; then
     cat "$REPORT_FILE"
   else
@@ -349,7 +349,7 @@ cmd_clean_deep() {
 cmd_fleet() {
   echo "=== 100-CLUSTER PARALLEL FLEET PIPELINE ==="
   require_tools python3 kubectl kubescape trivy
-  python3 src/run_cluster_fleet.py "$@"
+  python3 src/integrations/run_cluster_fleet.py "$@"
 }
 
 cmd_test_cluster() {
@@ -359,8 +359,8 @@ cmd_test_cluster() {
   local out_dir="$RAW_DIR/latest/$ctx"
   mkdir -p "$out_dir"
   scripts/collect_cluster.sh "$ctx" "$out_dir"
-  python3 src/build_cluster_dataset.py --report-input "$REPORT_INPUT"
-  python3 src/generate_report.py "$REPORT_INPUT" "$REPORT_FILE"
+  python3 src/data/build_cluster_dataset.py --report-input "$REPORT_INPUT"
+  python3 src/reporting/generate_report.py "$REPORT_INPUT" "$REPORT_FILE"
 }
 
 cmd_train_11() {

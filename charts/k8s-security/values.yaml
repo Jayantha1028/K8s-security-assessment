@@ -1,0 +1,78 @@
+# Default values for k8s-security Helm chart.
+# Declare variables to be passed into templates.
+
+replicaCount: 2
+
+image:
+  repository: k8s-security-platform
+  pullPolicy: IfNotPresent
+  tag: "2.0.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+podAnnotations: {}
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 443
+  targetPort: 8443
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Admission Controller Security Policy
+policy:
+  riskThreshold: 35.0
+  vetoRules: "V01,V02,V03,V04,V14,V26"
+  enableModel11: true
+  enableMutation: true
+
+# Webhook configuration
+webhook:
+  failurePolicy: Fail
+  timeoutSeconds: 3
+  caBundle: "" # Injected automatically via cert-manager or generate_certs.sh
+  certManager:
+    enabled: false
+    issuerRef:
+      name: selfsigned-issuer
+      kind: ClusterIssuer
+
+# Prometheus Monitoring
+monitoring:
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+    scrapeTimeout: 10s
+    labels:
+      release: prometheus
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
