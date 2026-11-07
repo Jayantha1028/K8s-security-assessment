@@ -1,4 +1,4 @@
-.PHONY: help manifests Manifests real Real live Live test Test report Report gate Gate chaos Chaos audit Audit pdf Pdf snowflake-full snowflake-update prometheus-collect prometheus-export prometheus-serve train-prometheus-model eval-prometheus-model prometheus-daemon scan-layers admission-webhook admission-certs all All clean Clean clean-deep clean_deep deep-clean deep run-all run_all all-features finetune Finetune rigor Rigor scan-native Scan-Native compare-scanners Compare-Scanners
+.PHONY: help manifests Manifests real Real live Live test Test report Report gate Gate chaos Chaos audit Audit pdf Pdf snowflake-full snowflake-update prometheus-collect prometheus-export prometheus-serve train-prometheus-model eval-prometheus-model prometheus-daemon ebpf-monitor gitops-remediate Gitops-Remediate scan-native scan-cluster Scan-Cluster scan-layers admission-webhook admission-certs all All clean Clean clean-deep clean_deep deep-clean deep run-all run_all all-features finetune Finetune rigor Rigor Compare-Scanners
 
 COUNT ?=
 BATCH_SIZE ?=
@@ -18,6 +18,7 @@ help:
 	@echo "  make real                                 Process 200 real manifests & train 11 models"
 	@echo "  make live [COUNT=N] [BATCH_SIZE=N]        Collect live telemetry & train models"
 	@echo "  make scan-native [SCAN_PATH=path]         Execute pure-Python zero-dependency AST security scanner"
+	@echo "  make scan-cluster [NS=name]               Live in-cluster CSPM audit of active workloads"
 	@echo "  make scan-layers [IMAGE=name] [TAR=path]  Deep container layer & OS package SBOM scan"
 	@echo "  make compare-scanners                     Execute empirical side-by-side benchmark: Native vs Kubescape vs Trivy"
 	@echo "  make finetune [TREES=N] [LR=N]            Incremental warm-start fine-tuning of Model 11"
@@ -31,6 +32,7 @@ help:
 	@echo "  make train-prometheus-model               Train Model 12 Unsupervised Prometheus Anomaly Detector"
 	@echo "  make eval-prometheus-model                Evaluate live Prometheus telemetry with Model 12"
 	@echo "  make prometheus-daemon [INTERVAL=15]      Run continuous Prometheus anomaly daemon with online learning"
+	@echo "  make ebpf-monitor                         Sub-second kernel syscall defense & auto-quarantine"
 	@echo "  make prometheus-export                    Export security assessment scores to OpenMetrics format"
 	@echo "  make prometheus-serve [PORT=9108]         Serve live /metrics Prometheus endpoint"
 	@echo "  make snowflake-full                       Push all baseline tables & views to Snowflake once"
@@ -81,6 +83,19 @@ scan-native:
 	@python3 src/scanners/native_security_scanner.py $(SCAN_PATH)
 
 Scan-Native: scan-native
+
+scan-cluster:
+	@python3 src/scanners/cluster_scanner.py $(if $(NS),-n $(NS),) $(if $(REMEDIATE_OUT),--remediate-out $(REMEDIATE_OUT),)
+
+Scan-Cluster: scan-cluster
+
+OVERLAY_DIR ?=
+PR_MD ?=
+
+gitops-remediate:
+	@python3 src/integrations/gitops_remediator.py $(if $(SCAN_PATH),$(SCAN_PATH),manifests/) $(if $(OVERLAY_DIR),--output-overlay $(OVERLAY_DIR),) $(if $(PR_MD),--output-pr-markdown $(PR_MD),)
+
+Gitops-Remediate: gitops-remediate
 
 IMAGE ?= nginx:1.14.2
 TAR ?=
@@ -134,6 +149,9 @@ INTERVAL ?= 15
 
 prometheus-daemon:
 	@python3 src/integrations/run_prometheus_daemon.py --interval $(INTERVAL) --port $(PORT) --url $(PROMETHEUS_URL)
+
+ebpf-monitor:
+	@python3 src/integrations/ebpf_runtime_monitor.py
 
 admission-webhook:
 	@python3 src/integrations/admission_webhook.py --port $(PORT)

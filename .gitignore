@@ -1,8 +1,8 @@
 # Python
 __pycache__/
-*.py[cod]
 .venv/
 venv/
+*.py[cod]
 
 # Raw / regenerable inputs: generated manifests, scanner output, cluster
 # collections (including in-progress .tmp folders). Processed datasets,
@@ -26,3 +26,7 @@ Mini-Project/
 **/.certs/
 *.key
 *.srl
+
+# Extended Testing Suite & Scratch
+testing/
+run_test.sh

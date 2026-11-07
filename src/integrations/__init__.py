@@ -10,9 +10,29 @@ Exported Modules:
 
 from .admission_webhook import start_admission_server, AdmissionSecurityEngine
 from .run_prometheus_daemon import run_continuous_daemon
+from .ebpf_runtime_monitor import (
+    EBPFRuntimeDefenseEngine,
+    EBPFSyscallEvent,
+    EBPFSecurityFinding,
+    run_ebpf_monitor_cli,
+)
+from .gitops_remediator import (
+    GitOpsRemediator,
+    GitOpsRemediationPlan,
+    WorkloadRemediationDiff,
+    run_gitops_remediator_cli,
+)
 
 __all__ = [
     "start_admission_server",
     "AdmissionSecurityEngine",
     "run_continuous_daemon",
+    "EBPFRuntimeDefenseEngine",
+    "EBPFSyscallEvent",
+    "EBPFSecurityFinding",
+    "run_ebpf_monitor_cli",
+    "GitOpsRemediator",
+    "GitOpsRemediationPlan",
+    "WorkloadRemediationDiff",
+    "run_gitops_remediator_cli",
 ]

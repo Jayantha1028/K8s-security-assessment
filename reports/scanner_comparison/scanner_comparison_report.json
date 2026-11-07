@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-11-06T05:48:59Z",
+  "timestamp": "2026-11-07T15:57:32Z",
   "total_workloads_benchmarked": 2,
   "results": [
     {
       "workload_path": "manifests/insecure/weak-deployment.yaml",
       "native_scanner": {
         "scanner_name": "Native Independent Security Scanner",
-        "scan_time_ms": 1.58,
+        "scan_time_ms": 1.6,
         "memory_footprint_mb": 18.4,
         "external_binaries_required": [],
         "air_gapped_compatible": true,
@@ -48,15 +48,15 @@
         "predicted_risk_tier": "High",
         "compliance_score": 0.0
       },
-      "speedup_factor": "6335.8x",
+      "speedup_factor": "6251.3x",
       "risk_concordance": true,
-      "summary_notes": "Native scanner executed 6336x faster with 0 external binaries. Both scanners agreed on High risk classification."
+      "summary_notes": "Native scanner executed 6251x faster with 0 external binaries. Both scanners agreed on High risk classification."
     },
     {
       "workload_path": "manifests/secure/hardened-deployment.yaml",
       "native_scanner": {
         "scanner_name": "Native Independent Security Scanner",
-        "scan_time_ms": 2.54,
+        "scan_time_ms": 2.64,
         "memory_footprint_mb": 18.4,
         "external_binaries_required": [],
         "air_gapped_compatible": true,
@@ -98,9 +98,9 @@
         "predicted_risk_tier": "High",
         "compliance_score": 30.0
       },
-      "speedup_factor": "3937.1x",
+      "speedup_factor": "3788.1x",
       "risk_concordance": true,
-      "summary_notes": "Native scanner executed 3937x faster with 0 external binaries. Both scanners agreed on Low risk classification."
+      "summary_notes": "Native scanner executed 3788x faster with 0 external binaries. Both scanners agreed on Low risk classification."
     }
   ]
 }

@@ -37,14 +37,28 @@ except ImportError:
     pass
 
 # Primary API Exports
-from scanners.native_security_scanner import NativeSecurityScanner, ScanReport, Finding
+from scanners.native_security_scanner import (
+    NativeSecurityScanner,
+    ScanReport,
+    Finding,
+    FEATURES_17,
+    FEATURES_32,
+    FEATURE_METADATA_32,
+)
 from scanners.container_layer_scanner import HybridContainerLayerScanner, SBOMScanReport
 from scanners.cve_sync_engine import CVEDatabaseEngine
 from scanners.auto_remediate import remediate_manifest, remediate_workload_dict, remediate_yaml_string
+from scanners.cluster_scanner import LiveClusterScanner, LiveClusterReport, WorkloadAuditResult
 from models.model_loader import load_master_model, MasterModelBundle, get_model_inventory
 from models.prometheus_unsupervised_model import PrometheusUnsupervisedDetector
 from integrations.admission_webhook import start_admission_server, AdmissionSecurityEngine
 from integrations.run_prometheus_daemon import run_continuous_daemon
+from integrations.ebpf_runtime_monitor import (
+    EBPFRuntimeDefenseEngine,
+    EBPFSyscallEvent,
+    EBPFSecurityFinding,
+)
+from integrations.gitops_remediator import GitOpsRemediator, GitOpsRemediationPlan
 from reporting.web_dashboard import start_web_console
 from reporting.generate_executive_audit import generate_compliance_reports
 
@@ -52,12 +66,18 @@ __all__ = [
     "NativeSecurityScanner",
     "ScanReport",
     "Finding",
+    "FEATURES_17",
+    "FEATURES_32",
+    "FEATURE_METADATA_32",
     "HybridContainerLayerScanner",
     "SBOMScanReport",
     "CVEDatabaseEngine",
     "remediate_manifest",
     "remediate_workload_dict",
     "remediate_yaml_string",
+    "LiveClusterScanner",
+    "LiveClusterReport",
+    "WorkloadAuditResult",
     "load_master_model",
     "MasterModelBundle",
     "get_model_inventory",
@@ -65,6 +85,11 @@ __all__ = [
     "start_admission_server",
     "AdmissionSecurityEngine",
     "run_continuous_daemon",
+    "EBPFRuntimeDefenseEngine",
+    "EBPFSyscallEvent",
+    "EBPFSecurityFinding",
+    "GitOpsRemediator",
+    "GitOpsRemediationPlan",
     "start_web_console",
     "generate_compliance_reports",
 ]

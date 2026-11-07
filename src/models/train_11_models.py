@@ -52,7 +52,8 @@ from xgb_wrapper import XGBoostSecurityClassifier
 from benchmark_k8s_goat import get_simulated_k8s_goat_telemetry
 from dual_mode_gmm import DualModeGMM
 
-FEATURES = [
+# Standard 17 Baseline Features
+FEATURES_17 = [
     "kubescape_failed",
     "kubescape_critical",
     "kubescape_high",
@@ -71,6 +72,46 @@ FEATURES = [
     "privileged_count",
     "host_port_count",
 ]
+
+# Expanded 32-Dimensional Defense-in-Depth Features
+FEATURES_32 = [
+    # Baseline 1-17
+    "kubescape_failed",
+    "kubescape_critical",
+    "kubescape_high",
+    "critical_cve_count",
+    "high_cve_count",
+    "critical_misconfig_count",
+    "high_misconfig_count",
+    "secret_count",
+    "rbac_risk_score",
+    "service_account_permission_score",
+    "risky_capability_count",
+    "host_path_count",
+    "missing_network_policies",
+    "root_execution_count",
+    "falco_alert_count",
+    "privileged_count",
+    "host_port_count",
+    # Expanded 18-32
+    "allow_privilege_escalation",
+    "writable_root_filesystem",
+    "capabilities_not_dropped",
+    "host_network",
+    "host_pid",
+    "host_ipc",
+    "missing_cpu_limit",
+    "missing_memory_limit",
+    "missing_seccomp_profile",
+    "docker_socket_mount",
+    "proc_sys_mount",
+    "cluster_admin_binding",
+    "secret_read_permission",
+    "pod_exec_permission",
+    "shannon_entropy_high",
+]
+
+FEATURES = FEATURES_17
 
 # Ensure pickle compatibility when run as script (__main__)
 sys.modules["train_11_models"] = sys.modules[__name__]

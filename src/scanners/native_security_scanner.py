@@ -91,10 +91,127 @@ class ScanReport:
     features: Dict[str, float] = field(default_factory=dict)
     risk_tier: str = "Low"
 
+    @property
+    def features_17(self) -> Dict[str, float]:
+        """Core 17 baseline features for legacy model compatibility."""
+        return {k: self.features.get(k, 0.0) for k in FEATURES_17}
+
+    @property
+    def features_32(self) -> Dict[str, float]:
+        """Full 32-dimensional expanded feature dictionary."""
+        return {k: self.features.get(k, 0.0) for k in FEATURES_32}
+
+    @property
+    def feature_vector_17(self) -> List[float]:
+        """17-element ordered float vector."""
+        return [float(self.features.get(k, 0.0)) for k in FEATURES_17]
+
+    @property
+    def feature_vector_32(self) -> List[float]:
+        """32-element ordered float vector."""
+        return [float(self.features.get(k, 0.0)) for k in FEATURES_32]
+
     def to_dict(self):
         d = asdict(self)
         d["detected_vuln_ids"] = sorted(list(self.detected_vuln_ids))
+        d["feature_vector_dimension"] = len(self.features)
         return d
+
+
+# ==============================================================================
+# Standardized Feature Schemas: 17-Dimensional Baseline vs 32-Dimensional Defense
+# ==============================================================================
+FEATURES_17 = [
+    "kubescape_failed",
+    "kubescape_critical",
+    "kubescape_high",
+    "critical_cve_count",
+    "high_cve_count",
+    "critical_misconfig_count",
+    "high_misconfig_count",
+    "secret_count",
+    "rbac_risk_score",
+    "service_account_permission_score",
+    "risky_capability_count",
+    "host_path_count",
+    "missing_network_policies",
+    "root_execution_count",
+    "falco_alert_count",
+    "privileged_count",
+    "host_port_count",
+]
+
+FEATURES_32 = [
+    # --- Dimensions 1-17: Baseline Observability & Legacy Vectors ---
+    "kubescape_failed",
+    "kubescape_critical",
+    "kubescape_high",
+    "critical_cve_count",
+    "high_cve_count",
+    "critical_misconfig_count",
+    "high_misconfig_count",
+    "secret_count",
+    "rbac_risk_score",
+    "service_account_permission_score",
+    "risky_capability_count",
+    "host_path_count",
+    "missing_network_policies",
+    "root_execution_count",
+    "falco_alert_count",
+    "privileged_count",
+    "host_port_count",
+    # --- Dimensions 18-32: Expanded Defense-in-Depth & AST Governance ---
+    "allow_privilege_escalation",
+    "writable_root_filesystem",
+    "capabilities_not_dropped",
+    "host_network",
+    "host_pid",
+    "host_ipc",
+    "missing_cpu_limit",
+    "missing_memory_limit",
+    "missing_seccomp_profile",
+    "docker_socket_mount",
+    "proc_sys_mount",
+    "cluster_admin_binding",
+    "secret_read_permission",
+    "pod_exec_permission",
+    "shannon_entropy_high",
+]
+
+FEATURE_METADATA_32 = {
+    "kubescape_failed": {"dim": 1, "category": "Compliance", "cis": "General", "desc": "Total failed security checks"},
+    "kubescape_critical": {"dim": 2, "category": "Compliance", "cis": "General", "desc": "Critical severity compliance failures"},
+    "kubescape_high": {"dim": 3, "category": "Compliance", "cis": "General", "desc": "High severity compliance failures"},
+    "critical_cve_count": {"dim": 4, "category": "Vulnerability", "cis": "5.4.1", "desc": "Critical CVSS container package CVEs"},
+    "high_cve_count": {"dim": 5, "category": "Vulnerability", "cis": "5.4.1", "desc": "High CVSS container package CVEs"},
+    "critical_misconfig_count": {"dim": 6, "category": "IaC", "cis": "5.2.1", "desc": "Critical manifest configuration violations"},
+    "high_misconfig_count": {"dim": 7, "category": "IaC", "cis": "5.2.1", "desc": "High manifest configuration violations"},
+    "secret_count": {"dim": 8, "category": "Secrets", "cis": "5.4.1", "desc": "Hardcoded credentials or API tokens"},
+    "rbac_risk_score": {"dim": 9, "category": "RBAC", "cis": "5.1.1", "desc": "Role/ClusterRole permission risk score"},
+    "service_account_permission_score": {"dim": 10, "category": "RBAC", "cis": "5.1.5", "desc": "ServiceAccount token auto-mount risk"},
+    "risky_capability_count": {"dim": 11, "category": "Isolation", "cis": "5.2.7", "desc": "Dangerous Linux capabilities added"},
+    "host_path_count": {"dim": 12, "category": "Storage", "cis": "5.2.4", "desc": "HostPath volume mount count"},
+    "missing_network_policies": {"dim": 13, "category": "Network", "cis": "5.3.2", "desc": "Unrestricted ingress/egress network exposure"},
+    "root_execution_count": {"dim": 14, "category": "Identity", "cis": "5.2.6", "desc": "Root UID 0 container execution"},
+    "falco_alert_count": {"dim": 15, "category": "Runtime", "cis": "5.7.1", "desc": "Runtime eBPF detection triggers"},
+    "privileged_count": {"dim": 16, "category": "Isolation", "cis": "5.2.5", "desc": "Privileged container execution flag"},
+    "host_port_count": {"dim": 17, "category": "Network", "cis": "5.2.3", "desc": "HostPort or NodePort exposure"},
+    "allow_privilege_escalation": {"dim": 18, "category": "Isolation", "cis": "5.2.5", "desc": "allowPrivilegeEscalation enabled"},
+    "writable_root_filesystem": {"dim": 19, "category": "Storage", "cis": "5.2.8", "desc": "Root filesystem writable"},
+    "capabilities_not_dropped": {"dim": 20, "category": "Isolation", "cis": "5.2.7", "desc": "Capabilities drop: [ALL] missing"},
+    "host_network": {"dim": 21, "category": "Network", "cis": "5.2.2", "desc": "Host network namespace sharing"},
+    "host_pid": {"dim": 22, "category": "Isolation", "cis": "5.2.2", "desc": "Host PID namespace sharing"},
+    "host_ipc": {"dim": 23, "category": "Isolation", "cis": "5.2.2", "desc": "Host IPC namespace sharing"},
+    "missing_cpu_limit": {"dim": 24, "category": "Resources", "cis": "5.2.13", "desc": "CPU resource limit omitted"},
+    "missing_memory_limit": {"dim": 25, "category": "Resources", "cis": "5.2.14", "desc": "Memory resource limit omitted"},
+    "missing_seccomp_profile": {"dim": 26, "category": "Isolation", "cis": "5.7.2", "desc": "RuntimeDefault seccomp profile missing"},
+    "docker_socket_mount": {"dim": 27, "category": "Escape", "cis": "5.2.4", "desc": "Docker/containerd socket mounted"},
+    "proc_sys_mount": {"dim": 28, "category": "Escape", "cis": "5.2.4", "desc": "/proc or /sys host paths mounted"},
+    "cluster_admin_binding": {"dim": 29, "category": "RBAC", "cis": "5.1.1", "desc": "cluster-admin or wildcard binding"},
+    "secret_read_permission": {"dim": 30, "category": "RBAC", "cis": "5.1.2", "desc": "Permission to read or list secrets"},
+    "pod_exec_permission": {"dim": 31, "category": "RBAC", "cis": "5.1.4", "desc": "Permission to exec into pods"},
+    "shannon_entropy_high": {"dim": 32, "category": "Secrets", "cis": "5.4.1", "desc": "Shannon entropy exceeds 3.8 bits/char"},
+}
 
 
 class NativeSecurityScanner:
@@ -451,7 +568,7 @@ class NativeSecurityScanner:
         report.detected_vuln_ids.add(vuln_id)
 
     def _compile_features_and_score(self, report: ScanReport):
-        """Map findings directly to the 17 standardized Model 11 features."""
+        """Map findings directly to the standardized 32-dimensional security feature vector."""
         vulns = report.detected_vuln_ids
 
         crit_count = sum(1 for f in report.findings if f.severity == "CRITICAL")
@@ -460,6 +577,7 @@ class NativeSecurityScanner:
         failed_count = len(report.findings)
 
         features = {
+            # --- Dimensions 1-17: Baseline Observability & Legacy Vectors ---
             "kubescape_failed": float(failed_count),
             "kubescape_critical": float(crit_count),
             "kubescape_high": float(high_count),
@@ -477,6 +595,23 @@ class NativeSecurityScanner:
             "falco_alert_count": float(1 if any(v in vulns for v in ("V09", "V10", "V11")) else 0),
             "privileged_count": float(1 if "V01" in vulns else 0),
             "host_port_count": float(1 if any(v in vulns for v in ("V09", "V36")) else 0),
+
+            # --- Dimensions 18-32: Expanded Defense-in-Depth & AST Governance ---
+            "allow_privilege_escalation": float(1 if "V03" in vulns else 0),
+            "writable_root_filesystem": float(1 if "V04" in vulns else 0),
+            "capabilities_not_dropped": float(1 if "V08" in vulns else 0),
+            "host_network": float(1 if "V09" in vulns else 0),
+            "host_pid": float(1 if "V10" in vulns else 0),
+            "host_ipc": float(1 if "V11" in vulns else 0),
+            "missing_cpu_limit": float(1 if "V13" in vulns else 0),
+            "missing_memory_limit": float(1 if "V14" in vulns else 0),
+            "missing_seccomp_profile": float(1 if "V12" in vulns else 0),
+            "docker_socket_mount": float(1 if "V45" in vulns else 0),
+            "proc_sys_mount": float(1 if any(v in vulns for v in ("V46", "V47")) else 0),
+            "cluster_admin_binding": float(1 if "V26" in vulns else 0),
+            "secret_read_permission": float(1 if "V24" in vulns else 0),
+            "pod_exec_permission": float(1 if "V25" in vulns else 0),
+            "shannon_entropy_high": float(1 if any(f.vuln_id == "V18" and "Shannon Entropy" in f.description for f in report.findings) else 0),
         }
         report.features = features
 

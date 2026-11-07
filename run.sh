@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 # Single entry point for the Kubernetes ML Security Assessment project.
 #
-#   ./run.sh --manifests   manifest pipeline & model training (needs Kubescape)
-#   ./run.sh --real        200 real-world manifests & 11-model master matrix
-#   ./run.sh --live        live cluster telemetry collection & model training
-#   ./run.sh --test        execute test suite (48 unit tests)
-#   ./run.sh --report      generate & display security assessment & benchmark reports
-#   ./run.sh --run-all     execute every feature in the project at once (18 stages)
-#   ./run.sh --all         run live-cluster Kind snapshots pipeline
+#   ./run.sh --manifests     manifest pipeline & model training (needs Kubescape)
+#   ./run.sh --real          200 real-world manifests & 11-model master matrix
+#   ./run.sh --live          live cluster telemetry collection & model training
+#   ./run.sh --test          execute comprehensive test suite (596 unit and integration tests)
+#   ./run.sh --report        generate & display security assessment & benchmark reports
+#   ./run.sh --scan-cluster  live in-cluster CSPM security posture audit
+#   ./run.sh --ebpf          sub-second kernel syscall defense & auto-quarantine
+#   ./run.sh --gitops-pr     GitOps auto-remediation PR bot & Kustomize overlays
+#   ./run.sh --daemon        continuous Prometheus runtime anomaly detector (Model 12)
+#   ./run.sh --audit         generate Executive Compliance Audit (HTML & 9-Page PDF)
+#   ./run.sh --admission     run dynamic admission controller webhook
+#   ./run.sh --run-all       execute every feature in the project at once
+#   ./run.sh --all           run live-cluster Kind snapshots pipeline
 #
 # Settings for --all (environment variables):
 #   SNAPSHOTS  snapshots per scenario, minimum 5   (default 6)
@@ -19,7 +25,7 @@
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/scripts/lib.sh"
 
-usage() { sed -n '2,11p' "$ROOT/run.sh" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,18p' "$ROOT/run.sh" | sed 's/^# \{0,1\}//'; }
 
 # State cleaned up on any exit (success, failure, Ctrl+C); the trap is set in
 # main(), which runs inside the logged subshell below.
@@ -367,14 +373,69 @@ cmd_train_11() {
   cmd_real
 }
 
+cmd_scan_cluster() {
+  echo "=== LIVE IN-CLUSTER CSPM SECURITY POSTURE AUDIT ==="
+  require_tools python3
+  python3 "$ROOT/src/scanners/cluster_scanner.py" "$@"
+}
+
+cmd_ebpf() {
+  echo "=== SUB-SECOND eBPF KERNEL RUNTIME DEFENSE ==="
+  require_tools python3
+  python3 "$ROOT/src/integrations/ebpf_runtime_monitor.py" "$@"
+}
+
+cmd_gitops_pr() {
+  echo "=== GITOPS AUTO-REMEDIATION & KUSTOMIZE OVERLAY GENERATOR ==="
+  require_tools python3
+  python3 "$ROOT/src/integrations/gitops_remediator.py" "$@"
+}
+
+cmd_daemon() {
+  echo "=== CONTINUOUS PROMETHEUS ANOMALY DAEMON (MODEL 12) ==="
+  require_tools python3
+  python3 "$ROOT/src/integrations/run_prometheus_daemon.py" "$@"
+}
+
+cmd_audit() {
+  echo "=== EXECUTIVE COMPLIANCE AUDIT (HTML & PDF) ==="
+  require_tools python3
+  python3 "$ROOT/src/reporting/generate_executive_audit.py" "$@"
+}
+
+cmd_admission() {
+  echo "=== IN-CLUSTER DYNAMIC ADMISSION CONTROLLER WEBHOOK ==="
+  require_tools python3
+  python3 "$ROOT/src/integrations/admission_webhook.py" "$@"
+}
+
 main() {
   trap cleanup EXIT
   case "$MODE" in
     --manifests|--midsem)          shift || true; cmd_manifests "$@" ;;
     --real)                        cmd_real ;;
     --live|--final)                shift || true; cmd_live "$@" ;;
-    --test)                        python3 -m unittest discover -s tests -v ;;
+    --test)
+      shift || true
+      if [[ -x "$ROOT/run_test.sh" ]]; then
+        exec "$ROOT/run_test.sh" "${@:-all}"
+      else
+        python3 -m unittest discover -s tests -v
+        if [ -d "$ROOT/testing" ]; then
+          python3 -m unittest discover -s testing -v
+        fi
+      fi
+      ;;
+    --testing)
+      python3 -m unittest discover -s testing -v
+      ;;
     --report)                      cmd_report ;;
+    --scan-cluster|--scan_cluster) shift || true; cmd_scan_cluster "$@" ;;
+    --ebpf)                        shift || true; cmd_ebpf "$@" ;;
+    --gitops-pr|--gitops_pr)       shift || true; cmd_gitops_pr "$@" ;;
+    --daemon)                      shift || true; cmd_daemon "$@" ;;
+    --audit|--pdf)                 shift || true; cmd_audit "$@" ;;
+    --admission|--webhook)         shift || true; cmd_admission "$@" ;;
     --all)                         cmd_all ;;
     --clean)                       cmd_clean ;;
     --clean-deep)                  cmd_clean_deep ;;
@@ -387,17 +448,21 @@ main() {
 
 MODE="${1:---manifests}"
 case "$MODE" in
-  manifests|real|live|final|all|test|report|fleet|pipeline|clean|clean-deep|clean_deep|deep-clean|deep|run-all|features)
+  manifests|real|live|final|all|test|testing|report|fleet|pipeline|clean|clean-deep|clean_deep|deep-clean|deep|run-all|features|scan-cluster|scan_cluster|ebpf|gitops-pr|gitops_pr|daemon|audit|pdf|admission|webhook)
     case "$MODE" in
       clean_deep|deep-clean|deep) MODE="--clean-deep" ;;
       run-all|features) MODE="--run-all" ;;
+      scan_cluster) MODE="--scan-cluster" ;;
+      gitops_pr) MODE="--gitops-pr" ;;
+      pdf) MODE="--audit" ;;
+      webhook) MODE="--admission" ;;
       *) MODE="--$MODE" ;;
     esac
     ;;
 esac
 
 case "$MODE" in
-  --manifests|--midsem|--real|--live|--final|--all|--test|--report|--clean|--clean-deep|--fleet|--pipeline|--compare-11|--train-11|--test-cluster|--test_cluster|--run-all|--features) ;;
+  --manifests|--midsem|--real|--live|--final|--all|--test|--testing|--report|--clean|--clean-deep|--fleet|--pipeline|--compare-11|--train-11|--test-cluster|--test_cluster|--run-all|--features|--scan-cluster|--ebpf|--gitops-pr|--daemon|--audit|--admission) ;;
   -h|--help) usage; exit 0 ;;
   *)
     echo "Unknown option: $MODE" >&2

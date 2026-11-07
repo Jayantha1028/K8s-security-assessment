@@ -126,6 +126,32 @@ def cmd_scan(args):
         sys.exit(1)
 
 
+def cmd_scan_cluster(args):
+    from scanners.cluster_scanner import LiveClusterScanner, print_cluster_report
+
+    if args.output != "json":
+        print(BANNER)
+    scanner = LiveClusterScanner(kubeconfig=args.kubeconfig)
+    report = scanner.scan_cluster(
+        namespace=args.namespace,
+        remediate_dir=args.remediate_out,
+        gate_threshold=args.threshold,
+    )
+
+    if args.output == "json":
+        print(json.dumps(report.to_dict(), indent=2))
+    else:
+        print_cluster_report(report)
+
+    if args.gate and (report.worst_workload_score < args.threshold or report.cluster_score < args.threshold):
+        print(
+            f"\n[CI/CD GATE FAILED] Cluster score ({report.cluster_score:.1f}) or worst workload ({report.worst_workload_score:.1f}) "
+            f"below policy threshold {args.threshold:.1f}!",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+
 def cmd_scan_image(args):
     from scanners.container_layer_scanner import HybridContainerLayerScanner, print_sbom_report
 
@@ -172,6 +198,7 @@ def cmd_admission(args):
         risk_threshold=args.risk_threshold,
         enable_mutation=not args.no_mutation,
         enable_model_11=not args.no_model_11,
+        enforcement_mode=getattr(args, "mode", "enforce"),
     )
 
     try:
@@ -179,6 +206,14 @@ def cmd_admission(args):
     except KeyboardInterrupt:
         print("\nStopping Admission Controller...")
         server.server_close()
+
+
+def cmd_gitops_pr(args):
+    from integrations.gitops_remediator import run_gitops_remediator_cli
+
+    if args.output != "json":
+        print(BANNER)
+    run_gitops_remediator_cli(args)
 
 
 def cmd_daemon(args):
@@ -191,6 +226,19 @@ def cmd_daemon(args):
         port=args.port,
         alpha=args.alpha,
         max_iterations=args.cycles,
+    )
+
+
+def cmd_ebpf(args):
+    from integrations.ebpf_runtime_monitor import run_ebpf_monitor_cli
+
+    if args.output != "json":
+        print(BANNER)
+    run_ebpf_monitor_cli(
+        duration_seconds=args.duration,
+        port=args.port,
+        auto_quarantine=not args.no_quarantine,
+        use_mock=not args.live_falco,
     )
 
 
@@ -258,6 +306,16 @@ def main():
     p_scan.add_argument("--threshold", type=float, default=35.0, help="Security gate threshold (default: 35.0)")
     p_scan.set_defaults(func=cmd_scan)
 
+    # 2. scan-cluster
+    p_clu = subparsers.add_parser("scan-cluster", help="Live in-cluster CSPM audit of active workloads via kube-apiserver")
+    p_clu.add_argument("-n", "--namespace", default=None, help="Specific namespace to audit (default: all namespaces)")
+    p_clu.add_argument("--kubeconfig", default=None, help="Explicit path to kubeconfig file")
+    p_clu.add_argument("--remediate-out", default=None, help="Directory to export auto-hardened YAML manifests")
+    p_clu.add_argument("--output", choices=["table", "json"], default="table", help="Output format")
+    p_clu.add_argument("--gate", action="store_true", help="Fail with exit code 1 if score < threshold")
+    p_clu.add_argument("--threshold", type=float, default=35.0, help="Security gate threshold (default: 35.0)")
+    p_clu.set_defaults(func=cmd_scan_cluster)
+
     # 2. scan-image
     p_img = subparsers.add_parser("scan-image", help="Deep unpack container image layers & extract SBOM")
     p_img.add_argument("image", nargs="?", default=None, help="Container image tag (e.g. redis:7-alpine)")
@@ -281,6 +339,7 @@ def main():
     p_adm.add_argument("--key", default=None, help="Path to TLS private key")
     p_adm.add_argument("--insecure-http", action="store_true", help="Run without TLS (for local curl tests)")
     p_adm.add_argument("--risk-threshold", type=float, default=35.0, help="Minimum score to admit workloads")
+    p_adm.add_argument("--mode", choices=["enforce", "warn", "audit"], default="enforce", help="Gate enforcement mode (default: enforce)")
     p_adm.add_argument("--no-mutation", action="store_true", help="Disable mutating webhook auto-remediation")
     p_adm.add_argument("--no-model-11", action="store_true", help="Disable Model 11 ML inference")
     p_adm.set_defaults(func=cmd_admission)
@@ -293,6 +352,25 @@ def main():
     p_dae.add_argument("--alpha", type=float, default=0.05, help="EMA online learning rate")
     p_dae.add_argument("--cycles", type=int, default=0, help="Number of cycles (0 = infinite)")
     p_dae.set_defaults(func=cmd_daemon)
+
+    # 6. ebpf
+    p_ebpf = subparsers.add_parser("ebpf", help="Sub-second kernel syscall runtime defense & auto-quarantine engine")
+    p_ebpf.add_argument("--port", type=int, default=9198, help="OpenMetrics /metrics port (default: 9198)")
+    p_ebpf.add_argument("--duration", type=float, default=0.0, help="Monitoring duration in seconds (0 = infinite)")
+    p_ebpf.add_argument("--no-quarantine", action="store_true", help="Disable automated pod quarantine mitigation")
+    p_ebpf.add_argument("--live-falco", action="store_true", help="Connect to live in-cluster Falco/Tetragon daemon")
+    p_ebpf.add_argument("--output", choices=["table", "json"], default="table", help="Output format")
+    p_ebpf.set_defaults(func=cmd_ebpf)
+
+    # 7. gitops-pr
+    p_gpr = subparsers.add_parser("gitops-pr", help="Generate GitOps Pull Request & Kustomize strategic overlay without drift")
+    p_gpr.add_argument("path", nargs="?", default="manifests/", help="Path to manifest file or repository directory")
+    p_gpr.add_argument("--threshold", type=float, default=35.0, help="Security score threshold (default: 35.0)")
+    p_gpr.add_argument("--output-overlay", default=None, help="Directory to export Kustomize strategic merge patches")
+    p_gpr.add_argument("--output-pr-markdown", default=None, help="File path to save Pull Request Markdown body")
+    p_gpr.add_argument("--apply-in-place", action="store_true", help="Overwrite failing manifest files in-place")
+    p_gpr.add_argument("--output", choices=["table", "json"], default="table", help="Output format")
+    p_gpr.set_defaults(func=cmd_gitops_pr)
 
     # 6. audit
     p_aud = subparsers.add_parser("audit", help="Generate Executive Compliance Audit (PDF & HTML)")

@@ -145,10 +145,12 @@ class AdmissionSecurityEngine:
         veto_rules: Optional[Set[str]] = None,
         enable_model_11: bool = True,
         enable_mutation: bool = True,
+        enforcement_mode: str = "enforce",  # "enforce", "warn", "audit"
     ):
         self.risk_threshold = risk_threshold
         self.veto_rules = veto_rules or {"V01", "V02", "V03", "V04", "V14", "V26"}
         self.enable_mutation = enable_mutation
+        self.enforcement_mode = enforcement_mode.lower()
         self.scanner = NativeSecurityScanner()
 
         # Load Model 11 if requested
@@ -243,18 +245,33 @@ class AdmissionSecurityEngine:
         allowed, score, risk_tier, reasons = self.evaluate_workload(obj, target_name)
 
         if not allowed:
-            with METRICS_LOCK:
-                METRICS["admissions_rejected_total"] += 1
-            msg = f"[K8S-SECURITY VETO] Admission REJECTED for {target_name}. Score: {score:.1f}/100 (Tier: {risk_tier}). { ' | '.join(reasons) }"
-            logger.warning(msg)
-            return {
-                "uid": uid,
-                "allowed": False,
-                "status": {
-                    "code": 403,
-                    "message": msg,
-                },
-            }
+            if self.enforcement_mode in ("warn", "audit"):
+                with METRICS_LOCK:
+                    METRICS["admissions_approved_total"] += 1
+                warn_msg = f"[k8s-sec WARN] Workload {target_name} security score {score:.1f}/100 below threshold ({self.risk_threshold:.1f}). Violations: {'; '.join(reasons)}"
+                logger.warning(warn_msg)
+                return {
+                    "uid": uid,
+                    "allowed": True,
+                    "warnings": [warn_msg],
+                    "status": {
+                        "code": 200,
+                        "message": warn_msg,
+                    },
+                }
+            else:
+                with METRICS_LOCK:
+                    METRICS["admissions_rejected_total"] += 1
+                msg = f"[K8S-SECURITY VETO] Admission REJECTED for {target_name}. Score: {score:.1f}/100 (Tier: {risk_tier}). { ' | '.join(reasons) }"
+                logger.warning(msg)
+                return {
+                    "uid": uid,
+                    "allowed": False,
+                    "status": {
+                        "code": 403,
+                        "message": msg,
+                    },
+                }
 
         with METRICS_LOCK:
             METRICS["admissions_approved_total"] += 1
@@ -494,12 +511,14 @@ def start_admission_server(
     risk_threshold: float = 35.0,
     enable_mutation: bool = True,
     enable_model_11: bool = True,
+    enforcement_mode: str = "enforce",
 ) -> ThreadedAdmissionServer:
     """Start and return the Admission Controller Server."""
     engine = AdmissionSecurityEngine(
         risk_threshold=risk_threshold,
         enable_model_11=enable_model_11,
         enable_mutation=enable_mutation,
+        enforcement_mode=enforcement_mode,
     )
     AdmissionRequestHandler.engine = engine
 

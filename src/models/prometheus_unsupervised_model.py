@@ -101,6 +101,8 @@ class PrometheusUnsupervisedDetector(BaseEstimator):
         self.feature_means = np.mean(X_arr, axis=0)
         self.feature_stds = np.std(X_arr, axis=0)
         self.feature_stds[self.feature_stds == 0] = 1.0  # prevent div by zero
+        self.initial_feature_means = np.copy(self.feature_means)
+        self.initial_feature_stds = np.copy(self.feature_stds)
 
         # Fit Isolation Forest and GMM density
         self.isolation_forest.fit(X_scaled)
@@ -211,13 +213,15 @@ class PrometheusUnsupervisedDetector(BaseEstimator):
         X: Union[pd.DataFrame, np.ndarray],
         alpha: float = 0.05,
         max_anomaly_threshold: float = 30.0,
+        max_drift_multiplier: float = 2.5,
     ) -> Dict[str, Any]:
         """
         Continuous Online Learning: Updates the running baseline manifold as containers run.
 
-        Anti-Poisoning Guardrail:
-        Strictly filters out any telemetry with score_anomaly >= max_anomaly_threshold,
-        preventing an attacker from slowly poisoning the baseline manifold.
+        Anti-Poisoning Guardrails:
+        1. Filters out any telemetry with score_anomaly >= max_anomaly_threshold.
+        2. Bounded Robust Statistics: Hard ceiling prevents "Boiling Frog" baseline poisoning
+           by capping learned means at max_drift_multiplier * initial_feature_means.
         """
         if not self.is_fitted:
             raise RuntimeError("Model is not fitted. Call fit() first.")
@@ -250,8 +254,16 @@ class PrometheusUnsupervisedDetector(BaseEstimator):
         batch_std = np.std(clean_X, axis=0)
         batch_std[batch_std == 0] = 1.0
 
-        self.feature_means = (1.0 - alpha) * self.feature_means + alpha * batch_mean
-        self.feature_stds = (1.0 - alpha) * self.feature_stds + alpha * batch_std
+        new_means = (1.0 - alpha) * self.feature_means + alpha * batch_mean
+        new_stds = (1.0 - alpha) * self.feature_stds + alpha * batch_std
+
+        # Apply Bounded Robust Statistics ceiling
+        if hasattr(self, "initial_feature_means") and self.initial_feature_means is not None:
+            max_allowed = np.maximum(self.initial_feature_means * max_drift_multiplier, 1e-4)
+            new_means = np.minimum(new_means, max_allowed)
+
+        self.feature_means = new_means
+        self.feature_stds = new_stds
 
         return {
             "learned_samples": clean_count,
