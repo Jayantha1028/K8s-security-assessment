@@ -4,7 +4,7 @@
 #   ./run.sh --manifests     manifest pipeline & model training (needs Kubescape)
 #   ./run.sh --real          200 real-world manifests & 11-model master matrix
 #   ./run.sh --live          live cluster telemetry collection & model training
-#   ./run.sh --test          execute comprehensive test suite (596 unit and integration tests)
+#   ./run.sh --test          execute comprehensive test suite (604 unit and integration tests)
 #   ./run.sh --report        generate & display security assessment & benchmark reports
 #   ./run.sh --scan-cluster  live in-cluster CSPM security posture audit
 #   ./run.sh --ebpf          sub-second kernel syscall defense & auto-quarantine

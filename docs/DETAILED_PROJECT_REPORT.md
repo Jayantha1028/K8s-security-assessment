@@ -38,7 +38,7 @@ An exhaustive live system audit was executed directly on this environment:
 - Kubescape Binary: /opt/homebrew/bin/kubescape (v4.0.14)
 - Trivy Binary: /opt/homebrew/bin/trivy (v0.74.0)
 - Helm Binary: /opt/homebrew/bin/helm (v3.16+)
-- Test Suite: 596 passed out of 596 tests in 108.36s (100% Pass Rate across baseline + deep suites)
+- Test Suite: 604 passed out of 604 tests in 109.8s (100% Pass Rate across baseline + deep suites)
 ```
 
 #### Feasibility Matrix
@@ -47,11 +47,11 @@ An exhaustive live system audit was executed directly on this environment:
 |---|---|---|---|
 | **Unified CLI (`k8s-sec`)** | `python3` | **Production Ready** | Fully functional. Consolidates 12 subcommands (`scan`, `scan-cluster`, `scan-image`, `remediate`, `gitops-pr`, `ebpf`, `admission`, `daemon`, `sync-cve`, `web`, `audit`, `version`). |
 | **In-Cluster Admission Controller** | `python3`, `kubectl` | **Production Ready** | Implements `/validate` & `/mutate` endpoints with automated RFC-compliant SAN TLS certificates. |
-| **Container Layer & SBOM Scanner** | `python3`, `docker` | **Production Ready** | Zero-disk I/O live streaming (`docker save | BytesIO`) unpacking Debian, Ubuntu, and Alpine SBOMs in < 600 ms. |
+| **Container Layer & SBOM Scanner** | `python3`, `docker` | **Production Ready** | Zero-disk I/O live streaming (`docker save | BytesIO`) unpacking Debian, Ubuntu, Alpine, and statically linked Go/Rust ELF `.go.buildinfo` SBOMs in < 600 ms. |
 | **Embedded SQLite CVE Threat Engine** | `python3`, `sqlite3` | **Production Ready** | Embedded database (`data/cve_database.sqlite`) indexing 349+ records with sub-millisecond query latency. |
 | **Model 12 Runtime Anomaly Detector** | `python3`, `scikit-learn` | **Production Ready** | Unsupervised Isolation Forest + GMM streaming daemon with online EMA baseline updates. |
 | **Production Helm Chart** | `helm` | **Production Ready** | `charts/k8s-security/` validated with 0 errors via official `helm lint`. |
-| **Complete Platform Test Suite** | `python3` | **Production Ready** | **596/596 tests passed (100% OK)** covering 56 AST rules, eBPF runtime, GitOps PR bot, ML rigor, chaos resilience, admission webhooks, and CLI. |
+| **Complete Platform Test Suite** | `python3` | **Production Ready** | **604/604 tests passed (100% OK)** covering 56 AST rules, Go/Rust ELF parsing, capability whitelisting, eBPF runtime, GitOps PR bot, ML rigor, chaos resilience, admission webhooks, and CLI. |
 
 ---
 

@@ -3,7 +3,7 @@
 [![CI Security Gate](https://github.com/Jayanthanayak/K8S-security-assessment/actions/workflows/k8s_security_gate.yml/badge.svg)](https://github.com/Jayanthanayak/K8S-security-assessment/actions)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-green.svg)](LICENSE)
-[![Tests: 596 Passed](https://img.shields.io/badge/tests-596%20passed-brightgreen.svg)](run_test.sh)
+[![Tests: 604 Passed](https://img.shields.io/badge/tests-604%20passed-brightgreen.svg)](run_test.sh)
 [![Model 11 Accuracy: 100%](https://img.shields.io/badge/Model%2011%20Zero--Shot-100%25-success.svg)](models/)
 [![Helm Lint: Clean](https://img.shields.io/badge/Helm%20Chart-v2.0.0-informational.svg)](charts/k8s-security/)
 
@@ -174,10 +174,10 @@ To generate TLS certificates for the admission webhook:
 
 ## Verification & Statistical Rigor
 
-The entire platform is continuously tested and verified through **596 unit, integration, rigor, and chaos tests** with a **100% pass rate**:
+The entire platform is continuously tested and verified through **604 unit, integration, rigor, and chaos tests** with a **100% pass rate**:
 
 ```bash
-# Execute modular test runner across all 596 tests
+# Execute modular test runner across all 604 tests
 ./run_test.sh all
 
 # Or run individual sub-suites

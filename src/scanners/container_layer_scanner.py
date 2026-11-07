@@ -335,6 +335,27 @@ class HybridContainerLayerScanner:
                             content = layer_tf.extractfile(item).read().decode("utf-8", errors="replace")
                             for pkg in self._parse_requirements_txt(content, layer_idx=idx):
                                 packages_dict[pkg.name] = pkg
+
+                        # D. Statically linked Go/Rust ELF Binaries (.go.buildinfo / Cargo Auditable)
+                        elif item.isfile() and (
+                            item.name.startswith("bin/") or "/bin/" in item.name or
+                            item.name.startswith("usr/bin/") or "/usr/bin/" in item.name or
+                            item.name.startswith("usr/local/bin/") or "/usr/local/bin/" in item.name or
+                            item.name.startswith("app/") or "/app/" in item.name or
+                            not "." in Path(item.name).name
+                        ):
+                            extracted = layer_tf.extractfile(item)
+                            if extracted:
+                                header = extracted.read(4)
+                                if header == b"\x7fELF":
+                                    rest = extracted.read(30 * 1024 * 1024)
+                                    elf_data = header + rest
+                                    elf_pkgs = self._parse_elf_symbols(elf_data, binary_name=Path(item.name).name, layer_idx=idx)
+                                    if elf_pkgs:
+                                        if not report.os_distro or report.os_distro == "unknown":
+                                            report.os_distro = "distroless/static-elf"
+                                        for pkg in elf_pkgs:
+                                            packages_dict[pkg.name] = pkg
             except Exception:
                 continue
 
@@ -404,6 +425,124 @@ class HybridContainerLayerScanner:
                         package_type="python",
                         layer_index=layer_idx
                     ))
+        return packages
+
+    @classmethod
+    def _parse_elf_symbols(cls, data: bytes, binary_name: str = "binary", layer_idx: int = 0) -> List[InstalledPackage]:
+        """
+        Parses statically linked Go and Rust ELF binaries in distroless/scratch containers:
+        1. Go ELF binaries: parses .go.buildinfo section and embedded module dependencies
+           (path, mod, dep, build flags) and Go compiler runtime version.
+        2. Rust ELF binaries: parses cargo-auditable dependency JSON tables and rustc versions.
+        """
+        packages: List[InstalledPackage] = []
+        if not data or len(data) < 16 or not data.startswith(b"\x7fELF"):
+            return packages
+
+        # Determine architecture from ELF header byte 18-19 (e_machine)
+        arch = "amd64"
+        if len(data) >= 20:
+            machine = int.from_bytes(data[18:20], byteorder="little")
+            if machine == 0x3E:   # EM_X86_64
+                arch = "amd64"
+            elif machine == 0xB7: # EM_AARCH64
+                arch = "arm64"
+            elif machine == 0x03: # EM_386
+                arch = "386"
+            elif machine == 0x28: # EM_ARM
+                arch = "arm"
+
+        # --- A. Go Build Info (.go.buildinfo) Module Parsing ---
+        has_go_magic = b"\xff Go buildinf:" in data or b"Go buildinf:" in data
+        go_mod_match = re.search(rb'(path\t[^\x00]+)', data)
+        if go_mod_match or has_go_magic:
+            raw_text = ""
+            if go_mod_match:
+                raw_text = go_mod_match.group(1).decode("utf-8", errors="ignore")
+            else:
+                dep_matches = re.findall(rb'(?:mod|dep)\t[^\n\x00]+', data)
+                if dep_matches:
+                    raw_text = "\n".join(m.decode("utf-8", errors="ignore") for m in dep_matches)
+
+            for line in raw_text.splitlines():
+                line = line.strip()
+                if line.startswith("dep\t"):
+                    parts = line.split("\t")
+                    if len(parts) >= 3:
+                        packages.append(InstalledPackage(
+                            name=parts[1].strip(),
+                            version=parts[2].strip(),
+                            architecture=arch,
+                            package_type="go-module",
+                            layer_index=layer_idx,
+                            license="unknown"
+                        ))
+                elif line.startswith("mod\t"):
+                    parts = line.split("\t")
+                    if len(parts) >= 3:
+                        packages.append(InstalledPackage(
+                            name=parts[1].strip(),
+                            version=parts[2].strip(),
+                            architecture=arch,
+                            package_type="go-module",
+                            layer_index=layer_idx,
+                            license="unknown"
+                        ))
+
+            # Detect Go compiler version (e.g. go1.22.1)
+            go_ver_match = re.search(rb'(go1\.[0-9]+(?:\.[0-9]+)?)', data)
+            if go_ver_match:
+                packages.append(InstalledPackage(
+                    name="golang",
+                    version=go_ver_match.group(1).decode("utf-8", errors="ignore"),
+                    architecture=arch,
+                    package_type="go-runtime",
+                    layer_index=layer_idx
+                ))
+
+        # --- B. Rust Cargo-Auditable Parsing ---
+        cargo_match = re.search(rb'(\{"packages":\s*\[.*?\]\})', data, re.DOTALL)
+        if cargo_match:
+            try:
+                cargo_data = json.loads(cargo_match.group(1).decode("utf-8", errors="ignore"))
+                for p in cargo_data.get("packages", []):
+                    p_name = p.get("name")
+                    p_ver = p.get("version")
+                    if p_name and p_ver:
+                        packages.append(InstalledPackage(
+                            name=p_name,
+                            version=str(p_ver),
+                            architecture=arch,
+                            package_type="rust-crate",
+                            layer_index=layer_idx,
+                            license=p.get("license", "unknown")
+                        ))
+            except Exception:
+                pass
+
+        # Detect rustc compiler version (e.g. rustc 1.77.0)
+        rustc_match = re.search(rb'(rustc\s+1\.[0-9]+(?:\.[0-9]+)?)', data)
+        if rustc_match:
+            parts = rustc_match.group(1).decode("utf-8", errors="ignore").split()
+            if len(parts) == 2:
+                packages.append(InstalledPackage(
+                    name="rustc",
+                    version=parts[1],
+                    architecture=arch,
+                    package_type="rust-runtime",
+                    layer_index=layer_idx
+                ))
+
+        # Standalone native ELF executable fallback
+        if not packages and data.startswith(b"\x7fELF"):
+            packages.append(InstalledPackage(
+                name=binary_name,
+                version="static-elf",
+                architecture=arch,
+                package_type="static-binary",
+                layer_index=layer_idx
+            ))
+
         return packages
 
     @staticmethod

@@ -170,6 +170,98 @@ class ContainerLayerScannerTests(unittest.TestCase):
         json_str = json.dumps(d)
         self.assertIn("test-app:1.0.0", json_str)
 
+    def test_go_buildinfo_symbol_parsing(self):
+        # Mock Go ELF binary header with .go.buildinfo magic and module dependencies
+        mock_go_elf = (
+            b"\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x3e\x00"
+            b"\xff Go buildinf:\x08\x00"
+            b"path\tk8s.io/kubernetes/cmd/kubelet\n"
+            b"mod\tk8s.io/kubernetes\tv1.28.2\th1:abc==\n"
+            b"dep\tk8s.io/client-go\tv0.28.2\th1:xyz==\n"
+            b"dep\tgithub.com/opencontainers/runc\tv1.1.9\th1:def==\n"
+            b"dep\tgoogle.golang.org/grpc\tv1.58.2\th1:jkl==\n"
+            b"build\tCGO_ENABLED=0\n"
+            b"go1.22.1\x00"
+        )
+        pkgs = self.scanner._parse_elf_symbols(mock_go_elf, binary_name="kubelet")
+        pkg_names = {p.name: p for p in pkgs}
+
+        self.assertIn("k8s.io/kubernetes", pkg_names)
+        self.assertEqual(pkg_names["k8s.io/kubernetes"].version, "v1.28.2")
+        self.assertEqual(pkg_names["k8s.io/kubernetes"].package_type, "go-module")
+
+        self.assertIn("k8s.io/client-go", pkg_names)
+        self.assertEqual(pkg_names["k8s.io/client-go"].version, "v0.28.2")
+
+        self.assertIn("github.com/opencontainers/runc", pkg_names)
+        self.assertEqual(pkg_names["github.com/opencontainers/runc"].version, "v1.1.9")
+
+        self.assertIn("golang", pkg_names)
+        self.assertEqual(pkg_names["golang"].version, "go1.22.1")
+        self.assertEqual(pkg_names["golang"].package_type, "go-runtime")
+
+    def test_rust_cargo_auditable_symbol_parsing(self):
+        # Mock Rust ELF binary with cargo-auditable embedded dependency JSON
+        cargo_json = json.dumps({
+            "packages": [
+                {"name": "tokio", "version": "1.35.0", "license": "MIT"},
+                {"name": "serde", "version": "1.0.193", "license": "Apache-2.0"},
+            ]
+        }).encode("utf-8")
+        mock_rust_elf = (
+            b"\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x3e\x00"
+            + cargo_json +
+            b"\x00rustc 1.77.0 (aedd173a2 2024-03-17)\x00"
+        )
+        pkgs = self.scanner._parse_elf_symbols(mock_rust_elf, binary_name="microservice")
+        pkg_names = {p.name: p for p in pkgs}
+
+        self.assertIn("tokio", pkg_names)
+        self.assertEqual(pkg_names["tokio"].version, "1.35.0")
+        self.assertEqual(pkg_names["tokio"].package_type, "rust-crate")
+
+        self.assertIn("serde", pkg_names)
+        self.assertEqual(pkg_names["serde"].version, "1.0.193")
+
+        self.assertIn("rustc", pkg_names)
+        self.assertEqual(pkg_names["rustc"].version, "1.77.0")
+        self.assertEqual(pkg_names["rustc"].package_type, "rust-runtime")
+
+    def test_static_elf_layer_unpacking_in_tar(self):
+        # Create an in-memory OCI tarball with a distroless/scratch Go binary
+        mock_go_elf = (
+            b"\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x3e\x00"
+            b"\xff Go buildinf:\x08\x00"
+            b"path\tgithub.com/traefik/traefik\n"
+            b"mod\tgithub.com/traefik/traefik\tv3.0.0\n"
+            b"dep\tgolang.org/x/crypto\tv0.21.0\n"
+        )
+        layer_bio = io.BytesIO()
+        with tarfile.open(fileobj=layer_bio, mode="w") as l_tf:
+            ti = tarfile.TarInfo(name="app/traefik")
+            ti.size = len(mock_go_elf)
+            ti.type = tarfile.REGTYPE
+            l_tf.addfile(ti, io.BytesIO(mock_go_elf))
+
+        outer_bio = io.BytesIO()
+        with tarfile.open(fileobj=outer_bio, mode="w") as out_tf:
+            manifest = [{"Config": "cfg.json", "RepoTags": ["traefik:v3"], "Layers": ["layer.tar"]}]
+            mb = json.dumps(manifest).encode("utf-8")
+            ti_m = tarfile.TarInfo(name="manifest.json")
+            ti_m.size = len(mb)
+            out_tf.addfile(ti_m, io.BytesIO(mb))
+
+            ti_l = tarfile.TarInfo(name="layer.tar")
+            lb = layer_bio.getvalue()
+            ti_l.size = len(lb)
+            out_tf.addfile(ti_l, io.BytesIO(lb))
+
+        report = self.scanner.scan_tar_bytes(outer_bio.getvalue(), source_name="traefik:v3")
+        self.assertEqual(report.os_distro, "distroless/static-elf")
+        pkg_names = {p.name for p in report.packages}
+        self.assertIn("github.com/traefik/traefik", pkg_names)
+        self.assertIn("golang.org/x/crypto", pkg_names)
+
 
 if __name__ == "__main__":
     unittest.main()

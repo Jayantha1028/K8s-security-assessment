@@ -20,9 +20,11 @@ Functions:
 import argparse
 import copy
 import difflib
+import json
 from pathlib import Path
+import re
 import sys
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 import yaml
 
 
@@ -47,6 +49,13 @@ def _get_pod_spec(workload_dict: Dict[str, Any]) -> Tuple[Optional[Dict[str, Any
 def remediate_workload_dict(data: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str]]:
     """
     Apply least-privilege security context fixes to a Kubernetes workload dictionary in memory.
+    Features:
+    - Eliminates host namespaces (hostNetwork, hostPID, hostIPC)
+    - Enforces Pod-level runAsNonRoot (UID 10001) & RuntimeDefault seccompProfile
+    - Disables privileged containers & allowPrivilegeEscalation
+    - Enforces readOnlyRootFilesystem with Safe Volume Padding (ephemeral scratchpads)
+    - Respects Workload Capability Whitelist Annotations (sec.k8s.io/allowed-caps)
+    - Enforces CPU & Memory ceilings to prevent noisy neighbor DoS
     Returns: (hardened_dict, list_of_changes_applied)
     """
     if not isinstance(data, dict):
@@ -58,6 +67,34 @@ def remediate_workload_dict(data: Dict[str, Any]) -> Tuple[Dict[str, Any], List[
         return data, []
 
     changes_applied = []
+
+    # 0. Capability Whitelist Annotation Extraction
+    top_annotations = hardened.get("metadata", {}).get("annotations", {}) or {}
+    template_annotations = {}
+    if "spec" in hardened and isinstance(hardened["spec"], dict):
+        template_annotations = hardened["spec"].get("template", {}).get("metadata", {}).get("annotations", {}) or {}
+
+    def _extract_whitelist(ann: Dict[str, Any], container_name: str) -> Optional[Set[str]]:
+        for key in (
+            f"sec.k8s.io/allowed-caps.{container_name}",
+            f"security.k8s.io/allowed-capabilities.{container_name}",
+            "sec.k8s.io/allowed-caps",
+            "security.k8s.io/allowed-capabilities",
+            "k8s-sec.io/allowed-capabilities",
+        ):
+            if key in ann:
+                val = ann[key]
+                if isinstance(val, str):
+                    try:
+                        parsed = json.loads(val)
+                        if isinstance(parsed, list):
+                            return {str(c).strip().upper() for c in parsed if str(c).strip()}
+                    except Exception:
+                        pass
+                    return {c.strip().upper() for c in re.split(r"[,\s]+", val) if c.strip()}
+                elif isinstance(val, list):
+                    return {str(c).strip().upper() for c in val if str(c).strip()}
+        return None
 
     # 1. Eliminate host namespaces
     if pod_spec.pop("hostNetwork", None):
@@ -79,9 +116,15 @@ def remediate_workload_dict(data: Dict[str, Any]) -> Tuple[Dict[str, Any], List[
         pod_sec["seccompProfile"] = {"type": "RuntimeDefault"}
         changes_applied.append("Applied RuntimeDefault seccomp profile")
 
-    # 3. Container-level hardening
+    # 3. Container-level hardening & Safe Volume Padding
     containers = pod_spec.get("containers", [])
-    has_empty_dir = False
+    needed_volumes: Dict[str, Dict[str, Any]] = {}
+
+    pad_enabled = (
+        top_annotations.get("sec.k8s.io/safe-volume-padding", "true").lower() != "false"
+        and template_annotations.get("sec.k8s.io/safe-volume-padding", "true").lower() != "false"
+    )
+
     for c in containers:
         c_name = c.get("name", "container")
         c_sec = c.setdefault("securityContext", {})
@@ -91,23 +134,65 @@ def remediate_workload_dict(data: Dict[str, Any]) -> Tuple[Dict[str, Any], List[
         if c_sec.get("allowPrivilegeEscalation") is not False:
             c_sec["allowPrivilegeEscalation"] = False
             changes_applied.append(f"Disabled allowPrivilegeEscalation on '{c_name}'")
-        if not c_sec.get("readOnlyRootFilesystem"):
+
+        was_readonly = c_sec.get("readOnlyRootFilesystem", False)
+        if not was_readonly:
             c_sec["readOnlyRootFilesystem"] = True
-            c.setdefault("volumeMounts", []).extend([
-                {"name": "tmp-storage", "mountPath": "/tmp"},
-                {"name": "var-run", "mountPath": "/var/run"}
-            ])
-            has_empty_dir = True
             changes_applied.append(f"Enforced readOnlyRootFilesystem on '{c_name}'")
 
+        # Safe Volume Padding: ensure scratchpads exist without duplicate mountPaths
+        if pad_enabled:
+            volume_mounts = c.setdefault("volumeMounts", [])
+            existing_mount_paths = {
+                str(m.get("mountPath", "")).rstrip("/")
+                for m in volume_mounts if isinstance(m, dict) and m.get("mountPath")
+            }
+            target_padding = [
+                ("/tmp", "tmp-storage"),
+                ("/var/run", "var-run"),
+            ]
+            for m_path, v_name in target_padding:
+                if m_path.rstrip("/") not in existing_mount_paths:
+                    volume_mounts.append({"name": v_name, "mountPath": m_path})
+                    existing_mount_paths.add(m_path.rstrip("/"))
+                    needed_volumes[v_name] = {"name": v_name, "emptyDir": {}}
+
+        # Capability handling with Workload Whitelist Support
         caps = c_sec.setdefault("capabilities", {})
-        caps["drop"] = ["ALL"]
-        if "NET_ADMIN" in caps.get("add", []):
-            caps["add"].remove("NET_ADMIN")
-            changes_applied.append(f"Removed risky capability NET_ADMIN on '{c_name}'")
-        if not caps.get("add"):
-            caps.pop("add", None)
-        changes_applied.append(f"Dropped ALL Linux capabilities on '{c_name}'")
+        whitelist = _extract_whitelist(template_annotations, c_name) or _extract_whitelist(top_annotations, c_name)
+
+        has_any_whitelist = any(
+            k.startswith("sec.k8s.io/allowed-caps") or k.startswith("security.k8s.io/allowed-capabilities")
+            for k in list(top_annotations.keys()) + list(template_annotations.keys())
+        )
+        if whitelist is None and has_any_whitelist:
+            whitelist = set()
+
+        existing_add = caps.get("add", [])
+        if whitelist is not None:
+            # Whitelist mode: preserve whitelisted capabilities, drop dangerous capabilities
+            allowed_add = [c_item for c_item in existing_add if c_item.upper() in whitelist]
+            dropped_add = [c_item for c_item in existing_add if c_item.upper() not in whitelist]
+            caps["drop"] = ["ALL"]
+            if allowed_add:
+                caps["add"] = sorted(list(set(allowed_add)))
+                changes_applied.append(
+                    f"Preserved whitelisted capability(ies) {', '.join(caps['add'])} on '{c_name}' via sec.k8s.io/allowed-caps"
+                )
+            else:
+                caps.pop("add", None)
+            if dropped_add:
+                changes_applied.append(f"Dropped unwhitelisted capability(ies) {', '.join(dropped_add)} on '{c_name}'")
+            changes_applied.append(f"Dropped ALL Linux capabilities on '{c_name}'")
+        else:
+            # Default least-privilege mode: drop ALL, remove NET_ADMIN / unneeded additions
+            caps["drop"] = ["ALL"]
+            if "NET_ADMIN" in caps.get("add", []):
+                caps["add"].remove("NET_ADMIN")
+                changes_applied.append(f"Removed risky capability NET_ADMIN on '{c_name}'")
+            if not caps.get("add"):
+                caps.pop("add", None)
+            changes_applied.append(f"Dropped ALL Linux capabilities on '{c_name}'")
 
         # Clean hostPort if present
         for port in c.get("ports", []):
@@ -122,12 +207,14 @@ def remediate_workload_dict(data: Dict[str, Any]) -> Tuple[Dict[str, Any], List[
             res["requests"] = {"cpu": "50m", "memory": "64Mi"}
             changes_applied.append(f"Configured CPU & memory resource limits on '{c_name}'")
 
-    if has_empty_dir:
+    # Safe volume registration without duplicates
+    if needed_volumes:
         vols = pod_spec.setdefault("volumes", [])
-        vols.extend([
-            {"name": "tmp-storage", "emptyDir": {}},
-            {"name": "var-run", "emptyDir": {}}
-        ])
+        existing_vol_names = {v.get("name") for v in vols if isinstance(v, dict)}
+        for v_name, v_def in needed_volumes.items():
+            if v_name not in existing_vol_names:
+                vols.append(v_def)
+                existing_vol_names.add(v_name)
 
     return hardened, changes_applied
 
