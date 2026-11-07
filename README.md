@@ -3,7 +3,7 @@
 [![CI Security Gate](https://github.com/Jayanthanayak/K8S-security-assessment/actions/workflows/k8s_security_gate.yml/badge.svg)](https://github.com/Jayanthanayak/K8S-security-assessment/actions)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-green.svg)](LICENSE)
-[![Tests: 604 Passed](https://img.shields.io/badge/tests-604%20passed-brightgreen.svg)](run_test.sh)
+[![Tests: 629 Passed](https://img.shields.io/badge/tests-629%20passed-brightgreen.svg)](run_test.sh)
 [![Model 11 Accuracy: 100%](https://img.shields.io/badge/Model%2011%20Zero--Shot-100%25-success.svg)](models/)
 [![Helm Lint: Clean](https://img.shields.io/badge/Helm%20Chart-v2.0.0-informational.svg)](charts/k8s-security/)
 
@@ -61,13 +61,17 @@ flowchart TD
 
 ## Architectural Highlights
 
-1. **Native AST Security Scanner (56 Rules, V01–V56)**
+1. **Native AST Security Scanner & Proprietary IP Engines (56 Rules, V01–V56)**
    - Pure Python, zero-external-binary AST evaluation across 8 security planes.
    - Operates in **2 to 8 milliseconds** per workload (1,000x to 3,000x faster than Kubescape or Trivy).
-   - Shannon entropy secret scanning ($H > 3.8$) detecting leaked keys, JWTs, and cloud credentials.
+   - **Cross-Resource Attack Path DAG Engine:** Traces multi-hop lateral movement paths across decoupled entities (Ingress $\to$ Service $\to$ Pod $\to$ ServiceAccount $\to$ RBAC $\to$ Secret / Host Linux Kernel).
+   - **Mathematical Blast Radius Formulation ($\mathcal{B} \in [0.0, 100.0]$):** Closed-form graph metric modeling reachability decay, crown jewel valuation, and kernel breakout severity.
+   - **Supply Chain Typosquatting Auditing:** Levenshtein distance analysis ($d \le 2$) preventing container image spoofing attacks (`ng1nx`, `red1s`, `ubuntuu`) against verified base libraries.
+   - **Shannon Entropy Secret Detection ($H > 3.8$):** Detects cryptographic tokens, private keys, and cloud API credentials across manifests and image layers.
 2. **Hybrid Container Layer & Deep OS Package Scanner**
    - Live Docker daemon streaming: pipes `docker save <image>` directly into an in-memory `BytesIO` buffer, eliminating multi-gigabyte disk thrashing.
    - Pure-Python layer unpacker parsing `/var/lib/dpkg/status` (Debian/Ubuntu), `/lib/apk/db/installed` (Alpine), and `requirements.txt` in **< 600 ms**.
+   - **ELF Binary Symbol Parsing:** Inspects statically linked Go `.go.buildinfo` dependencies and Rust `cargo-auditable` embedded JSON tables in distroless/scratch containers.
 3. **Embedded SQLite CVE Threat Engine & Feed Synchronizer**
    - High-speed embedded SQLite database (`data/cve_database.sqlite`) indexing 349+ CVEs with microsecond query latency.
    - Synchronizes delta feeds from OSV.dev (aggregating NVD 2.0, GHSA, Debian Security Tracker, and Alpine SecDB).

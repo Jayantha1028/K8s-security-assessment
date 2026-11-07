@@ -70,6 +70,70 @@ def shannon_entropy(data: str) -> float:
     return entropy
 
 
+# Canonical container library base images for supply chain typosquatting auditing
+CANONICAL_LIBRARY_IMAGES = {
+    "nginx", "redis", "busybox", "alpine", "ubuntu", "debian", "postgres",
+    "mysql", "node", "golang", "python", "traefik", "memcached", "rabbitmq",
+    "consul", "vault", "elasticsearch", "envoy", "etcd", "prometheus", "grafana",
+    "coredns", "fluentd", "k8s-device-plugin"
+}
+
+
+def levenshtein_distance(s1: str, s2: str) -> int:
+    """Compute Levenshtein edit distance between two strings."""
+    if len(s1) < len(s2):
+        return levenshtein_distance(s2, s1)
+    if len(s2) == 0:
+        return len(s1)
+    prev = list(range(len(s2) + 1))
+    for i, c1 in enumerate(s1):
+        curr = [i + 1] * (len(s2) + 1)
+        for j, c2 in enumerate(s2):
+            curr[j + 1] = min(
+                prev[j + 1] + 1,
+                curr[j] + 1,
+                prev[j] + (0 if c1 == c2 else 1)
+            )
+        prev = curr
+    return prev[len(s2)]
+
+
+def check_image_typosquatting(image: str) -> Tuple[bool, Optional[str], int]:
+    """
+    Detect if an image name is a typosquatting candidate against canonical base images.
+    Returns (is_typosquat, canonical_target, distance).
+    """
+    if not image:
+        return False, None, 0
+    # Strip digest first (@sha256:...)
+    no_digest = image.split("@")[0]
+    # Isolate the repository name from registry/domain/port prefix
+    last_slash = no_digest.rfind("/")
+    repo_and_tag = no_digest[last_slash + 1:] if last_slash != -1 else no_digest
+    # Strip tag (:tag)
+    base_name = repo_and_tag.split(":")[0].lower().strip()
+    if not base_name or base_name in CANONICAL_LIBRARY_IMAGES:
+        return False, None, 0
+
+    if len(base_name) < 4:
+        return False, None, 0
+
+    best_match = None
+    min_dist = 999
+    for canonical in CANONICAL_LIBRARY_IMAGES:
+        dist = levenshtein_distance(base_name, canonical)
+        if dist == 0:
+            return False, None, 0
+        if dist == 1 or (dist == 2 and len(canonical) >= 6 and len(base_name) >= 6):
+            if dist < min_dist:
+                min_dist = dist
+                best_match = canonical
+
+    if best_match is not None:
+        return True, best_match, min_dist
+    return False, None, 0
+
+
 @dataclass
 class Finding:
     vuln_id: str
@@ -90,6 +154,9 @@ class ScanReport:
     compliance_score: float = 100.0
     features: Dict[str, float] = field(default_factory=dict)
     risk_tier: str = "Low"
+    blast_radius: float = 0.0
+    kill_chains: List[Dict[str, Any]] = field(default_factory=list)
+    attack_graph_mermaid: str = ""
 
     @property
     def features_17(self) -> Dict[str, float]:
@@ -115,6 +182,9 @@ class ScanReport:
         d = asdict(self)
         d["detected_vuln_ids"] = sorted(list(self.detected_vuln_ids))
         d["feature_vector_dimension"] = len(self.features)
+        d["blast_radius"] = self.blast_radius
+        d["kill_chains"] = self.kill_chains
+        d["attack_graph_mermaid"] = self.attack_graph_mermaid
         return d
 
 
@@ -296,6 +366,34 @@ class NativeSecurityScanner:
                 reports.append(self.scan_file(str(file)))
         return reports
 
+    def build_directory_attack_graph(self, dirpath: str, recursive: bool = True):
+        """Build a unified cross-file Attack Path DAG across all YAML manifests in a directory."""
+        try:
+            from scanners.attack_graph import AttackGraphEngine
+        except ImportError:
+            from attack_graph import AttackGraphEngine
+        p = Path(dirpath)
+        pattern = "**/*.y*ml" if recursive else "*.y*ml"
+        all_docs = []
+        for file in sorted(p.glob(pattern)):
+            if file.is_file() and not file.name.startswith("."):
+                try:
+                    content = file.read_text(encoding="utf-8", errors="replace")
+                    for doc in yaml.safe_load_all(content):
+                        if isinstance(doc, dict):
+                            all_docs.append(doc)
+                except Exception:
+                    pass
+        return AttackGraphEngine().build_from_documents(all_docs)
+
+    @staticmethod
+    def levenshtein_distance(s1: str, s2: str) -> int:
+        return levenshtein_distance(s1, s2)
+
+    @staticmethod
+    def check_image_typosquatting(image: str) -> Tuple[bool, Optional[str], int]:
+        return check_image_typosquatting(image)
+
     def _audit_documents(self, docs: List[Dict[str, Any]], report: ScanReport):
         has_network_policy = any(d.get("kind") == "NetworkPolicy" for d in docs)
         has_workload = False
@@ -327,6 +425,20 @@ class NativeSecurityScanner:
                 desc="Workload deployed without active default-deny NetworkPolicy",
                 remed="Apply default-deny NetworkPolicy restricting ingress and egress",
             )
+
+        # Cross-resource Attack Path DAG & Blast Radius synthesis
+        try:
+            try:
+                from scanners.attack_graph import AttackGraphEngine
+            except ImportError:
+                from attack_graph import AttackGraphEngine
+            graph_engine = AttackGraphEngine().build_from_documents(docs)
+            report.blast_radius = graph_engine.calculate_cluster_blast_radius()
+            chains = graph_engine.find_kill_chains()
+            report.kill_chains = [c.to_dict() for c in chains]
+            report.attack_graph_mermaid = graph_engine.to_mermaid()
+        except Exception:
+            pass
 
     def _extract_pod_spec(self, doc: Dict[str, Any]) -> Dict[str, Any]:
         kind = doc.get("kind", "")
@@ -465,6 +577,15 @@ class NativeSecurityScanner:
                 self._add_finding(report, "V21", target=c_target,
                                   desc="Risky ImagePullPolicy (IfNotPresent with mutable tags)",
                                   remed="Set imagePullPolicy: Always when using mutable tags")
+
+            # Image Typosquatting Check (Levenshtein Supply Chain Spoofing)
+            is_typo, canonical_img, dist = self.check_image_typosquatting(image)
+            if is_typo:
+                self._add_finding(
+                    report, "V15", target=c_target,
+                    desc=f"Potential image typosquatting attack: '{image}' closely resembles official library image '{canonical_img}' (Levenshtein distance {dist}). Verify image authenticity and source registry.",
+                    remed=f"Verify supply chain integrity and replace with verified official image '{canonical_img}'"
+                )
 
             # Native CVE Intelligence & Deep Layer Unpacking
             try:
