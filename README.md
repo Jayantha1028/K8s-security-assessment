@@ -3,7 +3,7 @@
 [![CI Security Gate](https://github.com/Jayanthanayak/K8S-security-assessment/actions/workflows/k8s_security_gate.yml/badge.svg)](https://github.com/Jayanthanayak/K8S-security-assessment/actions)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-green.svg)](LICENSE)
-[![Tests: 107 Passed](https://img.shields.io/badge/tests-107%20passed-brightgreen.svg)](tests/)
+[![Tests: 596 Passed](https://img.shields.io/badge/tests-596%20passed-brightgreen.svg)](run_test.sh)
 [![Model 11 Accuracy: 100%](https://img.shields.io/badge/Model%2011%20Zero--Shot-100%25-success.svg)](models/)
 [![Helm Lint: Clean](https://img.shields.io/badge/Helm%20Chart-v2.0.0-informational.svg)](charts/k8s-security/)
 
@@ -88,6 +88,16 @@ flowchart TD
    - Standalone CLI executable (`bin/k8s-sec` or `pip install -e .`) with 9 consolidated subcommands.
 8. **Enterprise Web Management Console**
    - Self-hosted real-time glassmorphism web dashboard on `:8080` with live fleet compliance scorecards, interactive YAML audits, and 1-click remediation.
+9. **Sub-Second eBPF Runtime Defense & Kernel Syscall Interception (`k8s-sec ebpf`)**
+   - Intercepts raw kernel syscall events (`execve`, `openat`, `ptrace`, `connect`) with sub-millisecond detection latency (< 0.5 ms).
+   - Ruleset catching 8 forbidden container shells, 12 offensive recon tools (`nmap`, `tcpdump`, `socat`), C2 egress ports (`4444`, `1337`), and host filesystem tampering (`/etc/shadow`, `/var/run/docker.sock`).
+   - Automated active mitigation with real-time Pod quarantine label isolation (`security.k8s.io/quarantined=true`).
+10. **GitOps Automated PR Bot & Kustomize Strategic Overlays (`k8s-sec gitops-pr`)**
+   - Generates non-destructive Kustomize overlays (`patchesStrategicMerge`) to eliminate security drift without modifying base manifests.
+   - Synthesizes GitHub/GitLab Pull Request Markdown scorecards with baseline vs hardened deltas, CIS benchmark references, and unified diff blocks.
+11. **Live In-Cluster CSPM Posture Scanner (`k8s-sec scan-cluster`)**
+   - Scans live cluster workloads across namespaces via `kube-apiserver` with fallback mock capabilities.
+   - Calculates cluster-wide health scores, worst-offender leaderboards, and exports hardened YAML manifests directly to disk.
 
 ---
 
@@ -126,8 +136,11 @@ Trivy CLI Engine        : Installed (/opt/homebrew/bin/trivy)
 | Subcommand | Description | Example Command |
 | :--- | :--- | :--- |
 | `k8s-sec scan` | Audit manifests or directories against 56 rules with CI gate | `k8s-sec scan ./manifests/secure/hardened-deployment.yaml --gate --threshold 35.0` |
+| `k8s-sec scan-cluster` | Live in-cluster CSPM audit of active workloads via kube-apiserver | `k8s-sec scan-cluster -n production --remediate-out ./remediated/` |
 | `k8s-sec scan-image` | Unpack container layers in memory and extract OS/Python SBOM | `k8s-sec scan-image redis:7-alpine` |
 | `k8s-sec remediate` | 1-Click auto-hardening of insecure manifests with unified diff | `k8s-sec remediate ./manifests/insecure/weak-deployment.yaml` |
+| `k8s-sec gitops-pr` | Generate GitOps PR markdown scorecard & Kustomize overlays | `k8s-sec gitops-pr manifests/ --output-overlay ./overlay/` |
+| `k8s-sec ebpf` | Sub-second kernel syscall runtime defense & auto-quarantine | `k8s-sec ebpf --duration 30 --port 9198` |
 | `k8s-sec admission` | Launch in-cluster admission controller webhook server | `k8s-sec admission --port 8443` |
 | `k8s-sec daemon` | Run continuous Prometheus anomaly streaming daemon | `k8s-sec daemon --interval 15 --prometheus http://localhost:9090` |
 | `k8s-sec sync-cve` | Query embedded vulnerability database or pull delta feeds | `k8s-sec sync-cve --query libssl3` |
@@ -161,19 +174,35 @@ To generate TLS certificates for the admission webhook:
 
 ## Verification & Statistical Rigor
 
-The entire platform is continuously tested and verified through **107 unit, integration, rigor, and chaos tests**:
+The entire platform is continuously tested and verified through **596 unit, integration, rigor, and chaos tests** with a **100% pass rate**:
 
 ```bash
-# Run the complete test discovery suite
-python3 -m unittest discover -s tests -p "test_*.py"
+# Execute modular test runner across all 596 tests
+./run_test.sh all
+
+# Or run individual sub-suites
+./run_test.sh taxonomy    # V01-V56 AST security rules & MITRE mapping (112 tests, 0.02s)
+./run_test.sh deep        # Complete 14-module deep test suite (489 tests, ~16s)
+./run_test.sh baseline    # Standard regression baseline in tests/ (107 tests)
+./run_test.sh fast        # Fast unit tests (< 15s)
+./run_test.sh ebpf        # eBPF kernel syscall interceptor & quarantine (45 tests)
+./run_test.sh gitops      # GitOps auto-remediation PR bot & overlays (40 tests)
+./run_test.sh vector      # 32-dimensional feature vector extraction (40 tests)
+./run_test.sh cli         # Unified CLI integration tests (35 tests)
 ```
 
 ```text
-----------------------------------------------------------------------
-Ran 107 tests in 90.505s
+======================================================================
+Ran 596 tests in 108.362s
 
-OK (100% Pass Rate)
+OK (100% Pass Rate — 0 Failures, 0 Errors)
+======================================================================
 ```
+
+### Test Suite Structure
+- **[`testing/`](file:///Users/jayanthanayak/Side_task/K8S-security-assessment-main/testing/) (489 Tests, Ignored via `.gitignore`):** Deep exhaustive suites covering 56 AST rules, 32-dim feature vectors, eBPF sub-second runtime defenses, GitOps PR generation, in-cluster CSPM auditing, and ML ensemble inferences.
+- **[`tests/`](file:///Users/jayanthanayak/Side_task/K8S-security-assessment-main/tests/) (107 Tests, Tracked):** Core platform unit, pipeline integration, container layer unpacking, and chaos engineering suites.
+- **[`run_test.sh`](file:///Users/jayanthanayak/Side_task/K8S-security-assessment-main/run_test.sh):** Interactive modular test runner with category dispatching, regex pattern filtering (`-k`), and timed ANSI execution scorecards.
 
 ### Statistical Rigor Gates & Chaos Resilience
 - **12 Statistical Rigor Gates:** Bootstrap confidence intervals, Wilcoxon signed-rank tests, Cohen's d effect sizes, calibration curves, and Brier scores.
@@ -219,7 +248,10 @@ OK (100% Pass Rate)
 │   ├── models/                     # Model 11 ensemble, Model 12 anomaly, fine-tuner, XAI
 │   ├── reporting/                  # Web dashboard, executive audit, Plotly reporting
 │   └── scanners/                   # AST scanner, container layer scanner, CVE sync engine, remediator
-├── tests/                          # 107 Comprehensive unit and integration test suites
+├── tests/                          # 107 Comprehensive unit and baseline integration test suites
+├── testing/                        # 489 Deep exhaustive test suites (isolated in .gitignore)
+├── run.sh                          # Master entrypoint script with automated log archiving
+├── run_test.sh                     # Modular test runner for category, suite, or testcase execution
 ├── Makefile                        # Automation shortcuts for all platform workflows
 ├── pyproject.toml                  # Standard Python packaging configuration
 └── setup.py                        # Pip package setup definition

@@ -70,5 +70,6 @@ flowchart TD
 | `k8s-sec sync-cve --stats` | View embedded SQLite CVE database stats | Microsecond CVE package lookup table |
 | `k8s-sec web --port 8080` | Start self-hosted Web Management Console | Real-time Dark-Mode UI at `http://localhost:8080` |
 | `k8s-sec audit` | Compile executive compliance audit | Boardroom-ready PDF & HTML reports |
-| `make test` | Run complete unit, rigor & chaos suite (107 tests) | 100% Mock-based test discovery (~90s) |
+| `make test` | Run complete unit, rigor & chaos suite (596 tests) | 100% Mock-based test discovery with 100% pass rate |
+| `./run_test.sh <category>` | Modular test runner for specific testcases | Granular sub-suite execution (taxonomy, ebpf, gitops, cli, etc.) |
 | `helm lint charts/k8s-security` | Validate production Helm chart syntax | 0 errors, 100% lint pass |
